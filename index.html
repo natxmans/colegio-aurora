@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es" translate="no" class="notranslate">
+<head>
+<meta charset="utf-8" />
+<meta name="google" content="notranslate" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Colegio Aurora · Nuestro colegio ideal</title>
+<meta name="description" content="Colegio Aurora: nuestro colegio-internado ideal en España. Maqueta 3D interactiva." />
+<meta name="theme-color" content="#050816" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23050816'/%3E%3Cpath d='M17 50 L32 13 L47 50' fill='none' stroke='%2322d3ee' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 39 Q32 29 42 39' fill='none' stroke='%233d8bff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://esm.sh" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="css/estilos.css" />
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react-dom": "https://esm.sh/react-dom@18.3.1?external=react",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?external=react",
+    "three": "https://esm.sh/three@0.169.0",
+    "three/": "https://esm.sh/three@0.169.0/",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.10?external=react,react-dom,three",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@9.114.0?external=react,react-dom,three,@react-three/fiber",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body>
+<div id="cargador" role="status" aria-live="polite">
+  <div class="carg-fondo"></div>
+  <div class="carg-centro">
+    <svg class="carg-logo" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+      <path d="M17 50 L32 13 L47 50" fill="none" stroke="url(#cg)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 39 Q32 29 42 39" fill="none" stroke="#3d8bff" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="32" cy="34" r="2.6" fill="#22d3ee"/>
+    </svg>
+    <div class="carg-nombre">COLEGIO AURORA</div>
+    <div class="carg-sub">Colegio-internado del futuro · España</div>
+    <div class="carg-barra"><span id="carg-progreso"></span></div>
+    <div class="carg-msg" id="carg-msg">Preparando el campus…</div>
+    <div class="carg-error" id="carg-error" hidden>
+      <p id="carg-error-txt"></p>
+      <button type="button" onclick="location.reload()">Volver a intentar</button>
+    </div>
+  </div>
+</div>
+<div id="raiz"></div>
+<noscript><p style="color:#fff;padding:2rem;font-family:sans-serif">Activa JavaScript para ver la maqueta 3D del Colegio Aurora.</p></noscript>
+<script>
+(function () {
+  var msgs = ['Preparando el campus…', 'Construyendo las aulas…', 'Colocando los pupitres…', 'Llegan los alumnos…', 'Encendiendo las luces LED…', 'Llenando la piscina…', 'Plantando los árboles…'];
+  var i = 0, p = 4;
+  var el = document.getElementById('carg-msg'), bar = document.getElementById('carg-progreso');
+  window.__cargaTimer = setInterval(function () {
+    i = (i + 1) % msgs.length; el.textContent = msgs[i];
+    p = Math.min(94, p + (94 - p) * 0.16); bar.style.width = p + '%';
+  }, 850);
+  window.__listo = function () {
+    if (window.__yaListo) return; window.__yaListo = true;
+    clearInterval(window.__cargaTimer); bar.style.width = '100%'; el.textContent = '¡Bienvenidos!';
+    setTimeout(function () { var c = document.getElementById('cargador'); if (c) c.classList.add('oculto'); }, 450);
+    setTimeout(function () { var c = document.getElementById('cargador'); if (c) c.remove(); }, 1500);
+  };
+  window.__error = function (txt) {
+    clearInterval(window.__cargaTimer);
+    var b = document.getElementById('carg-error'); if (!b) return;
+    document.getElementById('carg-error-txt').textContent = txt; b.hidden = false;
+    el.textContent = ''; bar.parentNode.style.display = 'none';
+  };
+  if (location.protocol === 'file:') {
+    window.__error('Para ver la maqueta 3D, abre el sitio con el archivo «LANCER-LE-SITE.bat» (o publícalo en Internet). Un archivo abierto directamente no puede cargar la escena 3D.');
+  }
+})();
+</script>
+<script type="module">
+  if (location.protocol !== 'file:') {
+    import('./js/main.js').catch(function (e) {
+      console.error(e);
+      window.__error('No se ha podido cargar la maqueta 3D. Comprueba la conexión a Internet y vuelve a intentarlo.');
+    });
+  }
+</script>
+</body>
+</html>
