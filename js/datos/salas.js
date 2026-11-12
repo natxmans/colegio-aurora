@@ -20,7 +20,8 @@ export const ZONAS = {
 };
 
 // Caja que contiene todo el campus (para encuadrar la cámara)
-export const CAMPUS = { x0: -66, x1: 106, z0: -66, z1: 54, y0: 0, y1: 12 };
+// Campus COMPACTO: los edificios ocupan la mayor parte del terreno
+export const CAMPUS = { x0: -52, x1: 74, z0: -70, z1: 50, y0: 0, y1: 12 };
 
 const L = [];
 function sala(o) {
@@ -36,7 +37,7 @@ function zona(o) { const s = { y: 0, ...o }; L.push(s); return s; }
 const AZUL = '#1f4e9a', MARINO = '#14285a', ARENA = '#c9a978';
 sala({ id: 'mates', planta: 'baja', fila: 'norte', x0: -32, x1: -24, tipo: 'aula', materia: 'mates', color: '#2a62b8',
   nombre: 'Aula de matemáticas', corto: 'Matemáticas',
-  desc: 'En esta aula estudiamos matemáticas. Cada alumno tiene una mesa y un ordenador. En la pizarra digital hay fórmulas.',
+  desc: 'En esta aula estudiamos matemáticas. Hay mesas individuales y ordenadores. En la pizarra digital hay fórmulas.',
   hay: ['la pizarra digital', 'las mesas', 'los ordenadores', 'las sillas', 'las figuras geométricas'] });
 sala({ id: 'frances', planta: 'baja', fila: 'norte', x0: -24, x1: -16, tipo: 'aula', materia: 'frances', color: '#3b5fa8',
   nombre: 'Aula de francés', corto: 'Francés',
@@ -60,8 +61,8 @@ sala({ id: 'fisica', planta: 'baja', fila: 'norte', x0: 8, x1: 16, tipo: 'aula',
   hay: ['los tubos de ensayo', 'la tabla periódica', 'el átomo', 'la vitrina', 'los ordenadores'] });
 sala({ id: 'tecno', planta: 'baja', fila: 'norte', x0: 16, x1: 24, tipo: 'aula', materia: 'tecno', color: '#5b5fa8',
   nombre: 'Aula de tecnología', corto: 'Tecnología',
-  desc: 'En el aula de tecnología usamos ordenadores, una impresora 3D y un brazo robótico.',
-  hay: ['los ordenadores', 'la impresora 3D', 'el brazo robótico', 'los robots', 'el dron'] });
+  desc: 'En el aula de tecnología usamos los ordenadores y hacemos proyectos en equipo.',
+  hay: ['los ordenadores', 'la pizarra digital', 'las mesas', 'las herramientas', 'los proyectos'] });
 sala({ id: 'musica', planta: 'baja', fila: 'norte', x0: 24, x1: 32, tipo: 'aula', materia: 'musica', color: '#8a4f8f',
   nombre: 'Aula de música', corto: 'Música',
   desc: 'Nos encanta el aula de música. Hay un piano, una batería y guitarras. Cantamos y tocamos juntos.',
@@ -74,7 +75,7 @@ sala({ id: 'biblioteca', planta: 'baja', fila: 'sur', x0: -32, x1: -4, tipo: 'bi
   hay: ['las estanterías', 'los libros', 'los ordenadores', 'las mesas de estudio', 'los sillones'] });
 sala({ id: 'entrada', planta: 'baja', fila: 'sur', x0: -4, x1: 4, tipo: 'recepcion', color: MARINO,
   nombre: 'Entrada', corto: 'Entrada',
-  desc: 'Es la entrada del colegio. Aquí está la escalera: sube al primer piso, donde están los dormitorios.',
+  desc: 'Aquí recibimos a las familias y a los visitantes. La escalera sube al primer piso, donde están los dormitorios.',
   hay: ['la escalera', 'el logo del colegio', 'el mostrador', 'los sofás', 'las plantas'] });
 sala({ id: 'comedor', planta: 'baja', fila: 'sur', x0: 4, x1: 32, tipo: 'comedor', color: '#b9863b',
   nombre: 'Comedor', corto: 'Comedor',
@@ -101,7 +102,7 @@ for (let i = 0; i < 10; i++) {
 });
 sala({ id: 'salon1', planta: 'primer', fila: 'sur', x0: -4, x1: 4, tipo: 'descanso', color: '#4f8a4a',
   nombre: 'Salón de descanso', corto: 'Salón de descanso',
-  desc: 'Aquí llega la escalera. Es un salón tranquilo con sofás, cojines y plantas para descansar.',
+  desc: 'Es un salón tranquilo con sofás, cojines y plantas para descansar. Aquí llega la escalera.',
   hay: ['la escalera', 'los sofás', 'los cojines', 'las plantas', 'la estantería'] });
 sala({ id: 'salon2', planta: 'primer', fila: 'sur', x0: 4, x1: 20, tipo: 'salon', color: '#6b5a8e',
   nombre: 'Salón común', corto: 'Salón común',
@@ -116,38 +117,38 @@ zona({ id: 'edificio', planta: 'edif', x0: -32, x1: 32, z0: -11, z1: 11, h: 8.3,
   cam: { pos: [-30, 30, 50], mira: [0, 3, 0] } });
 
 // ---------------- COMPLEJO DEPORTIVO ----------------
-zona({ id: 'gimnasio', planta: 'deporte', x0: 38, x1: 66, z0: -12, z1: 12, h: 10, color: '#2a7ab0',
+zona({ id: 'gimnasio', planta: 'deporte', x0: 35, x1: 63, z0: -12, z1: 12, h: 10, color: '#2a7ab0',
   nombre: 'Gimnasio', corto: 'Gimnasio',
   desc: 'Tenemos un gran gimnasio cubierto y moderno. Hacemos educación física, gimnasia y deportes de equipo.',
   hay: ['la pista', 'las canastas', 'las gradas', 'las colchonetas', 'el marcador'],
-  cam: { pos: [62, 26, 30], mira: [52, 1, 0] }, interior: { ojo: [40.5, 4, 9], mira: [53, 1.5, -1] } });
-zona({ id: 'piscina', planta: 'deporte', x0: 72, x1: 102, z0: -36, z1: 24, h: 12, color: '#1f7ab8',
+  cam: { pos: [57, 30, 34], mira: [49, 1, -1] }, interior: { ojo: [37.5, 4, 9], mira: [50, 1.5, -1] } });
+zona({ id: 'piscina', planta: 'deporte', x0: 10, x1: 70, z0: 15, z1: 45, h: 12, color: '#1f7ab8',
   nombre: 'Piscina olímpica', corto: 'Piscina olímpica',
   desc: 'Hay una piscina olímpica cubierta y climatizada de cincuenta metros. ¡Podemos nadar todo el año!',
   hay: ['la piscina', 'las calles', 'las gradas', 'el techo de cristal', 'el socorrista'],
-  cam: { pos: [108, 34, 32], mira: [87, 0, -6] }, interior: { ojo: [74.5, 3.5, 21], mira: [87, 0, -10] } });
-zona({ id: 'baloncesto', planta: 'deporte', x0: 36, x1: 66, z0: -46, z1: -24, h: 4, color: '#c46a2e',
+  cam: { pos: [40, 36, 70], mira: [40, 0, 30] }, interior: { ojo: [13, 3.5, 25], mira: [44, 0, 31] } });
+zona({ id: 'baloncesto', planta: 'deporte', x0: 35, x1: 65, z0: -37, z1: -17, h: 4, color: '#c46a2e',
   nombre: 'Cancha de baloncesto', corto: 'Baloncesto',
   desc: 'En la cancha de baloncesto jugamos en equipo durante el recreo y después de las clases.',
   hay: ['las canastas', 'la cancha', 'el balón', 'los bancos'],
-  cam: { pos: [51, 22, -10], mira: [51, 0, -35] } });
-zona({ id: 'futbol', planta: 'deporte', x0: -36, x1: 32, z0: -64, z1: -16, h: 4, color: '#3f8a4a',
+  cam: { pos: [50, 22, -2], mira: [50, 0, -27] } });
+zona({ id: 'futbol', planta: 'deporte', x0: -35, x1: 33, z0: -67, z1: -15, h: 4, color: '#3f8a4a',
   nombre: 'Campo de fútbol', corto: 'Campo de fútbol',
   desc: 'Jugamos al fútbol en un gran campo de césped. Hay porterías y gradas para mirar los partidos.',
   hay: ['el césped', 'las porterías', 'las gradas', 'el balón', 'los focos'],
-  cam: { pos: [-2, 46, 4], mira: [-2, 0, -40] } });
+  cam: { pos: [-1, 46, 6], mira: [-1, 0, -37] } });
 
 // ---------------- EXTERIORES ----------------
-zona({ id: 'patio', planta: 'exterior', x0: -32, x1: 32, z0: 13, z1: 44, h: 2, color: '#4f8a4a',
+zona({ id: 'patio', planta: 'exterior', x0: -32, x1: 8, z0: 13, z1: 44, h: 2, color: '#4f8a4a',
   nombre: 'Patio central', corto: 'Patio central',
   desc: 'Es un gran patio con árboles, bancos y una fuente. Durante el recreo, hablamos y descansamos aquí.',
   hay: ['la fuente', 'los olivos', 'los bancos', 'las flores', 'los caminos'],
-  cam: { pos: [0, 26, 70], mira: [0, 0, 28] } });
-zona({ id: 'jardin', planta: 'exterior', x0: -64, x1: -36, z0: -14, z1: 46, h: 2, color: '#5c9a48',
+  cam: { pos: [-12, 26, 68], mira: [-12, 0, 28] } });
+zona({ id: 'jardin', planta: 'exterior', x0: -50, x1: -34, z0: -60, z1: 46, h: 2, color: '#5c9a48',
   nombre: 'Jardines', corto: 'Jardines',
   desc: 'En los jardines hay árboles, flores, caminos y un estanque. Es un lugar muy tranquilo para pasear y leer.',
   hay: ['el estanque', 'los árboles', 'las flores', 'los caminos', 'los bancos'],
-  cam: { pos: [-24, 36, 48], mira: [-50, 0, 14] } });
+  cam: { pos: [-20, 40, 34], mira: [-43, 0, 4] } });
 
 export const SALAS = Object.fromEntries(L.map(s => [s.id, s]));
 export const LISTA = L;
@@ -194,19 +195,19 @@ export function camaraInterior(s) {
 
 // Vistas generales de la cámara ('ajuste' = encuadre automático del campus según la pantalla)
 export const VISTAS = {
-  inicio: { ajuste: 'campus', azimut: -0.42, polar: 0.92, margen: 0.74, desplazar: 0.3 },
-  completa: { ajuste: 'campus', azimut: -0.2, polar: 0.86, margen: 0.94 },
-  baja: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: 0 },
-  primer: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: Y1 },
+  inicio: { ajuste: 'campus', azimut: -0.42, polar: 0.92, margen: 0.64, desplazar: 0.4, fov: 30 },
+  completa: { ajuste: 'campus', azimut: -0.12, polar: 0.98, margen: 0.98, fov: 25 },
+  baja: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: 0, fov: 36 },
+  primer: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: Y1, fov: 36 },
   corte: { pos: [-52, 21, 54], mira: [2, 6.5, 0] },
-  deportes: { ajuste: 'deportes', azimut: -0.35, polar: 0.9, margen: 0.85 },
+  deportes: { ajuste: 'deportes', azimut: 0.62, polar: 0.95, margen: 0.95, fov: 30 },
 };
 
 // Cajas para el encuadre automático
 export const CAJAS = {
-  campus: CAMPUS,
+  campus: { x0: -35, x1: 69, z0: -52, z1: 44, y0: 0, y1: 8 },  // edificios y pistas (el fondo del campo de fútbol puede salir del cuadro)
   edificio: { x0: -33, x1: 33, z0: -12.5, z1: 12.5, y0: 0, y1: 4 },
-  deportes: { x0: 36, x1: 103, z0: -46, z1: 24, y0: 0, y1: 10 },
+  deportes: { x0: -34, x1: 70, z0: -62, z1: 45, y0: 0, y1: 8 },
 };
 
 // Visita guiada (orden de las paradas)

@@ -94,7 +94,7 @@ export function texPizarra(m) {
       g.fillStyle = '#ff7b8f'; g.beginPath(); g.arc(780, 280, 26, 0, 7); g.fill();
     } else if (m === 'tecno') {
       g.font = `500 34px Consolas, monospace`; g.textBaseline = 'middle';
-      const cod = [['si (distancia < 10) {', '#ffffff', 0], ['robot.parar();', '#3ee6ff', 1], ['} si no {', '#ffffff', 0], ['robot.avanzar();', '#3ee6ff', 1], ['}', '#ffffff', 0]];
+      const cod = [['si (nota >= 5) {', '#ffffff', 0], ['aprobado();', '#3ee6ff', 1], ['} si no {', '#ffffff', 0], ['repasar();', '#3ee6ff', 1], ['}', '#ffffff', 0]];
       cod.forEach(([t, c, ind], i) => { g.fillStyle = c; g.fillText(t, 60 + ind * 44, 160 + i * 62); });
       g.strokeStyle = '#b18cff'; g.lineWidth = 3;
       g.strokeRect(700, 160, 220, 220); for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(700 + 22 + i * 44, 160); g.lineTo(700 + 22 + i * 44, 120); g.stroke(); g.beginPath(); g.moveTo(700 + 22 + i * 44, 380); g.lineTo(700 + 22 + i * 44, 420); g.stroke(); }
@@ -148,7 +148,7 @@ export function texPoster(tipo) {
       for (let i = 0; i < 4; i++) { g.strokeRect(80 + i * 95, 500, 40, 60); }
     } else if (tipo === 'programacion') {
       g.font = '500 30px Consolas, monospace'; g.textAlign = 'left';
-      ['<robot>', '  avanzar();', '  girar(90);', '  saludar();', '</robot>'].forEach((t, i) => g.fillText(t, 70, 180 + i * 60));
+      ['<programa>', '  hola();', '  repetir(3);', '  saludar();', '</programa>'].forEach((t, i) => g.fillText(t, 70, 180 + i * 60));
     } else if (tipo === 'espacio') {
       g.beginPath(); g.arc(cx, cy, 90, 0, 7); g.stroke(); g.beginPath(); g.ellipse(cx, cy, 170, 40, -0.3, 0, 7); g.stroke();
       for (let i = 0; i < 40; i++) { g.fillRect((i * 97) % w, (i * 53) % 560 + 40, 3, 3); }
@@ -177,7 +177,7 @@ export function texPantalla(tipo) {
     if (tipo === 'bienvenida') {
       logoA(g, w / 2, 170, 90);
       texto(g, '¡Bienvenidos!', w / 2, 330, 84, '#ffffff', 700, 'center', F, 24);
-      texto(g, 'Colegio Pablo Picasso · Disciplina y arte', w / 2, 420, 38, '#e6d6b8', 500, 'center');
+      texto(g, 'Estudiar · Convivir · Crecer', w / 2, 420, 38, '#e6d6b8', 500, 'center');
     } else if (tipo === 'menu') {
       texto(g, 'Menú del día', 60, 80, 60, '#ffb35c', 700, 'left', F, 14);
       ['Gazpacho andaluz', 'Paella de verduras', 'Tortilla de patatas', 'Fruta fresca', 'Agua y zumo natural'].forEach((t, i) => {
@@ -187,7 +187,7 @@ export function texPantalla(tipo) {
     } else if (tipo === 'codigo') {
       g.font = '500 30px Consolas, monospace'; g.textBaseline = 'middle';
       const r = rnd(4); const cols = ['#7fdcff', '#c4b5fd', '#ffffff', '#4ee6aa', '#ffd36b'];
-      const pal = ['función', 'robot', 'avanzar()', 'girar(90)', 'si', 'repetir', 'variable', 'luz.encender()', 'sensor', 'mientras', '= 10', 'colegio', 'aurora'];
+      const pal = ['función', 'pantalla', 'avanzar()', 'girar(90)', 'si', 'repetir', 'variable', 'luz.encender()', 'sensor', 'mientras', '= 10', 'colegio', 'picasso'];
       for (let i = 0; i < 13; i++) {
         let lin = ''; const n = 2 + Math.floor(r() * 4);
         for (let k = 0; k < n; k++) lin += pal[Math.floor(r() * pal.length)] + ' ';
@@ -306,7 +306,11 @@ export function texLogo() {
 export function texRotuloTexto(t, color = '#14285a') {
   return tex('rtx-' + t + color, 1600, 190, (g, w, h) => {
     g.clearRect(0, 0, w, h);
-    texto(g, t, w / 2, h / 2 + 4, 120, color, 700, 'center', '"Playfair Display", Georgia, serif');
+    // el texto se reduce si es largo, para que nunca se corte
+    const fuente = '"Playfair Display", Georgia, serif';
+    g.font = `700 120px ${fuente}`;
+    const tam = Math.min(120, 120 * (w * 0.95) / Math.max(1, g.measureText(t).width));
+    texto(g, t, w / 2, h / 2 + 4, tam, color, 700, 'center', fuente);
   });
 }
 export function texCruz() {

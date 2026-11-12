@@ -75,7 +75,7 @@ function Hero() {
     <div className="hero-logo"><img src="img/logo-512.png" alt="Logo del Colegio Pablo Picasso" width="150" height="150" /></div>
     <span className="hero-kicker">Proyecto de español (4º) · ${COLEGIO.proyecto}</span>
     <h1>Colegio <span>Pablo Picasso</span></h1>
-    <p className="hero-slogan">${COLEGIO.lema} · <em>Un internado moderno en España</em></p>
+    <p className="hero-slogan">${COLEGIO.lema}<br /><em>Un internado moderno en España</em></p>
     <p className="hero-texto">${COLEGIO.presentacion}</p>
     <div className="hero-botones">
       <button className="btn btn-primario" onClick=${() => abrirExplorador('completa')}><${Icono} n="cubo" />Explorar nuestro colegio</button>
@@ -111,7 +111,7 @@ function Plano() {
 function SeccionColegio() {
   return html`<section className="seccion" id="colegio">
     <${Cabecera} num="01" etiqueta="Nuestro colegio" titulo="Un colegio moderno," grad="limpio y acogedor"
-      lead=${html`El <b>Colegio Pablo Picasso</b> es un internado en España. Los alumnos viven aquí <b>de lunes a viernes</b> y vuelven a casa <b>el fin de semana</b>.`} />
+      lead=${html`El <b>Colegio Pablo Picasso</b> está en España. Tiene un <b>edificio de dos plantas</b>, patios con jardines y un gran <b>complejo deportivo</b>.`} />
     <div className="dos-col">
       <${Foto} src="fachada" alt="La entrada del Colegio Pablo Picasso" className="revelar alta" />
       <${Puntos} items=${PRESENTACION} />
@@ -177,7 +177,7 @@ function SeccionAulas() {
 function SeccionInternado() {
   return html`<section className="seccion" id="internado">
     <${Cabecera} num="03" etiqueta="Nuestro internado" titulo="El primer piso:" grad="los dormitorios"
-      lead=${html`Los alumnos viven en el colegio <b>de lunes a viernes</b>. <b>Todos los dormitorios están en el primer piso.</b>`} />
+      lead=${html`<b>De lunes a viernes</b>, el colegio es también nuestra casa.`} />
     <div className="dos-col">
       <${Foto} src="dormitorio" alt="Una habitación con dos camas, dos escritorios y dos armarios" className="revelar alta" />
       <div>
@@ -287,8 +287,8 @@ function SeccionUniforme() {
     <${Cabecera} num="07" etiqueta="Nuestro uniforme" titulo="El uniforme y" grad="la ropa de diario"
       lead=${html`De <b>lunes a viernes</b> llevamos el uniforme. <b>El fin de semana</b>, en casa, llevamos ropa cómoda.`} />
     <div className="dos-fotos">
-      <figure className="foto-pie revelar"><${Foto} src="uniforme" alt="El uniforme: polo blanco, chaqueta azul marino con el logo, pantalón y zapatos" />
-        <figcaption><b>El uniforme (de lunes a viernes)</b>Un polo blanco con el cuello azul, una chaqueta azul marino con el logo y un pantalón.</figcaption></figure>
+      <figure className="foto-pie revelar"><${Foto} src="uniforme" alt="El uniforme: polo blanco, chaqueta azul marino con el logo, pantalón o falda y zapatos" />
+        <figcaption><b>El uniforme (de lunes a viernes)</b>Un polo blanco con el cuello azul, una chaqueta azul marino con el logo y un pantalón o una falda azul marino.</figcaption></figure>
       <figure className="foto-pie revelar"><${Foto} src="ropa-diario" alt="La ropa de diario: sudadera, vaqueros y zapatillas" />
         <figcaption><b>La ropa de diario (el fin de semana)</b>Ropa cómoda para el fin de semana en casa.</figcaption></figure>
     </div>
@@ -301,7 +301,7 @@ function SeccionUniforme() {
         </div>`)}
         <div className="tarjeta pieza revelar">
           <img src="img/logo-256.png" alt="El logo del colegio" width="54" height="54" className="muestra-logo" />
-          <div><h3>El logo del colegio</h3><p>«Disciplina y arte»: un escudo con un libro, una pluma y una antorcha.</p></div>
+          <div><h3>El logo del colegio</h3><p>Un escudo azul con un libro, una pluma y una antorcha. Está en la chaqueta, a la izquierda del pecho.</p></div>
         </div>
       </div>
     </div>

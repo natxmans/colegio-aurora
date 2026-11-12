@@ -24,8 +24,23 @@ export function poner(p) {
 const suscribir = f => { subs.add(f); return () => subs.delete(f); };
 export function useEstado(sel) { return useSyncExternalStore(suscribir, () => sel(estado)); }
 
+// ¿El navegador puede mostrar 3D (WebGL)? Se comprueba una sola vez
+let _webgl = null;
+export function hayWebGL() {
+  if (_webgl === null) {
+    try {
+      const c = document.createElement('canvas');
+      _webgl = !!(c.getContext('webgl2') || c.getContext('webgl'));
+    } catch (e) { _webgl = false; }
+  }
+  return _webgl;
+}
+
 // Referencia a los controles de cámara (CameraControls de Drei)
-export const camara = { ctrl: null, introHecha: false };
+// fov: ángulo de visión deseado. Las vistas generales usan un ángulo más cerrado (menos
+// deformación: los edificios del fondo no se ven diminutos) y las salas uno más abierto.
+export const FOV_BASE = 45;
+export const camara = { ctrl: null, introHecha: false, fov: FOV_BASE };
 
 // Encuadre automático: busca la distancia para que la caja ocupe ~85 % de la pantalla
 // (funciona igual en ordenador, tableta y teléfono)
@@ -36,6 +51,7 @@ export function encuadre(v) {
   const cam = c.camera.clone();
   // el lienzo 3D ocupa toda la ventana: usamos su tamaño real (también en teléfono)
   cam.aspect = Math.max(0.3, innerWidth / Math.max(1, innerHeight));
+  cam.fov = v.fov || FOV_BASE;
   cam.updateProjectionMatrix();
   const mira = new THREE.Vector3((box.x0 + box.x1) / 2, v.y ?? 1, (box.z0 + box.z1) / 2);
   // En teléfono (pantalla vertical) giramos la cámara: el campus, que es ancho, ocupa la altura
@@ -44,7 +60,9 @@ export function encuadre(v) {
   const esquinas = [];
   for (const x of [box.x0, box.x1]) for (const y of [box.y0, box.y1]) for (const z of [box.z0, box.z1]) esquinas.push(new THREE.Vector3(x, y, z));
   const movil = cam.aspect < 0.9;
-  const margen = (v.margen || 0.85) * (movil ? 1.04 : 1);
+  // En teléfono el campus no cabe entero a buen tamaño: se acerca un poco más
+  // (los extremos del campo de fútbol y de la entrada salen del cuadro; se ven al girar)
+  const margen = (v.margen || 0.85) * (movil ? (vertical ? 1.32 : 1.04) : 1);
   let lo = 4, hi = 3000;
   for (let i = 0; i < 32; i++) {
     const d = (lo + hi) / 2;
@@ -61,13 +79,14 @@ export function encuadre(v) {
   const pos = mira.clone().addScaledVector(dir, hi);
   // En la portada (pantalla ancha), el campus se desplaza a la derecha para dejar sitio al texto
   const desp = !movil && v.desplazar ? (box.x1 - box.x0) * v.desplazar : 0;
-  return { pos: pos.toArray(), mira: mira.toArray(), desp };
+  return { pos: pos.toArray(), mira: mira.toArray(), desp, fov: v.fov };
 }
 
 export function volar(v, suave = true) {
   const c = camara.ctrl;
   if (!c || !v) return;
   if (v.ajuste) v = encuadre(v);
+  camara.fov = v.fov || FOV_BASE;
   c.setFocalOffset(-(v.desp || 0), 0, 0, suave);
   c.setLookAt(v.pos[0], v.pos[1], v.pos[2], v.mira[0], v.mira[1], v.mira[2], suave);
 }

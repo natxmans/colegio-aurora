@@ -8,6 +8,7 @@ export const TEXTOS = [
   "Presentado por los alumnos de 4º"
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "1. Presentación del colegio",
   "Un lugar ideal",
   "• El colegio está en España, en un lugar tranquilo y agradable.",
@@ -19,13 +20,15 @@ export const TEXTOS = [
   "• Los profesores son simpáticos, las clases son divertidas y no hay deberes en casa."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "2. El uniforme y la ropa de diario",
   "EL UNIFORME (de lunes a viernes)",
-  "Polo blanco con cuello azul, chaqueta azul marino con el logo y pantalón.",
+  "Polo blanco con cuello azul, chaqueta azul marino con el logo y pantalón o falda azul marino.",
   "LA ROPA DE DIARIO (el fin de semana)",
   "Ropa cómoda para el fin de semana en casa."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "3. El edificio",
   "Un edificio moderno de dos plantas",
   "• Es un edificio práctico y seguro.",
@@ -36,15 +39,17 @@ export const TEXTOS = [
   "• Hay grandes ventanas y patios con jardines."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "4. Las aulas y los ordenadores",
   "Aulas grandes",
   "• Las aulas son grandes, limpias y cómodas.",
-  "Ordenadores modernos",
-  "• Cada alumno tiene una mesa individual con un ordenador.",
+  "Ordenadores en clase",
+  "• En las aulas hay ordenadores modernos para trabajar.",
   "Clases divertidas",
   "• Trabajamos mucho en equipo."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "5. Nuestras nueve asignaturas",
   "Las asignaturas de 4º:",
   "1. SVT (Ciencias de la Vida y de la Tierra)",
@@ -58,6 +63,7 @@ export const TEXTOS = [
   "9. Música"
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "6. Los dormitorios",
   "En el primer piso",
   "• Todos los dormitorios están en el primer piso.",
@@ -67,6 +73,7 @@ export const TEXTOS = [
   "• Hay dos camas individuales, dos escritorios y dos armarios."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "7. El complejo deportivo",
   "Un gran gimnasio",
   "• Es un gimnasio cubierto y moderno para hacer deporte y gimnasia.",
@@ -76,6 +83,7 @@ export const TEXTOS = [
   "• Es cubierta y climatizada: podemos nadar todo el año."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "8. Los espacios comunes",
   "El comedor",
   "• Es grande y la comida es sana y equilibrada.",
@@ -85,6 +93,7 @@ export const TEXTOS = [
   "• Hay jardines y salones con sofás para descansar con los amigos."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "9. La vida en el internado",
   "De lunes a viernes",
   "• Los alumnos viven en el colegio.",
@@ -94,6 +103,7 @@ export const TEXTOS = [
   "• Hacemos todo el trabajo en el colegio."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "10. El horario",
   "Un día en el colegio:",
   "07:45 h  —  Los alumnos se despiertan.",
@@ -105,6 +115,7 @@ export const TEXTOS = [
   "21:00 h  —  Los alumnos se acuestan."
  ],
  [
+  "COLEGIO PABLO PICASSO",
   "11. ¿Por qué nos gusta nuestro colegio?",
   "Instalaciones de calidad",
   "• El colegio es moderno, limpio y bien equipado.",

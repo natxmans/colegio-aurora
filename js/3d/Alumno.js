@@ -115,13 +115,16 @@ function angulos(pose, t, asiento) {
 
 const SIN_MOVIMIENTO = new Set(['tumbado', 'durmiendo']);
 
-export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asiento = 0.42, ruta = null, ropa = null, adulto = false, objeto = null, falda = false, escala = 1, deporte = false, banador = false, velocidad = 1, logoTex = null }) {
+// Poses en las que una falda se ve bien (de pie o caminando)
+const CON_FALDA = new Set(['de_pie', 'caminando', 'hablando', 'saludando']);
+
+export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asiento = 0.42, ruta = null, ropa = null, adulto = false, objeto = null, falda = null, escala = 1, deporte = false, banador = false, velocidad = 1, logoTex = null }) {
   const a = useMemo(() => {
     const r = azar(seed);
     return { piel: PIEL[Math.floor(r() * PIEL.length)], pelo: PELO[Math.floor(r() * PELO.length)], estilo: Math.floor(r() * 4), falda: r() < 0.42, alt: 0.93 + r() * 0.1, fase: r() * 30, libro: ['#2a62b8', '#b84a55', '#d9a441', '#3f8a5a', '#8a4f8f'][Math.floor(r() * 5)] };
   }, [seed]);
   const R = adulto ? { ...UNIFORME, ...ADULTO, ...(ropa || {}) } : { ...UNIFORME, ...(ropa || {}) };
-  const conFalda = !adulto && !deporte && !banador && falda === true;
+  const conFalda = !adulto && !deporte && !banador && !ropa && (falda === true || (falda === null && a.falda && CON_FALDA.has(pose)));
   const piernas = conFalda ? R.medias : R.pantalon;
   const camiseta = deporte === true ? '#1f4e9a' : deporte;
   const col = {

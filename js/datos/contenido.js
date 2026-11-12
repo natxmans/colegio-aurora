@@ -6,15 +6,15 @@
 export const COLEGIO = {
   nombre: 'Colegio Pablo Picasso',
   proyecto: 'Nuestro colegio ideal',
-  lema: 'Disciplina y arte',
+  lema: 'Estudiar · Convivir · Crecer',
   presentacion: 'Es un internado moderno, limpio y acogedor en España. Los alumnos viven en el colegio de lunes a viernes y vuelven a casa el fin de semana.',
 };
 
 export const CIFRAS = [
   { n: '2', t: 'plantas' },
-  { n: '16', t: 'habitaciones dobles' },
   { n: '9', t: 'asignaturas' },
   { n: '4', t: 'instalaciones deportivas' },
+  { n: '2', t: 'alumnos por habitación' },
 ];
 
 export const MENU = [
@@ -50,7 +50,7 @@ export const EDIFICIO = [
 // Diapositiva 5 · Las aulas
 export const AULAS_TXT = [
   { t: 'Aulas grandes', txt: 'Las aulas son grandes, limpias y cómodas.' },
-  { t: 'Ordenadores modernos', txt: 'Cada alumno tiene una mesa individual con un ordenador.' },
+  { t: 'Ordenadores en clase', txt: 'En las aulas hay ordenadores modernos para trabajar.' },
   { t: 'Clases divertidas', txt: 'Trabajamos mucho en equipo.' },
 ];
 
@@ -89,7 +89,7 @@ export const ASIGNATURAS = [
   { id: 'mates', nombre: 'Matemáticas', corto: 'Matemáticas', color: '#14285a', icono: 'mates', sala: 'mates',
     desc: 'Calculamos y resolvemos problemas.' },
   { id: 'tecno', nombre: 'Tecnología', corto: 'Tecnología', color: '#5b5fa8', icono: 'tecno', sala: 'tecno',
-    desc: 'Usamos ordenadores, robots y una impresora 3D.' },
+    desc: 'Usamos los ordenadores y hacemos proyectos en equipo.' },
   { id: 'ingles', nombre: 'Inglés', corto: 'Inglés', color: '#b84a55', icono: 'ingles', sala: 'ingles',
     desc: 'Hablamos y cantamos en inglés.' },
   { id: 'musica', nombre: 'Música', corto: 'Música', color: '#8a4f8f', icono: 'musica', sala: 'musica',
@@ -127,17 +127,17 @@ export const VIDA = [
 
 // Diapositiva 8 · El complejo deportivo
 export const FRASES_DEPORTE = [
-  'Tenemos un gran gimnasio cubierto.',
-  'Podemos jugar al fútbol y al baloncesto.',
-  'Hay una piscina olímpica cubierta y climatizada.',
-  'Nos encanta hacer deporte.',
+  'Tenemos clases de educación física en el gimnasio.',
+  'Podemos jugar al fútbol y al baloncesto en el recreo.',
+  'Hay agua caliente en la piscina: nadamos todo el año.',
+  'Nos encanta hacer deporte con los amigos.',
 ];
 
 // Diapositiva 3 · El uniforme y la ropa de diario
 export const UNIFORME_PIEZAS = [
   { pieza: 'Un polo blanco', detalle: 'Tiene el cuello azul.', color: '#ffffff' },
   { pieza: 'Una chaqueta azul marino', detalle: 'Lleva el logo del colegio a la izquierda del pecho.', color: '#14285a' },
-  { pieza: 'Un pantalón azul marino', detalle: 'Es cómodo y elegante.', color: '#1b2440' },
+  { pieza: 'Un pantalón o una falda azul marino', detalle: 'Cada alumno elige. Es cómodo y elegante.', color: '#1b2440' },
   { pieza: 'Unos zapatos marrones', detalle: 'Los llevamos de lunes a viernes.', color: '#5a3a24' },
 ];
 

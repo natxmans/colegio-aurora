@@ -1,7 +1,8 @@
 // =========================================================
 // "Nuestro uniforme": un alumno en 3D que gira, con pantalón o falda
 // =========================================================
-import { html, useState, useRef, useEffect, Canvas, useFrame, CameraControls, Environment, Lightformer } from '../lib.js';
+import { html, useState, useRef, useEffect, Canvas, useFrame, CameraControls, Environment, Lightformer, Component } from '../lib.js';
+import { hayWebGL } from '../estado.js';
 import { KitRoot } from '../3d/kit.js';
 import { Alumno, ROPA_DIARIO } from '../3d/Alumno.js';
 import { texLogo } from '../3d/texturas.js';
@@ -32,8 +33,25 @@ function Camara() {
   return html`<${CameraControls} ref=${ref} />`;
 }
 
+// Si el 3D no funciona, se muestra la foto del uniforme (el resto de la página sigue funcionando)
+const FotoUniforme = () => html`<div className="visor visor-foto">
+  <img src="img/fotos/uniforme.jpg" alt="El uniforme: polo blanco, chaqueta azul marino con el logo, pantalón o falda y zapatos" />
+</div>`;
+class SeguroUniforme extends Component {
+  constructor(p) { super(p); this.state = { error: false }; }
+  static getDerivedStateFromError() { return { error: true }; }
+  componentDidCatch(e) { console.warn('Visor del uniforme sin 3D:', e && e.message); }
+  render() { return this.state.error ? html`<${FotoUniforme} />` : this.props.children; }
+}
+
 export function VisorUniforme() {
-  const [diario, setDiario] = useState(false);
+  if (!hayWebGL()) return html`<${FotoUniforme} />`;
+  return html`<${SeguroUniforme}><${Visor3D} /><//>`;
+}
+
+function Visor3D() {
+  const [ropa, setRopa] = useState('pantalon'); // 'pantalon' | 'falda' | 'diario'
+  const diario = ropa === 'diario';
   const [pose, setPose] = useState('de_pie');
   const [activo, setActivo] = useState(false);
   const caja = useRef();
@@ -56,14 +74,15 @@ export function VisorUniforme() {
         <//>
         <${Podio} />
         <${Girar}>
-          <${Alumno} p=${[0, 0, 0]} pose=${pose} seed=${12} escala=${1} ropa=${diario ? ROPA_DIARIO : null} logoTex=${diario ? null : texLogo()} />
+          <${Alumno} p=${[0, 0, 0]} pose=${pose} seed=${12} escala=${1} falda=${ropa === 'falda'} ropa=${diario ? ROPA_DIARIO : null} logoTex=${diario ? null : texLogo()} />
         <//>
         <${Camara} />
       <//>
     <//>
     <div className="visor-ctrl">
-      <button className=${!diario ? 'activo' : ''} onClick=${() => setDiario(false)}>Uniforme</button>
-      <button className=${diario ? 'activo' : ''} onClick=${() => setDiario(true)}>Ropa de diario</button>
+      <button className=${ropa === 'pantalon' ? 'activo' : ''} onClick=${() => setRopa('pantalon')}>Con pantalón</button>
+      <button className=${ropa === 'falda' ? 'activo' : ''} onClick=${() => setRopa('falda')}>Con falda</button>
+      <button className=${diario ? 'activo' : ''} onClick=${() => setRopa('diario')}>Ropa de diario</button>
       <button className=${pose === 'saludando' ? 'activo' : ''} onClick=${() => setPose(pose === 'saludando' ? 'de_pie' : 'saludando')}>¡Hola!</button>
     </div>
   </div>`;

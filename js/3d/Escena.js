@@ -44,9 +44,9 @@ function Luces() {
     const l = sol.current;
     if (l) {
       const cam = l.shadow.camera;
-      cam.left = -150; cam.right = 150; cam.top = 150; cam.bottom = -150; cam.near = 10; cam.far = 600;
+      cam.left = -100; cam.right = 100; cam.top = 100; cam.bottom = -100; cam.near = 10; cam.far = 600;
       cam.updateProjectionMatrix();
-      l.target.position.set(20, 0, -8); l.target.updateMatrixWorld();
+      l.target.position.set(10, 0, -10); l.target.updateMatrixWorld();
     }
   }, []);
   useEffect(() => {
@@ -96,7 +96,15 @@ function Controles() {
   }, []);
   useFrame((_, dt) => {
     const c = ref.current;
-    if (c && leer().modo === 'inicio' && camara.introHecha) c.rotate(Math.min(dt, 0.05) * 0.03, 0, true);
+    if (!c) return;
+    if (leer().modo === 'inicio' && camara.introHecha) c.rotate(Math.min(dt, 0.05) * 0.03, 0, true);
+    // el ángulo de visión cambia suavemente de una vista a otra
+    const cam = c.camera, obj = camara.fov;
+    if (Math.abs(cam.fov - obj) > 0.01) {
+      cam.fov += (obj - cam.fov) * (1 - Math.exp(-Math.min(dt, 0.05) * 3));
+      if (Math.abs(cam.fov - obj) < 0.02) cam.fov = obj;
+      cam.updateProjectionMatrix();
+    }
   });
   return html`<${CameraControls} ref=${ref} makeDefault />`;
 }

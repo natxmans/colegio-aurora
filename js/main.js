@@ -2,18 +2,24 @@
 // COLEGIO PABLO PICASSO · aplicación principal
 // =========================================================
 import { html, createRoot, Component } from './lib.js';
-import { useEstado, poner, camara, seleccionar, abrirExplorador } from './estado.js';
+import { useEstado, poner, camara, seleccionar, abrirExplorador, hayWebGL } from './estado.js';
 import { SALAS, VISTAS } from './datos/salas.js';
 import { Escena } from './3d/Escena.js';
 import { Explorador } from './ui/Explorador.js';
 import { Sitio } from './ui/Secciones.js';
 import { Icono } from './ui/Iconos.js';
 
-function hayWebGL() {
-  try {
-    const c = document.createElement('canvas');
-    return !!(c.getContext('webgl2') || c.getContext('webgl'));
-  } catch (e) { return false; }
+
+// Imagen fija del campus + mensaje (si la 3D no funciona)
+function Sin3D({ titulo, texto, boton = false }) {
+  return html`<div className="sin3d">
+    <img src="img/campus-3d.jpg" alt="Vista general del campus del Colegio Pablo Picasso" />
+    <div className="sin3d-caja">
+      <h2>${titulo}</h2>
+      <p>${texto}</p>
+      ${boton ? html`<button className="btn btn-primario" onClick=${() => location.reload()}>Volver a cargar</button>` : null}
+    </div>
+  </div>`;
 }
 
 // Solución de emergencia si la maqueta 3D no se puede cargar
@@ -22,13 +28,8 @@ class Seguro extends Component {
   static getDerivedStateFromError(error) { return { error }; }
   componentDidCatch(e) { console.error(e); if (window.__listo) window.__listo(); }
   render() {
-    if (this.state.error) return html`<div className="sin3d">
-      <div>
-        <h2>La maqueta 3D no se puede mostrar</h2>
-        <p>Tu navegador o tu ordenador no puede cargar la escena 3D. Prueba con Chrome, Edge o Firefox actualizados, o vuelve a cargar la página.</p>
-        <button className="btn btn-primario" onClick=${() => location.reload()}>Volver a cargar</button>
-      </div>
-    </div>`;
+    if (this.state.error) return html`<${Sin3D} titulo="La maqueta 3D no se puede mostrar"
+      texto="Tu navegador no puede cargar la escena 3D. Aquí tienes una imagen del campus. Prueba con Chrome, Edge o Firefox actualizados, o vuelve a cargar la página." boton />`;
     return this.props.children;
   }
 }
@@ -38,7 +39,7 @@ function App() {
   const webgl = hayWebGL();
   return html`
     <div className="lienzo" aria-label="Maqueta 3D del Colegio Pablo Picasso">
-      ${webgl ? html`<${Seguro}><${Escena} /><//>` : html`<div className="sin3d"><div><h2>Sin 3D</h2><p>Este navegador no tiene WebGL: la maqueta 3D no se puede mostrar.</p></div></div>`}
+      ${webgl ? html`<${Seguro}><${Escena} /><//>` : html`<${Sin3D} titulo="Sin 3D en este navegador" texto="Este navegador no tiene WebGL: la maqueta 3D no se puede mostrar. Aquí tienes una imagen del campus." />`}
     </div>
     ${modo === 'explorar' ? html`<${Explorador} />` : html`<${Sitio} />`}
   `;

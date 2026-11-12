@@ -208,64 +208,9 @@ function Atomo({ p }) {
   <//>`;
 }
 
-function Impresora3D({ p }) {
-  return html`<${G} p=${p}>
-    ${[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b], i) => html`<${B} key=${i} m="M" p=${[a * 0.28, 0.35, b * 0.22]} s=${[0.04, 0.7, 0.04]} c=${COL.grisO} />`)}
-    <${B} m="M" p=${[0, 0.71, 0]} s=${[0.6, 0.04, 0.48]} c=${COL.grisO} />
-    <${B} m="B" p=${[0, 0.06, 0]} s=${[0.6, 0.12, 0.48]} c=${COL.negro} />
-    <${B} m="L" p=${[0, 0.125, 0]} s=${[0.4, 0.01, 0.34]} c="#3d8bff" />
-    <${Ico} p=${[0, 0.22, 0]} s=${0.18} c=${COL.violeta} />
-    <${B} m="M" p=${[0.05, 0.5, 0]} s=${[0.5, 0.04, 0.04]} c=${COL.grisM} />
-    <${B} m="L" p=${[0.05, 0.44, 0]} s=${[0.05, 0.08, 0.05]} c=${COL.cian} />
-    <${V} p=${[0, 0.4, 0.24]} s=${[0.58, 0.6, 0.01]} />
-  <//>`;
-}
 
-function BrazoRobot({ p }) {
-  const g1 = useRef(), g2 = useRef(), g3 = useRef();
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    if (g1.current) g1.current.rotation.y = Math.sin(t * 0.7) * 1.2;
-    if (g2.current) g2.current.rotation.z = -0.5 + Math.sin(t * 1.1) * 0.35;
-    if (g3.current) g3.current.rotation.z = 1.2 + Math.sin(t * 1.3 + 1) * 0.4;
-  });
-  return html`<${G} p=${p}>
-    <${C} m="M" p=${[0, 0.05, 0]} s=${[0.32, 0.1, 0.32]} c=${COL.grisO} />
-    <group ref=${g1} position=${[0, 0.1, 0]}>
-      <${C} dyn m="B" p=${[0, 0.06, 0]} s=${[0.22, 0.12, 0.22]} c="#f97316" />
-      <group ref=${g2} position=${[0, 0.12, 0]}>
-        <${B} dyn m="B" p=${[0, 0.22, 0]} s=${[0.09, 0.44, 0.09]} c="#f97316" />
-        <${S} dyn m="M" p=${[0, 0.44, 0]} s=${0.12} c=${COL.grisO} />
-        <group ref=${g3} position=${[0, 0.44, 0]}>
-          <${B} dyn m="B" p=${[0, 0.17, 0]} s=${[0.07, 0.34, 0.07]} c="#f97316" />
-          <${B} dyn m="M" p=${[0, 0.36, 0]} s=${[0.14, 0.05, 0.05]} c=${COL.grisO} />
-          <${B} dyn m="L" p=${[0, 0.39, 0]} s=${[0.03, 0.03, 0.03]} c=${COL.cian} />
-        <//>
-      <//>
-    <//>
-  <//>`;
-}
 
-function Robotito({ p, r, c = COL.blanco }) {
-  return html`<${G} p=${p} r=${r}>
-    <${B} m="B" p=${[0, 0.08, 0]} s=${[0.14, 0.12, 0.12]} c=${c} />
-    <${B} m="B" p=${[0, 0.2, 0]} s=${[0.12, 0.09, 0.1]} c=${c} />
-    <${B} m="L" p=${[-0.03, 0.2, 0.052]} s=${[0.025, 0.025, 0.005]} c=${COL.cian} />
-    <${B} m="L" p=${[0.03, 0.2, 0.052]} s=${[0.025, 0.025, 0.005]} c=${COL.cian} />
-    <${C} p=${[-0.075, 0.035, 0]} r=${[0, 0, Math.PI / 2]} s=${[0.07, 0.02, 0.07]} c=${COL.negro} />
-    <${C} p=${[0.075, 0.035, 0]} r=${[0, 0, Math.PI / 2]} s=${[0.07, 0.02, 0.07]} c=${COL.negro} />
-  <//>`;
-}
 
-function Dron({ p }) {
-  return html`<${G} p=${p}>
-    <${B} m="B" p=${[0, 0.05, 0]} s=${[0.16, 0.06, 0.16]} c=${COL.negro} />
-    ${[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b], i) => html`<${G} key=${i}>
-      <${B} m="B" p=${[a * 0.1, 0.06, b * 0.1]} r=${[0, a * b > 0 ? -0.78 : 0.78, 0]} s=${[0.02, 0.02, 0.2]} c=${COL.negro} />
-      <${C} m="L" p=${[a * 0.17, 0.08, b * 0.17]} s=${[0.14, 0.006, 0.14]} c=${COL.cian} />
-    <//>`)}
-  <//>`;
-}
 
 function Piano({ p, r }) {
   const teclas = [];
@@ -405,13 +350,14 @@ export function Aula({ s }) {
     <//>
     <${Panel} p=${[-w / 2 + 0.11, 1.95, -0.6]} r=${[0, Math.PI / 2, 0]} w=${2.8} h=${1.75} tex=${texTabla()} luz=${false} />
     <${Planta} p=${[-0.3, yt, zt]} s=${0.55} tipo=${1} />`;
+  // Tecnología: solo lo que dice el PowerPoint (ordenadores) + objetos normales de clase
   if (m === 'tecno') deco = html`
-    <${Impresora3D} p=${[-2.6, yt, zt]} />
-    <${BrazoRobot} p=${[-0.6, yt, zt]} />
-    <${Dron} p=${[1.2, yt, zt]} />
-    <${Robotito} p=${[2.4, yt, zt]} c="#f97316" />
-    <${Robotito} p=${[1.12, 0.74, -2.66]} r=${[0, 0.4, 0]} />
-    <${Robotito} p=${[-2.27, 0.74, -1.1]} r=${[0, -0.3, 0]} c=${COL.elec} />
+    <${Portatil} p=${[-2.4, yt, zt]} r=${[0, 0.25, 0]} />
+    <${Portatil} p=${[-1.6, yt, zt]} r=${[0, -0.2, 0]} pantalla="#a5d8ff" />
+    <${Libro} p=${[0.2, yt + 0.02, zt]} c="#3d8bff" /><${Libro} p=${[0.2, yt + 0.06, zt]} c="#ffffff" />
+    <${B} m="B" p=${[1.3, yt + 0.09, zt]} s=${[0.5, 0.18, 0.3]} c="#c0392b" />
+    <${B} m="M" p=${[1.3, yt + 0.2, zt]} s=${[0.36, 0.04, 0.05]} c=${COL.grisM} />
+    <${Planta} p=${[2.5, yt, zt]} s=${0.6} tipo=${1} />
     ${estanteO} ${posterE('programacion')}`;
   if (m === 'musica') deco = html`
     <${Piano} p=${[-w / 2 + 0.45, 0, -0.8]} r=${[0, Math.PI / 2, 0]} />

@@ -3,6 +3,9 @@
 Site web du projet d'espagnol (4e) : un internat moderne en Espagne, avec une maquette 3D
 que l'on peut visiter et la présentation PowerPoint intégrée.
 
+Devise affichée sur le site : **Estudiar · Convivir · Crecer**. Le logo utilisé est le blason
+original du PowerPoint (`img/logo-original-1024.png`) : ne jamais le redessiner ni le déformer.
+
 - **En ligne :** https://natxmans.github.io/colegio-aurora/
 - **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (12 diapositives)
 
@@ -40,23 +43,32 @@ que l'on peut visiter et la présentation PowerPoint intégrée.
 
 - `index.html` : écran de chargement + « import map » des bibliothèques
 - `css/estilos.css` : tout le design (bleu marine, blanc, beige)
-- `img/` : logo original (`logo-original-1024.png`), photos sans filigrane (`fotos/`), diapositives (`diapositivas/`)
+- `img/` : logo original (`logo-original-1024.png`), photos sans filigrane (`fotos/`), diapositives (`diapositivas/`),
+  `campus-3d.jpg` (image fixe du campus, affichée si la 3D ne peut pas se charger)
 - `presentacion/` : le PowerPoint final téléchargeable
 - `js/main.js` : application React (+ liens directs)
 - `js/estado.js` : état de la visite et cadrage automatique de la caméra (ordinateur, tablette, téléphone)
-- `js/datos/salas.js` : tous les espaces (position, texte en espagnol, caméra)
+- `js/datos/salas.js` : tous les espaces (position, texte en espagnol, caméra) et les vues générales
+  (`VISTAS` : angle, cadrage, `fov` = angle de vision ; `CAJAS` = zone à cadrer)
 - `js/datos/contenido.js` : textes des sections (fidèles au PowerPoint)
 - `js/datos/diapositivas.js` : texte des 12 diapositives
 - `js/3d/` : la maquette
   - `kit.js` : moteur d'instanciation (des milliers de pièces en peu d'appels de dessin)
-  - `Alumno.js` : élèves en uniforme (polo blanc à col bleu, veste bleu marine avec le logo, pantalon)
-  - `Aulas.js` : les 8 salles (tables individuelles avec ordinateur)
+  - `Alumno.js` : élèves en uniforme (polo blanc à col bleu, veste bleu marine avec le logo, pantalon ou jupe)
+  - `Aulas.js` : les 8 salles (tables individuelles, ordinateurs en classe)
   - `Salas.js` : bibliothèque numérique, entrée, comedor, chambres, salons
   - `Edificio.js` : bâtiment, étages qui s'écartent, toit
-  - `Deportes.js` : gymnase couvert, piscine olympique couverte, foot, basket
+  - `Deportes.js` : gymnase couvert, piscine olympique couverte et chauffée, foot, basket
   - `Exteriores.js` : patio, jardins, entrée avec le logo, oliveraies
   - `etiquetas.js` : étiquettes des bâtiments sans chevauchement
 - `js/ui/` : menu, sections, visite 3D, uniforme 3D, diaporama (`Presentacion.js`)
+
+## Taille des bâtiments dans la 3D
+
+Le campus est compact (le gymnase, la piscine, le basket et le foot sont collés au bâtiment
+principal) et la « Vista completa » utilise un angle de vision serré : les bâtiments occupent
+environ 2,5 fois plus de place à l'écran qu'avant (mesuré : 48 % de l'écran au lieu de 19 %).
+Pour régler le cadrage : `VISTAS.completa` et `CAJAS.campus` dans `js/datos/salas.js`.
 
 ## Modifier le PowerPoint puis le site
 

@@ -76,7 +76,7 @@ export function Logo({ size = 36 }) {
 const DECOR = {
   mates: ['π', '√x', 'a²+b²', '∑'], frances: ['Bonjour', 'Merci', 'Paris'], ingles: ['Hello', 'Thank you', 'London'],
   historia: ['1492', 'Roma', 'Egipto'], svt: ['ADN', 'Célula', 'CO₂'], fisica: ['H₂O', 'E=mc²', 'NaCl'],
-  tecno: ['</>', '3D', 'Robot'], musica: ['♪', '♫', 'Do Re Mi'], edfisica: ['⚽', '🏀', '🏊'],
+  tecno: ['</>', 'PC', 'Web'], musica: ['♪', '♫', 'Do Re Mi'], edfisica: ['⚽', '🏀', '🏊'],
 };
 export function IlusMateria({ m }) {
   const d = DECOR[m.icono] || [];

@@ -87,9 +87,20 @@ function Arco({ cx, cz, largo, luz, flecha, alto, eje = 'x', cristal = 2 }) {
   return segs;
 }
 
+// Costilla metálica que sigue el arco del techo (eje z)
+function Costilla({ cx, cz, luz, flecha, alto }) {
+  const R = ((luz / 2) ** 2 + flecha ** 2) / (2 * flecha), yc = alto + flecha - R, a0 = Math.asin(luz / 2 / R);
+  const n = 14, segs = [];
+  for (let i = 0; i < n; i++) {
+    const a = -a0 + (i + 0.5) * (2 * a0 / n);
+    segs.push(html`<${B} key=${i} m="M" p=${[cx + R * Math.sin(a), yc + R * Math.cos(a) + 0.12, cz]} r=${[0, 0, -a]} s=${[(2 * a0 * R) / n + 0.04, 0.22, 0.3]} c=${COL.noche} />`);
+  }
+  return segs;
+}
+
 // ---------------- GIMNASIO CUBIERTO ----------------
 function Gimnasio() {
-  const cx = 52, cz = 0, w = 28, d = 24;
+  const cx = 49, cz = 0, w = 28, d = 24;
   const columnas = [];
   for (let x = cx - w / 2; x <= cx + w / 2 + 0.01; x += 4) for (const z of [cz - d / 2, cz + d / 2]) columnas.push(html`<${B} key=${'c' + x + z} m="M" p=${[x, 4.8, z]} s=${[0.3, 9.6, 0.3]} c=${COL.noche} />`);
   return html`<${G}>
@@ -134,8 +145,9 @@ function Agua({ p, w, d }) {
 }
 
 function Piscina() {
-  // Nave de 30 × 60 m (x 72→102, z -36→24); vaso olímpico de 50 × 21 m (8 calles)
-  const cx = 87, cz = -6, W = 30, D = 60, pw = 21, pd = 50;
+  // Nave de 30 × 60 m; vaso olímpico de 50 × 21 m (8 calles).
+  // Se dibuja a lo largo de z y luego se gira: queda en x 10→70, z 15→45
+  const cx = 0, cz = 0, W = 30, D = 60, pw = 21, pd = 50;
   const x0 = cx - pw / 2, x1 = cx + pw / 2, z0 = cz - pd / 2, z1 = cz + pd / 2;
   const cuerdas = [];
   for (let i = 1; i < 8; i++) {
@@ -157,7 +169,7 @@ function Piscina() {
     ${[...Array(8)].map((_, i) => html`<${B} key=${'p' + i} m="B" p=${[x0 + (i + 0.5) * (pw / 8), 0.55, z1 + 0.5]} s=${[0.55, 0.7, 0.6]} c=${COL.blanco} />`)}
     ${[1, 2, 4, 5, 6].map((carril, i) => html`<${Alumno} key=${'n' + i} p=${[0, -0.08, 0]} pose="nadando" banador seed=${1800 + i}
       velocidad=${0.8 + i * 0.1} ruta=${{ tipo: 'linea', a: [x0 + (carril + 0.5) * (pw / 8), z0 + 1.5], b: [x0 + (carril + 0.5) * (pw / 8), z1 - 1.5], vel: 1.2 }} />`)}
-    <${Gradas} p=${[cx - W / 2 + 2.4, 0.2, cz]} r=${[0, -PI / 2, 0]} largo=${40} filas=${3} publico=${9} seed=${1830} />
+    <${Gradas} p=${[cx - W / 2 + 4.6, 0.2, cz]} r=${[0, PI / 2, 0]} largo=${40} filas=${3} publico=${9} seed=${1830} />
     <${G} p=${[x1 + 2.2, 0.2, cz]}>
       ${[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b], i) => html`<${B} key=${i} m="B" p=${[a * 0.35, 0.9, b * 0.35]} s=${[0.07, 1.8, 0.07]} c=${COL.blanco} />`)}
       <${B} m="B" p=${[0, 1.8, 0]} s=${[0.8, 0.08, 0.8]} c=${COL.blanco} />
@@ -173,12 +185,15 @@ function Piscina() {
     ${columnas}
     <${Panel} p=${[cx - 9, 5.4, cz + D / 2 + 0.06]} w=${2.6} h=${2.6} transp tex=${texLogo()} />
     <${B} m="B" p=${[cx + 3, 5.4, cz + D / 2 + 0.04]} s=${[15, 1.6, 0.06]} c=${COL.noche} />
-    <${Panel} p=${[cx + 3, 5.4, cz + D / 2 + 0.08]} w=${14} h=${1.4} transp tex=${texRotuloTexto('PISCINA OLÍMPICA', '#ffffff')} />
-    <${TechoMovil} y=${0} ids=${['piscina']}>
+    <${Panel} p=${[cx + 3, 5.4, cz + D / 2 + 0.08]} w=${13} h=${1.55} transp tex=${texRotuloTexto('PISCINA OLÍMPICA', '#ffffff')} />
+    <${B} m="B" p=${[cx + W / 2 + 0.24, 5.6, cz + 2]} s=${[0.08, 2.3, 22]} c=${COL.noche} />
+    <${Panel} p=${[cx + W / 2 + 0.3, 5.6, cz + 10.6]} r=${[0, PI / 2, 0]} w=${2.4} h=${2.4} transp tex=${texLogo()} />
+    <${Panel} p=${[cx + W / 2 + 0.3, 5.6, cz + 0.6]} r=${[0, PI / 2, 0]} w=${16} h=${1.9} transp tex=${texRotuloTexto('PISCINA OLÍMPICA CLIMATIZADA', '#ffffff')} />
+    <${TechoMovil} y=${0} ids=${['piscina', 'gimnasio']}>
       <${Arco} cx=${cx} cz=${cz} largo=${D + 0.6} luz=${W} flecha=${4.5} alto=${7} eje="z" cristal=${9} />
       <${B} m="M" p=${[cx - W / 2, 7.05, cz]} s=${[0.3, 0.14, D + 0.6]} c=${COL.noche} />
       <${B} m="M" p=${[cx + W / 2, 7.05, cz]} s=${[0.3, 0.14, D + 0.6]} c=${COL.noche} />
-      ${[-24, -12, 0, 12, 24].map(z => html`<${B} key=${'v' + z} m="M" p=${[cx, 10.1, cz + z]} s=${[W - 4, 0.2, 0.25]} c=${COL.noche} />`)}
+      ${[-24, -12, 0, 12, 24].map(z => html`<${Costilla} key=${'v' + z} cx=${cx} cz=${cz + z} luz=${W} flecha=${4.5} alto=${7} />`)}
     <//>
   <//>`;
 }
@@ -202,7 +217,7 @@ function Foco({ p, r }) {
 }
 
 function Futbol() {
-  const cx = -2, cz = -40;
+  const cx = -1, cz = -39;
   const jugadores = [];
   for (let i = 0; i < 10; i++) {
     const eq = i < 5;
@@ -219,9 +234,9 @@ function Futbol() {
     <${Alumno} p=${[cx - 30.6, 0.07, cz]} ry=${PI / 2} pose="portero" deporte="#14285a" seed=${1920} />
     <${Alumno} p=${[cx + 30.6, 0.07, cz]} ry=${-PI / 2} pose="portero" deporte="#14285a" seed=${1921} />
     <${Balon} c="#ffffff" radio=${0.13} mover=${(p, t) => p.set(cx + Math.sin(t * 0.3) * 18, 0.2 + Math.abs(Math.sin(t * 2.4)) * 0.6, cz + Math.sin(t * 0.47) * 10)} />
-    <${Gradas} p=${[cx, 0, cz - 23.5]} r=${[0, PI, 0]} largo=${34} filas=${4} publico=${12} seed=${1950} />
-    <${B} m="B" p=${[cx, 4.6, cz - 26.6]} r=${[0.16, 0, 0]} s=${[38, 0.25, 5.2]} c=${COL.blanco} />
-    ${[-16, -8, 0, 8, 16].map(x => html`<${B} key=${x} m="M" p=${[cx + x, 2.4, cz - 28.6]} s=${[0.25, 4.8, 0.25]} c=${COL.noche} />`)}
+    <${Gradas} p=${[cx, 0, cz - 23.2]} largo=${34} filas=${4} publico=${12} seed=${1950} />
+    <${B} m="B" p=${[cx, 4.6, cz - 25.6]} r=${[0.16, 0, 0]} s=${[38, 0.25, 5.2]} c=${COL.blanco} />
+    ${[-16, -8, 0, 8, 16].map(x => html`<${B} key=${x} m="M" p=${[cx + x, 2.4, cz - 27.6]} s=${[0.25, 4.8, 0.25]} c=${COL.noche} />`)}
     <${Foco} p=${[cx - 35, 0, cz - 23]} r=${[0, PI * 0.25, 0]} />
     <${Foco} p=${[cx + 35, 0, cz - 23]} r=${[0, -PI * 0.25, 0]} />
     <${Foco} p=${[cx - 35, 0, cz + 23]} r=${[0, PI * 0.75, 0]} />
@@ -242,7 +257,7 @@ function Valla({ x0, x1, z0, z1, h = 3 }) {
 }
 
 function Baloncesto() {
-  const cx = 51, cz = -35;
+  const cx = 50, cz = -27;
   return html`<${G}>
     <${B} p=${[cx, 0.03, cz]} s=${[30, 0.06, 19]} c="#3a4a6a" />
     <${Suelo} p=${[cx, cz]} w=${28} d=${15} tex=${texPistaBasket()} y=${0.065} />
@@ -260,9 +275,8 @@ function Baloncesto() {
 
 export function Deportes() {
   return html`<${G}>
-    <${B} p=${[69, 0.015, 16]} s=${[2, 0.03, 1]} c="#d9cdb6" />
     <${Gimnasio} />
-    <${Piscina} />
+    <${G} p=${[40, 0, 30]} r=${[0, -PI / 2, 0]}><${Piscina} /><//>
     <${Futbol} />
     <${Baloncesto} />
     <${Zonas} planta="deporte" />
