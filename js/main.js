@@ -1,8 +1,9 @@
 // =========================================================
-// COLEGIO AURORA · aplicación principal
+// COLEGIO PABLO PICASSO · aplicación principal
 // =========================================================
 import { html, createRoot, Component } from './lib.js';
-import { useEstado, volverInicio } from './estado.js';
+import { useEstado, poner, camara, seleccionar, abrirExplorador } from './estado.js';
+import { SALAS, VISTAS } from './datos/salas.js';
 import { Escena } from './3d/Escena.js';
 import { Explorador } from './ui/Explorador.js';
 import { Sitio } from './ui/Secciones.js';
@@ -36,7 +37,7 @@ function App() {
   const modo = useEstado(s => s.modo);
   const webgl = hayWebGL();
   return html`
-    <div className="lienzo" aria-label="Maqueta 3D del Colegio Aurora">
+    <div className="lienzo" aria-label="Maqueta 3D del Colegio Pablo Picasso">
       ${webgl ? html`<${Seguro}><${Escena} /><//>` : html`<div className="sin3d"><div><h2>Sin 3D</h2><p>Este navegador no tiene WebGL: la maqueta 3D no se puede mostrar.</p></div></div>`}
     </div>
     ${modo === 'explorar' ? html`<${Explorador} />` : html`<${Sitio} />`}
@@ -45,8 +46,32 @@ function App() {
 
 const arrancar = async () => {
   try { await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]); } catch (e) {}
+  // Logo ORIGINAL precargado (se usa en las pizarras, pantallas y banderas de la maqueta)
+  const logo = new Image();
+  logo.src = 'img/logo-512.png';
+  try { await logo.decode(); } catch (e) {}
+  window.__logoImg = logo;
   createRoot(document.getElementById('raiz')).render(html`<${App} />`);
   if (!hayWebGL()) setTimeout(() => window.__listo && window.__listo(), 300);
   setTimeout(() => window.__listo && window.__listo(), 20000);
+  enlaceDirecto();
 };
+
+// Enlaces directos: ?vista=completa|baja|primer|corte · ?sala=mates · &noche=1 · ?seccion=presentacion
+function enlaceDirecto() {
+  const q = new URLSearchParams(location.search);
+  const vista = q.get('vista'), sala = q.get('sala'), seccion = q.get('seccion');
+  if (!vista && !sala && !seccion) return;
+  const esperar = () => {
+    if (!camara.ctrl && !seccion) return setTimeout(esperar, 200);
+    setTimeout(() => {
+      if (q.get('noche') === '1') poner({ noche: true });
+      if (q.get('techo') === '0') poner({ techo: false });
+      if (sala && SALAS[sala]) seleccionar(sala, { interior: q.get('dentro') === '1' });
+      else if (vista && VISTAS[vista]) abrirExplorador(vista);
+      else if (seccion) document.getElementById(seccion)?.scrollIntoView();
+    }, 600);
+  };
+  esperar();
+}
 arrancar();

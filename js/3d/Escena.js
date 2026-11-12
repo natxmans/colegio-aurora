@@ -3,6 +3,7 @@
 // =========================================================
 import { html, THREE, Canvas, useFrame, useThree, CameraControls, Environment, Lightformer, Stars, useRef, useEffect, useMemo } from '../lib.js';
 import { KitRoot } from './kit.js';
+import { ProyectarEtiquetas } from './etiquetas.js';
 import { Edificio } from './Edificio.js';
 import { Deportes } from './Deportes.js';
 import { Exteriores } from './Exteriores.js';
@@ -65,9 +66,9 @@ function Luces() {
 function Reflejos() {
   return html`<${Environment} resolution=${128} frames=${1} background=${false}>
     <${Lightformer} form="rect" intensity=${2.2} color="#ffffff" position=${[0, 80, -60]} rotation=${[Math.PI / 2.5, 0, 0]} scale=${[220, 80, 1]} />
-    <${Lightformer} form="rect" intensity=${1.6} color="#22d3ee" position=${[-140, 25, 0]} rotation=${[0, Math.PI / 2, 0]} scale=${[120, 18, 1]} />
-    <${Lightformer} form="rect" intensity=${1.4} color="#8b5cf6" position=${[140, 25, 0]} rotation=${[0, -Math.PI / 2, 0]} scale=${[120, 18, 1]} />
-    <${Lightformer} form="rect" intensity=${1.2} color="#3d8bff" position=${[0, 15, 140]} rotation=${[0, Math.PI, 0]} scale=${[160, 14, 1]} />
+    <${Lightformer} form="rect" intensity=${1.6} color="#f3dfb2" position=${[-140, 25, 0]} rotation=${[0, Math.PI / 2, 0]} scale=${[120, 18, 1]} />
+    <${Lightformer} form="rect" intensity=${1.4} color="#c9a978" position=${[140, 25, 0]} rotation=${[0, -Math.PI / 2, 0]} scale=${[120, 18, 1]} />
+    <${Lightformer} form="rect" intensity=${1.2} color="#9fb7da" position=${[0, 15, 140]} rotation=${[0, Math.PI, 0]} scale=${[160, 14, 1]} />
     <${Lightformer} form="ring" intensity=${3} color="#ffffff" position=${[60, 120, 60]} scale=${40} />
   <//>`;
 }
@@ -78,7 +79,7 @@ function Controles() {
     const c = ref.current;
     camara.ctrl = c;
     c.minDistance = 0.6;
-    c.maxDistance = 520;
+    c.maxDistance = 700;
     c.maxPolarAngle = Math.PI * 0.495;
     c.dollyToCursor = true;
     c.draggingSmoothTime = 0.12;
@@ -87,7 +88,11 @@ function Controles() {
     c.smoothTime = 2.1;
     const t1 = setTimeout(() => volar(leer().modo === 'explorar' ? (VISTAS[leer().vista] || VISTAS.completa) : VISTAS.inicio), 250);
     const t2 = setTimeout(() => { c.smoothTime = 0.75; camara.introHecha = true; }, 3800);
-    return () => { clearTimeout(t1); clearTimeout(t2); camara.ctrl = null; };
+    // Al cambiar el tamaño de la ventana (o girar la tableta), se vuelve a encuadrar el campus
+    let tr = 0;
+    const alCambiar = () => { clearTimeout(tr); tr = setTimeout(() => { const e = leer(); if (!e.sel) volar(e.modo === 'explorar' ? VISTAS[e.vista] : VISTAS.inicio); }, 250); };
+    window.addEventListener('resize', alCambiar);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(tr); window.removeEventListener('resize', alCambiar); camara.ctrl = null; };
   }, []);
   useFrame((_, dt) => {
     const c = ref.current;
@@ -124,6 +129,7 @@ export function Escena() {
       <${Edificio} />
       <${Deportes} />
       <${Listo} />
+      <${ProyectarEtiquetas} />
     <//>
   <//>`;
 }

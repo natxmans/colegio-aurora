@@ -55,6 +55,7 @@ const BASE = {
   capsula: [G.capsula, MAT.mate, 1000, true],
   toro: [G.toro, MAT.mate, 800, true],
   toroM: [G.toro, MAT.metal, 800, true],
+  toroB: [G.toro, MAT.brillo, 400, true],
   toroL: [G.toro, MAT.luz, 800, false],
 };
 // Tipos "a..." = piezas animadas (alumnos, robots...): se copian en cada imagen

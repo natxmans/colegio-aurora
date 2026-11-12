@@ -5,6 +5,12 @@ import { html } from '../lib.js';
 
 const P = {
   inicio: 'M3 11l9-8 9 8M5 9.5V21h5v-6h4v6h5V9.5',
+  corazon: 'M12 20.5s-7.5-4.6-9.2-9.4A5 5 0 0 1 12 6.6a5 5 0 0 1 9.2 4.5C19.5 15.9 12 20.5 12 20.5z',
+  sofa: 'M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M3 11a2 2 0 0 1 2 2v2h14v-2a2 2 0 0 1 4 0v5H1v-5a2 2 0 0 1 2-2zM5 18v2M19 18v2',
+  descarga: 'M12 3v12M7 10l5 5 5-5M4 20h16',
+  pantalla: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  salirPantalla: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
+  diapo: 'M3 4h18v13H3zM8 21h8M12 17v4',
   cubo: 'M12 2.5l8.5 4.8v9.4L12 21.5l-8.5-4.8V7.3zM12 12l8.5-4.7M12 12v9.5M12 12L3.5 7.3',
   edificio: 'M3 21h18M5 21V8l7-4 7 4v13M9 21v-4h6v4M8 10h2M14 10h2M8 13.5h2M14 13.5h2',
   capas: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5',
@@ -61,14 +67,9 @@ export function Icono({ n, size, className = '' }) {
     className=${className} width=${size} height=${size} aria-hidden="true"><path d=${P[n] || P.estrella} /></svg>`;
 }
 
+// Logo ORIGINAL del colegio (PNG cuadrado con fondo transparente: nunca se deforma)
 export function Logo({ size = 36 }) {
-  return html`<svg viewBox="0 0 64 64" width=${size} height=${size} aria-hidden="true">
-    <defs><linearGradient id="lg-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#22d3ee" /><stop offset="1" stopColor="#8b5cf6" /></linearGradient></defs>
-    <rect x="2" y="2" width="60" height="60" rx="16" fill="#0a1236" stroke="rgba(140,190,255,.35)" />
-    <path d="M18 48 L32 15 L46 48" fill="none" stroke="url(#lg-a)" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M23 38 Q32 29 41 38" fill="none" stroke="#3d8bff" strokeWidth="4.5" strokeLinecap="round" />
-    <circle cx="32" cy="33.5" r="2.6" fill="#22d3ee" />
-  </svg>`;
+  return html`<img src="img/logo-256.png" width=${size} height=${size} alt="Logo del Colegio Pablo Picasso" className="logo-img" style=${{ width: size + 'px', height: size + 'px', objectFit: 'contain' }} />`;
 }
 
 // --------- Ilustración de cada asignatura (tarjetas) ---------
@@ -88,7 +89,7 @@ export function IlusMateria({ m }) {
     <rect width="320" height="160" fill=${'url(#' + id + ')'} />
     <rect width="320" height="160" fill=${'url(#' + id + 'p)'} />
     <circle cx="250" cy="40" r="70" fill=${m.color} opacity=".18" />
-    <circle cx="60" cy="150" r="50" fill="#8b5cf6" opacity=".14" />
+    <circle cx="60" cy="150" r="50" fill="#c9a978" opacity=".14" />
     ${d.map((t, i) => html`<text key=${i} x=${30 + i * 92} y=${i % 2 ? 128 : 42} fill="#fff" opacity=".42" fontFamily="Space Grotesk, sans-serif" fontWeight="600" fontSize=${t.length > 4 ? 18 : 26}>${t}</text>`)}
     <g transform="translate(124 44) scale(3)" fill="none" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" style=${{ filter: 'drop-shadow(0 0 6px ' + m.color + ')' }}>
       <path d=${P[m.icono]} />
@@ -99,27 +100,27 @@ export function IlusMateria({ m }) {
 // --------- Ilustraciones de los momentos del día ---------
 const pers = (x, y, c = '#16224f', piel = '#f1c8a5', pelo = '#3b2a1f', esc = 1) => html`<g transform=${`translate(${x} ${y}) scale(${esc})`}>
   <rect x="-9" y="-2" width="18" height="24" rx="8" fill=${c} />
-  <rect x="-1" y="2" width="2" height="14" fill="#3d8bff" />
+  <rect x="-1" y="2" width="2" height="14" fill="#8f9ab3" /><circle cx="4" cy="4" r="2.2" fill="#ffffff" />
   <circle cx="0" cy="-12" r="9" fill=${piel} />
   <path d="M-9.5 -13 a9.5 9.5 0 0 1 19 0 q-9 -6 -19 0z" fill=${pelo} />
   <circle cx="-3" cy="-11" r="1.2" fill="#1d2233" /><circle cx="3" cy="-11" r="1.2" fill="#1d2233" />
 </g>`;
 
 export function IlusMomento({ icono, noche = false }) {
-  const fondoA = noche ? '#080c2a' : '#1b3a8a', fondoB = noche ? '#1e1550' : '#4f8fe8';
+  const fondoA = noche ? '#0b1430' : '#14285a', fondoB = noche ? '#23305a' : '#3f6fb5';
   const id = 'm-' + icono;
   let esc = null;
   if (icono === 'despertar') esc = html`
     <rect x="200" y="30" width="90" height="70" rx="6" fill="#ffd9a0" opacity=".9" /><circle cx="245" cy="100" r="26" fill="#f59e0b" />
     <rect x="200" y="30" width="90" height="70" rx="6" fill="none" stroke="#fff" strokeWidth="4" /><path d="M245 30v70M200 65h90" stroke="#fff" strokeWidth="3" />
     <rect x="30" y="110" width="150" height="34" rx="8" fill="#e8edf5" /><rect x="30" y="92" width="14" height="52" rx="4" fill="#16224f" />
-    <rect x="70" y="100" width="110" height="20" rx="8" fill="#3d8bff" /><rect x="46" y="98" width="30" height="14" rx="6" fill="#fff" />
+    <rect x="70" y="100" width="110" height="20" rx="8" fill="#2a62b8" /><rect x="46" y="98" width="30" height="14" rx="6" fill="#fff" />
     ${pers(120, 88)}
     <circle cx="180" cy="140" r="14" fill="#fff" /><text x="180" y="145" textAnchor="middle" fontSize="11" fontWeight="700" fill="#16224f" fontFamily="Orbitron">7:45</text>`;
   if (icono === 'clases') esc = html`
-    <rect x="70" y="22" width="180" height="70" rx="8" fill="#0b1a44" stroke="#3d8bff" strokeWidth="3" />
+    <rect x="70" y="22" width="180" height="70" rx="8" fill="#0b1a44" stroke="#2a62b8" strokeWidth="3" />
     <text x="160" y="52" textAnchor="middle" fill="#fff" fontSize="18" fontFamily="Space Grotesk">a² + b² = c²</text>
-    <text x="160" y="76" textAnchor="middle" fill="#7fdcff" fontSize="14" fontFamily="Space Grotesk">π ≈ 3,14</text>
+    <text x="160" y="76" textAnchor="middle" fill="#e6d6b8" fontSize="14" fontFamily="Space Grotesk">π ≈ 3,14</text>
     ${[70, 160, 250].map((x, i) => html`<g key=${i}><rect x=${x - 32} y="135" width="64" height="8" rx="3" fill="#e8edf5" />${pers(x, 125, '#16224f', ['#f1c8a5', '#c98e66', '#f5d3b8'][i], ['#3b2a1f', '#151515', '#c08a45'][i])}</g>`)}`;
   if (icono === 'recreo') esc = html`
     <circle cx="270" cy="38" r="18" fill="#fde68a" /><rect x="0" y="130" width="320" height="30" fill="#79b35e" />
@@ -136,11 +137,11 @@ export function IlusMomento({ icono, noche = false }) {
     <circle cx="275" cy="98" r="9" fill="#f97316" /><circle cx="290" cy="100" r="8" fill="#ef4444" />
     <text x="160" y="50" textAnchor="middle" fill="#fff" fontSize="16" fontFamily="Space Grotesk" fontWeight="600">¡Buen provecho!</text>`;
   if (icono === 'reanudar') esc = html`
-    <rect x="90" y="60" width="140" height="80" rx="8" fill="#0b1a44" stroke="#8b5cf6" strokeWidth="3" />
-    <path d="M110 85h60M110 100h90M110 115h40" stroke="#7fdcff" strokeWidth="5" strokeLinecap="round" />
+    <rect x="90" y="60" width="140" height="80" rx="8" fill="#0b1a44" stroke="#c9a978" strokeWidth="3" />
+    <path d="M110 85h60M110 100h90M110 115h40" stroke="#e6d6b8" strokeWidth="5" strokeLinecap="round" />
     <rect x="70" y="140" width="180" height="10" rx="4" fill="#e8edf5" />
-    <rect x="250" y="90" width="40" height="10" rx="2" fill="#3d8bff" /><rect x="252" y="100" width="36" height="10" rx="2" fill="#f472b6" /><rect x="248" y="110" width="44" height="10" rx="2" fill="#fbbf24" />
-    <circle cx="50" cy="60" r="14" fill="#22d3ee" opacity=".7" /><circle cx="50" cy="60" r="5" fill="#fff" />`;
+    <rect x="250" y="90" width="40" height="10" rx="2" fill="#2a62b8" /><rect x="252" y="100" width="36" height="10" rx="2" fill="#b84a55" /><rect x="248" y="110" width="44" height="10" rx="2" fill="#d9a441" />
+    <circle cx="50" cy="60" r="14" fill="#e6d6b8" opacity=".7" /><circle cx="50" cy="60" r="5" fill="#fff" />`;
   if (icono === 'fin') esc = html`
     <rect x="0" y="118" width="320" height="42" fill="#38bdf8" opacity=".85" />
     <path d="M0 125 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" strokeWidth="3" fill="none" opacity=".7" />
@@ -151,7 +152,7 @@ export function IlusMomento({ icono, noche = false }) {
     ${[[40, 30], [80, 50], [130, 22], [180, 40], [300, 70], [250, 20]].map(([x, y], i) => html`<circle key=${i} cx=${x} cy=${y} r="2" fill="#fff" />`)}
     <path d="M285 30a22 22 0 10 0 40a17 17 0 01 0 -40z" fill="#fde68a" />
     <rect x="30" y="110" width="200" height="34" rx="8" fill="#e8edf5" /><rect x="30" y="88" width="16" height="56" rx="4" fill="#16224f" />
-    <rect x="80" y="100" width="150" height="24" rx="10" fill="#8b5cf6" /><rect x="50" y="96" width="34" height="16" rx="6" fill="#fff" />
+    <rect x="80" y="100" width="150" height="24" rx="10" fill="#c9a978" /><rect x="50" y="96" width="34" height="16" rx="6" fill="#fff" />
     <circle cx="68" cy="94" r="10" fill="#f1c8a5" /><path d="M58 92 a10 10 0 0 1 20 0z" fill="#3b2a1f" />
     <text x="110" y="70" fill="#c4b5fd" fontSize="22" fontFamily="Space Grotesk" fontWeight="700">Z z z</text>`;
   return html`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">

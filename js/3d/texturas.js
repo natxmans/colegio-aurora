@@ -34,14 +34,10 @@ function fondoPantalla(g, w, h, a = '#0b1a44', b = '#13286a') {
   for (let x = 0; x < w; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
   for (let y = 0; y < h; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
 }
-function logoA(g, cx, cy, r, color = '#22d3ee') {
-  g.save(); g.lineCap = 'round'; g.lineJoin = 'round'; g.shadowColor = color; g.shadowBlur = r * 0.3;
-  g.strokeStyle = color; g.lineWidth = r * 0.16;
-  g.beginPath(); g.moveTo(cx - r * 0.55, cy + r * 0.62); g.lineTo(cx, cy - r * 0.62); g.lineTo(cx + r * 0.55, cy + r * 0.62); g.stroke();
-  g.strokeStyle = '#3d8bff'; g.lineWidth = r * 0.13;
-  g.beginPath(); g.moveTo(cx - r * 0.36, cy + r * 0.3); g.quadraticCurveTo(cx, cy - r * 0.05, cx + r * 0.36, cy + r * 0.3); g.stroke();
-  g.fillStyle = color; g.beginPath(); g.arc(cx, cy + r * 0.1, r * 0.08, 0, Math.PI * 2); g.fill();
-  g.restore();
+// Dibuja el logo ORIGINAL del colegio (PNG precargado en main.js), cuadrado: nunca se deforma
+function logoA(g, cx, cy, r) {
+  const img = window.__logoImg;
+  if (img && img.complete) g.drawImage(img, cx - r, cy - r, 2 * r, 2 * r);
 }
 
 // ---------------- Pizarras digitales de cada asignatura ----------------
@@ -122,7 +118,7 @@ export function texPoster(tipo) {
       pitagoras: ['#0d2a6b', '#3d8bff', 'Teorema de Pitágoras'], paris: ['#2a1b5e', '#f472b6', 'París'], londres: ['#3b0d1d', '#ff5d73', 'Londres'],
       celula: ['#06392b', '#34d399', 'La célula'], cuerpo: ['#0b2d3b', '#22d3ee', 'El cuerpo humano'], linea: ['#3a2606', '#f2a541', 'Grandes civilizaciones'],
       programacion: ['#1d0d4a', '#a78bfa', 'Aprende a programar'], espacio: ['#070b2a', '#8b5cf6', 'El espacio'], futbol: ['#05301c', '#22c55e', '¡Vamos, equipo!'],
-      musica: ['#3a0b3f', '#e879f9', 'Concierto'], naturaleza: ['#0b3320', '#4ade80', 'La naturaleza'], valencia: ['#0b2a52', '#38bdf8', 'Valencia'],
+      musica: ['#3a0b3f', '#e879f9', 'Concierto'], naturaleza: ['#0b3320', '#4ade80', 'La naturaleza'], espana: ['#3a0d12', '#f2c14e', 'España'],
     }[tipo] || ['#0d2a6b', '#3d8bff', tipo];
     const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, P[0]); gr.addColorStop(1, '#050816');
     g.fillStyle = gr; g.fillRect(0, 0, w, h);
@@ -162,7 +158,7 @@ export function texPoster(tipo) {
     } else if (tipo === 'musica') {
       g.beginPath(); g.ellipse(cx - 60, 430, 50, 36, -0.4, 0, 7); g.fill(); g.beginPath(); g.ellipse(cx + 90, 390, 50, 36, -0.4, 0, 7); g.fill();
       g.fillRect(cx - 18, 160, 12, 270); g.fillRect(cx + 132, 120, 12, 270); g.fillRect(cx - 18, 140, 162, 30);
-    } else if (tipo === 'valencia') {
+    } else if (tipo === 'espana') {
       g.beginPath(); g.ellipse(cx, 400, 180, 70, 0, Math.PI, 0); g.stroke(); g.beginPath(); g.moveTo(cx - 180, 400); g.quadraticCurveTo(cx, 120, cx + 180, 400); g.stroke();
       g.beginPath(); g.arc(cx + 100, 170, 40, 0, 7); g.fill();
     } else {
@@ -181,7 +177,7 @@ export function texPantalla(tipo) {
     if (tipo === 'bienvenida') {
       logoA(g, w / 2, 170, 90);
       texto(g, '¡Bienvenidos!', w / 2, 330, 84, '#ffffff', 700, 'center', F, 24);
-      texto(g, 'Colegio Aurora · Aprender hoy, brillar mañana', w / 2, 420, 38, '#7fdcff', 500, 'center');
+      texto(g, 'Colegio Pablo Picasso · Disciplina y arte', w / 2, 420, 38, '#e6d6b8', 500, 'center');
     } else if (tipo === 'menu') {
       texto(g, 'Menú del día', 60, 80, 60, '#ffb35c', 700, 'left', F, 14);
       ['Gazpacho andaluz', 'Paella de verduras', 'Tortilla de patatas', 'Fruta fresca', 'Agua y zumo natural'].forEach((t, i) => {
@@ -220,10 +216,17 @@ export function texPantalla(tipo) {
       texto(g, '2 - 1', w / 2, 40, 34, '#fff', 700, 'center', FM);
     } else if (tipo === 'horario') {
       texto(g, 'Nuestro horario', 50, 70, 54, '#7fdcff', 700, 'left', F, 12);
-      [['7:45', 'Los alumnos se despiertan.'], ['8:00', 'Empiezan las clases.'], ['10:00', 'Recreo de veinte minutos.'], ['12:20', 'Comida.'], ['14:00', 'Reanudación de las clases.'], ['17:00', 'Fin de las clases.'], ['21:00', 'Los alumnos se acuestan.']]
+      [['07:45', 'Los alumnos se despiertan.'], ['08:00', 'Empiezan las clases.'], ['10:00', 'Recreo de veinte minutos.'], ['12:20', 'Comemos en el comedor.'], ['14:00', 'Las clases vuelven a empezar.'], ['17:00', 'Terminan las clases.'], ['21:00', 'Los alumnos se acuestan.']]
         .forEach(([a, b], i) => { texto(g, a, 60, 150 + i * 60, 36, '#22d3ee', 700, 'left', FM); texto(g, b, 230, 150 + i * 60, 36, '#ffffff', 500); });
+    } else if (tipo === 'biblioteca') {
+      texto(g, 'Biblioteca digital', 50, 70, 58, '#e6d6b8', 700, 'left', F, 10);
+      ['Buscar un libro', 'Libros digitales', 'Revistas', 'Ciencias', 'Historia', 'Novelas'].forEach((t, i) => {
+        const x = 50 + (i % 3) * 315, y = 150 + Math.floor(i / 3) * 190;
+        rr(g, x, y, 290, 160, 18); g.fillStyle = 'rgba(230,214,184,.14)'; g.fill();
+        texto(g, t, x + 22, y + 80, 34, '#ffffff', 600);
+      });
     } else if (tipo === 'mapa-campus') {
-      texto(g, 'Colegio Aurora · Plano', 50, 60, 44, '#7fdcff', 700);
+      texto(g, 'Colegio Pablo Picasso · Plano', 50, 60, 44, '#e6d6b8', 700);
       g.fillStyle = 'rgba(61,139,255,.6)'; g.fillRect(200, 200, 300, 110); g.fillStyle = 'rgba(52,211,153,.5)'; g.fillRect(200, 320, 300, 160);
       g.fillStyle = 'rgba(56,189,248,.6)'; g.fillRect(540, 190, 160, 120); g.fillStyle = 'rgba(14,165,233,.6)'; g.fillRect(540, 330, 160, 110);
       g.fillStyle = 'rgba(22,163,74,.6)'; g.fillRect(540, 90, 330, 90);
@@ -282,20 +285,28 @@ export function texRotulo(t, sub = '', color = '#22d3ee') {
     if (sub) texto(g, sub, 224, 190, 38, color, 500, 'left', F, 10);
   });
 }
-export function texCartel(t, color = '#22d3ee', fondo = 'rgba(8,14,40,0.92)') {
+export function texCartel(t, color = '#c9a978', fondo = 'rgba(20,40,90,0.95)') {
   return tex('car-' + t + color, 512, 160, (g, w, h) => {
     g.fillStyle = fondo; rr(g, 0, 0, w, h, 28); g.fill();
     g.strokeStyle = color; g.lineWidth = 6; rr(g, 6, 6, w - 12, h - 12, 24); g.stroke();
     texto(g, t, w / 2, h / 2 + 2, t.length > 14 ? 46 : 60, '#ffffff', 700, 'center', F, 12);
   });
 }
-export function texLogoRedondo() {
-  return tex('logo-redondo', 512, 512, (g, w, h) => {
-    const gr = g.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w / 2); gr.addColorStop(0, '#13286a'); gr.addColorStop(1, '#050816');
-    g.fillStyle = gr; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 4, 0, 7); g.fill();
-    g.strokeStyle = '#22d3ee'; g.lineWidth = 10; g.shadowColor = '#22d3ee'; g.shadowBlur = 20; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 16, 0, 7); g.stroke(); g.shadowBlur = 0;
-    logoA(g, w / 2, h / 2 - 30, 150);
-    texto(g, 'AURORA', w / 2, h / 2 + 150, 54, '#ffffff', 800, 'center', FM, 14);
+// Logo ORIGINAL (PNG con fondo transparente) como textura 3D
+let _logo = null;
+export function texLogo() {
+  if (!_logo) {
+    _logo = new THREE.TextureLoader().load('img/logo-512.png');
+    _logo.colorSpace = THREE.SRGBColorSpace;
+    _logo.anisotropy = 8;
+  }
+  return _logo;
+}
+// Rótulo solo con texto (fondo transparente)
+export function texRotuloTexto(t, color = '#14285a') {
+  return tex('rtx-' + t + color, 1600, 190, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    texto(g, t, w / 2, h / 2 + 4, 120, color, 700, 'center', '"Playfair Display", Georgia, serif');
   });
 }
 export function texCruz() {
@@ -315,7 +326,7 @@ export function texBandera(tipo) {
         g.beginPath(); for (let k = 0; k < 10; k++) { const r = k % 2 ? 6 : 14, b = -Math.PI / 2 + (k * Math.PI) / 5; g.lineTo(x + Math.cos(b) * r, y + Math.sin(b) * r); } g.fill();
       }
     } else {
-      g.fillStyle = '#0a1030'; g.fillRect(0, 0, w, h); logoA(g, w / 2, h / 2 - 10, 90); texto(g, 'AURORA', w / 2, h - 34, 34, '#fff', 800, 'center', FM);
+      g.fillStyle = '#14285a'; g.fillRect(0, 0, w, h); logoA(g, w / 2, h / 2, 105);
     }
   });
 }
@@ -441,4 +452,27 @@ export function texPista() {
     g.fillStyle = '#c4553d'; g.fillRect(0, 0, w, h);
     g.fillStyle = 'rgba(255,255,255,.9)'; for (let i = 0; i <= 6; i++) g.fillRect(0, (i * h) / 6 - 2, w, 4);
   }, [40, 1]);
+}
+
+// ---------------- Césped y adoquines (texturas que se repiten) ----------------
+export function texCesped() {
+  return tex('cesped', 256, 256, (g, w, h) => {
+    g.fillStyle = '#8fb86f'; g.fillRect(0, 0, w, h);
+    const r = rnd(7);
+    for (let i = 0; i < 2600; i++) {
+      const v = r();
+      g.fillStyle = v < 0.33 ? 'rgba(70,110,50,.35)' : v < 0.66 ? 'rgba(160,200,120,.3)' : 'rgba(110,150,80,.35)';
+      g.fillRect(r() * w, r() * h, 1 + r() * 2, 2 + r() * 4);
+    }
+  }, [1, 1]);
+}
+export function texAdoquin() {
+  return tex('adoquin', 256, 256, (g, w, h) => {
+    g.fillStyle = '#d8ccb4'; g.fillRect(0, 0, w, h);
+    const r = rnd(11);
+    for (let y = 0; y < h; y += 32) for (let x = (y / 32) % 2 ? -32 : 0; x < w; x += 64) {
+      const t = 205 + Math.floor(r() * 30);
+      g.fillStyle = `rgb(${t},${t - 10},${t - 30})`; g.fillRect(x + 1, y + 1, 62, 30);
+    }
+  }, [1, 1]);
 }

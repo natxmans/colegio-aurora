@@ -32,28 +32,25 @@ function MesaProfesor({ d, conProfe, seed, m }) {
   <//>`;
 }
 
-// Pupitres dobles en 3 filas, con alumnos sentados mirando la pizarra
-function Pupitres({ s, col, objeto = 'cuaderno', poses = ['escribiendo', 'sentado'], vacios = 2, seed }) {
+// Mesas individuales con ordenador (como en el PowerPoint), en 3 filas de 4,
+// con los alumnos sentados mirando la pizarra
+const PANTALLAS = ['#5b8fd6', '#7fa7dc', '#9bb8e0', '#6d97c9'];
+function Pupitres({ s, col, objeto = 'monitor', poses = ['tecleando', 'sentado'], vacios = 2, seed }) {
   const r = useMemo(() => azar(seed), [seed]);
-  const filas = [-2.7, -1.0, 0.7], columnas = [-1.8, 1.8];
+  const filas = [-2.8, -1.25, 0.3], columnas = [-2.55, -0.85, 0.85, 2.55];
   const items = [];
   let k = 0;
   const huecos = new Set();
   while (huecos.size < vacios) huecos.add(Math.floor(r() * 12));
   for (const z of filas) for (const x of columnas) {
-    items.push(html`<${Pupitre} key=${'p' + x + z} p=${[x, 0, z]} ancho=${1.55} led=${col} />`);
-    for (const dx of [-0.39, 0.39]) {
-      const i = k++;
-      const sx = x + dx;
-      items.push(html`<${Silla} key=${'s' + i} p=${[sx, 0, z - 0.56]} c=${i % 2 ? col : COL.noche} />`);
-      if (objeto === 'portatil') items.push(html`<${Portatil} key=${'o' + i} p=${[sx, 0.74, z - 0.02]} pantalla=${i % 3 ? '#7cc4ff' : '#c4b5fd'} />`);
-      else if (objeto === 'monitor') items.push(html`<${Monitor} key=${'o' + i} p=${[sx, 0.74, z + 0.12]} ancho=${0.48} pantalla=${['#3d8bff', '#8b5cf6', '#22d3ee'][i % 3]} />`);
-      else if (objeto === 'microscopio' && i % 3 === 0) items.push(html`<${Microscopio} key=${'o' + i} p=${[sx, 0.74, z + 0.05]} />`);
-      else items.push(html`<${Cuaderno} key=${'o' + i} p=${[sx, 0.74, z - 0.06]} r=${[0, (r() - 0.5) * 0.3, 0]} c=${['#3d8bff', '#22d3ee', '#8b5cf6', '#f472b6', '#fbbf24'][i % 5]} />`);
-      if (!huecos.has(i)) {
-        const pose = poses[Math.floor(r() * poses.length)];
-        items.push(html`<${Alumno} key=${'a' + i} p=${[sx, 0, z - 0.56]} pose=${pose} seed=${seed * 31 + i * 7} />`);
-      }
+    const i = k++;
+    items.push(html`<${Pupitre} key=${'p' + i} p=${[x, 0, z]} ancho=${0.82} c=${COL.blanco} led=${COL.maderaC} />`);
+    items.push(html`<${Silla} key=${'s' + i} p=${[x, 0, z - 0.56]} c=${i % 2 ? col : COL.noche} />`);
+    if (objeto === 'microscopio' && i % 3 === 0) items.push(html`<${Microscopio} key=${'o' + i} p=${[x, 0.74, z + 0.05]} />`);
+    else items.push(html`<${Monitor} key=${'o' + i} p=${[x, 0.74, z + 0.12]} ancho=${0.46} pantalla=${PANTALLAS[i % 4]} />`);
+    if (!huecos.has(i)) {
+      const pose = objeto === 'microscopio' && i % 3 === 0 ? 'escribiendo' : poses[Math.floor(r() * poses.length)];
+      items.push(html`<${Alumno} key=${'a' + i} p=${[x, 0, z - 0.56]} pose=${pose} seed=${seed * 31 + i * 7} />`);
     }
   }
   return items;
@@ -413,8 +410,8 @@ export function Aula({ s }) {
     <${BrazoRobot} p=${[-0.6, yt, zt]} />
     <${Dron} p=${[1.2, yt, zt]} />
     <${Robotito} p=${[2.4, yt, zt]} c="#f97316" />
-    <${Robotito} p=${[1.4, 0.74, -2.6]} r=${[0, 0.4, 0]} />
-    <${Robotito} p=${[-2.2, 0.74, -0.95]} r=${[0, -0.3, 0]} c=${COL.cian} />
+    <${Robotito} p=${[1.12, 0.74, -2.66]} r=${[0, 0.4, 0]} />
+    <${Robotito} p=${[-2.27, 0.74, -1.1]} r=${[0, -0.3, 0]} c=${COL.elec} />
     ${estanteO} ${posterE('programacion')}`;
   if (m === 'musica') deco = html`
     <${Piano} p=${[-w / 2 + 0.45, 0, -0.8]} r=${[0, Math.PI / 2, 0]} />
@@ -436,8 +433,8 @@ export function Aula({ s }) {
     ${m !== 'musica' && m !== 'fisica' && m !== 'svt' && m !== 'tecno' ? html`<${MuebleTrasero} w=${w} d=${d} col=${col} />` : null}
     ${m === 'svt' || m === 'fisica' || m === 'tecno' ? html`<${MuebleTrasero} w=${w} d=${d} col=${col} />` : null}
     ${m === 'musica' ? html`<${SillasMusica} col=${col} seed=${seed} />` : html`<${Pupitres} s=${s} col=${col} seed=${seed}
-        objeto=${m === 'tecno' ? 'monitor' : m === 'frances' || m === 'ingles' ? 'portatil' : m === 'svt' ? 'microscopio' : 'cuaderno'}
-        poses=${m === 'tecno' || m === 'frances' || m === 'ingles' ? ['tecleando', 'sentado'] : ['escribiendo', 'sentado', 'escribiendo']} vacios=${m === 'fisica' ? 3 : 2} />`}
+        objeto=${m === 'svt' ? 'microscopio' : 'monitor'}
+        poses=${['tecleando', 'sentado', 'tecleando', 'escribiendo']} vacios=${m === 'fisica' ? 3 : 2} />`}
     ${deco}
   <//>`;
 }

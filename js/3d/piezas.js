@@ -4,12 +4,14 @@
 import { html, THREE, useMemo, useRef, useFrame } from '../lib.js';
 import { Pieza, Grupo } from './kit.js';
 
+// Paleta del Colegio Pablo Picasso: azul marino, blanco y beige (+ madera y luz cálida)
 export const COL = {
-  blanco: '#f4f7fb', gris: '#cfd6e0', grisM: '#9aa5b8', grisO: '#3a4357', negro: '#151a26',
-  noche: '#14204a', azul: '#2f6bff', elec: '#3d8bff', cian: '#22d3ee', violeta: '#8b5cf6',
-  madera: '#c89b6d', maderaC: '#e2c49b', verde: '#4fae5f', verdeO: '#2f7d4a', calido: '#ffd59a',
+  blanco: '#f7f4ee', gris: '#ddd7cc', grisM: '#a7a49c', grisO: '#3a4256', negro: '#1a1d26',
+  noche: '#14285a', azul: '#1f4e9a', elec: '#2a62b8', cian: '#f3dfb2', violeta: '#7d8fb8',
+  madera: '#b98a5a', maderaC: '#dcc39c', verde: '#5c9a48', verdeO: '#3f7a3c', calido: '#ffd9a0',
+  beige: '#e6d6b8', arena: '#d2bc94', piedra: '#cdb894',
 };
-export const COLORES_VIVOS = ['#3d8bff', '#22d3ee', '#8b5cf6', '#f472b6', '#34d399', '#fbbf24', '#fb7185', '#60a5fa', '#a78bfa', '#f97316'];
+export const COLORES_VIVOS = ['#2a62b8', '#c9a978', '#14285a', '#b84a55', '#3f8a5a', '#d9a441', '#8a4f8f', '#5b8fd6', '#a77b4f', '#c46a2e'];
 
 // Generador pseudoaleatorio (siempre igual para una misma semilla)
 export function azar(semilla) {

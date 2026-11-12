@@ -67,11 +67,9 @@ export function Zonas({ planta }) {
   const hover = useEstado(s => s.hover);
   const lista = POR_PLANTA[planta];
   const act = activa(planta, vista, modo);
-  const etq = act && !sel && conEtiquetas(planta, vista);
   return html`<group>
     ${act ? lista.map(s => html`<${Caja} key=${s.id} s=${s} />`) : null}
     ${lista.map(s => (s.id === sel || (act && s.id === hover && !sel)) ? html`<${Resalte} key=${'r' + s.id} s=${s} fuerte=${s.id === sel} />` : null)}
-    ${etq ? lista.map(s => html`<${Etiqueta} key=${'e' + s.id} s=${s} hover=${s.id === hover} />`) : null}
   </group>`;
 }
 
@@ -83,7 +81,7 @@ export function EtiquetaPlanta({ planta }) {
   const z = ZONAS[planta];
   return html`<${Html} position=${[-35, 1.9, 6]} center zIndexRange=${[19, 0]}>
     <button className=${'etq-planta' + (planta === 'primer' ? ' violeta' : '')} onClick=${() => cambiarVista(planta)}>
-      ${z.titulo.toUpperCase()}<small>${planta === 'baja' ? 'Zona escolar · aulas' : 'Internado · dormitorios'}</small>
+      ${z.titulo.toUpperCase()}<small>${planta === 'baja' ? 'Aulas, laboratorios, biblioteca y comedor' : 'Dormitorios y salones'}</small>
     </button>
   <//>`;
 }

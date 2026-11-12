@@ -1,12 +1,14 @@
 // =========================================================
-// SITIO: menú, portada y todas las secciones de presentación (en español)
+// SITIO · COLEGIO PABLO PICASSO
+// Menú, portada y todas las secciones (español sencillo, fiel al PowerPoint)
 // =========================================================
 import { html, useState, useEffect, useRef } from '../lib.js';
 import { poner, abrirExplorador, seleccionar, volar } from '../estado.js';
 import { SALAS, AULAS, ESPACIOS_PB, COMUNES_INT, POR_PLANTA, VISTAS } from '../datos/salas.js';
-import { COLEGIO, CIFRAS, MENU, ZONAS_CAMPUS, ASIGNATURAS, HORARIO, VIDA, FRASES_DEPORTE, UNIFORME_PIEZAS, RAZONES, ARQUITECTURA } from '../datos/contenido.js';
+import { COLEGIO, CIFRAS, MENU, PRESENTACION, EDIFICIO, AULAS_TXT, COMUNES, INTERNADO, SEMANA, ASIGNATURAS, HORARIO, VIDA, FRASES_DEPORTE, UNIFORME_PIEZAS, RAZONES } from '../datos/contenido.js';
 import { Icono, Logo, IlusMateria, IlusMomento } from './Iconos.js';
 import { VisorUniforme } from './Uniforme.js';
+import { Presentacion } from './Presentacion.js';
 
 const irA = (id) => {
   if (id === 'explorar') return abrirExplorador('completa');
@@ -18,12 +20,22 @@ function Ver3D({ id, texto = 'Ver en 3D' }) {
   return html`<button className="ver3d" onClick=${() => seleccionar(id)}><${Icono} n="cubo" />${texto}</button>`;
 }
 
+function Foto({ src, alt, className = '' }) {
+  return html`<figure className=${'foto ' + className}><img src=${'img/fotos/' + src + '.jpg'} alt=${alt} loading="lazy" decoding="async" /></figure>`;
+}
+
 function Cabecera({ num, etiqueta, titulo, grad, lead, centro }) {
   return html`<div className=${'cabecera revelar' + (centro ? ' centro' : '')}>
     <span className="etiqueta">${num} · ${etiqueta}</span>
     <h2>${titulo} ${grad ? html`<span className="grad">${grad}</span>` : null}</h2>
     ${lead ? html`<p className="lead">${lead}</p>` : null}
   </div>`;
+}
+
+function Puntos({ items, icono = 'estrella' }) {
+  return html`<ul className="puntos">
+    ${items.map(p => html`<li key=${p.t} className="revelar"><span className="punto-ico"><${Icono} n=${p.icono || icono} /></span><div><b>${p.t}</b><span>${p.txt}</span></div></li>`)}
+  </ul>`;
 }
 
 // ---------------- Menú ----------------
@@ -36,19 +48,19 @@ function Nav() {
     return () => window.removeEventListener('scroll', f);
   }, []);
   const click = (id) => { setAbierto(false); irA(id); };
-  return html`<${'nav'} className=${'nav' + (solida ? ' solida' : '')} aria-label="Menú principal">
+  return html`<nav className=${'nav' + (solida ? ' solida' : '')} aria-label="Menú principal">
     <a className="marca" href="#inicio" onClick=${e => { e.preventDefault(); click('inicio'); }}>
-      <${Logo} size=${36} /><div><b>AURORA</b><small>Colegio-internado</small></div>
+      <${Logo} size=${44} /><div><b>COLEGIO PABLO PICASSO</b><small>Nuestro colegio ideal</small></div>
     </a>
     <div className="nav-links">
-      ${MENU.filter(m => m.id !== 'explorar').map(m => html`<a key=${m.id} href=${'#' + m.id} onClick=${e => { e.preventDefault(); click(m.id); }}>${m.t}</a>`)}
+      ${MENU.filter(m => m.id !== 'explorar' && m.id !== 'inicio').map(m => html`<a key=${m.id} href=${'#' + m.id} onClick=${e => { e.preventDefault(); click(m.id); }}>${m.t}</a>`)}
       <button className="nav-3d" onClick=${() => click('explorar')}><${Icono} n="cubo" />Explorar en 3D</button>
     </div>
-    <button className="hamburguesa" onClick=${() => setAbierto(!abierto)} aria-label="Abrir el menú" aria-expanded=${abierto}><${Icono} n=${abierto ? 'cerrar' : 'menu'} /></button>
+    <button className="hamburguesa" onClick=${() => setAbierto(!abierto)} aria-label="Abrir el menú" aria-expanded=${abierto}><${Icono} n=${abierto ? 'cerrar' : 'menu'} /><span>Menú</span></button>
     ${abierto ? html`<div className="menu-movil">
       ${MENU.map((m, i) => html`<button key=${m.id} onClick=${() => click(m.id)}><span className="num">${String(i + 1).padStart(2, '0')}</span>${m.t}</button>`)}
     </div>` : null}
-  <//>`;
+  </nav>`;
 }
 
 // ---------------- Portada ----------------
@@ -57,16 +69,18 @@ function Hero() {
   useEffect(() => {
     const io = new IntersectionObserver(([e]) => poner({ heroVisible: e.isIntersecting }), { threshold: 0.02 });
     io.observe(ref.current);
-    return () => { io.disconnect(); };
+    return () => io.disconnect();
   }, []);
   return html`<section className="hero" id="inicio" ref=${ref}>
-    <span className="hero-kicker">${COLEGIO.tipo} · ${COLEGIO.lugar}</span>
-    <h1>${COLEGIO.nombre}</h1>
-    <p className="hero-slogan">Aprender hoy, <em>brillar mañana.</em></p>
+    <div className="hero-logo"><img src="img/logo-512.png" alt="Logo del Colegio Pablo Picasso" width="150" height="150" /></div>
+    <span className="hero-kicker">Proyecto de español (4º) · ${COLEGIO.proyecto}</span>
+    <h1>Colegio <span>Pablo Picasso</span></h1>
+    <p className="hero-slogan">${COLEGIO.lema} · <em>Un internado moderno en España</em></p>
     <p className="hero-texto">${COLEGIO.presentacion}</p>
     <div className="hero-botones">
       <button className="btn btn-primario" onClick=${() => abrirExplorador('completa')}><${Icono} n="cubo" />Explorar nuestro colegio</button>
       <button className="btn btn-secundario" onClick=${() => abrirExplorador('primer')}><${Icono} n="cama" />Descubrir el internado</button>
+      <button className="btn btn-texto" onClick=${() => irA('presentacion')}><${Icono} n="diapo" />Ver la presentación</button>
     </div>
     <div className="hero-stats">
       ${CIFRAS.map(c => html`<div key=${c.t} className="stat"><b>${c.n}</b><span>${c.t}</span></div>`)}
@@ -75,21 +89,20 @@ function Hero() {
   </section>`;
 }
 
-// ---------------- Nuestro colegio ----------------
+// ---------------- 01 · Nuestro colegio ----------------
 function Plano() {
-  const zonas = ['futbol', 'jardin', 'patio', 'edificio', 'gimnasio', 'fitness', 'vestuarios', 'piscina', 'baloncesto', 'padel'].map(id => SALAS[id]);
+  const zonas = ['futbol', 'jardin', 'patio', 'edificio', 'gimnasio', 'piscina', 'baloncesto'].map(id => SALAS[id]).filter(Boolean);
   return html`<div className="plano revelar">
-    <svg viewBox="-92 -86 228 158" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Plano del campus">
-      <defs><pattern id="rej" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="rgba(120,170,255,.08)" strokeWidth=".4" /></pattern></defs>
-      <rect x="-92" y="-86" width="228" height="158" fill="url(#rej)" />
-      <rect x="-84" y="-82" width="216" height="132" rx="4" fill="none" stroke="rgba(61,139,255,.5)" strokeWidth=".8" strokeDasharray="3 2" />
-      <rect x="-7" y="48" width="14" height="22" fill="rgba(255,255,255,.08)" />
-      ${zonas.map(s => html`<g key=${s.id} className="zona" onClick=${() => seleccionar(s.id)}>
-        <rect x=${s.x0} y=${s.z0} width=${s.x1 - s.x0} height=${s.z1 - s.z0} rx="2" fill=${s.color} fillOpacity=${s.id === 'edificio' ? 0.75 : 0.42} stroke=${s.color} strokeWidth=".8" />
-        <text x=${(s.x0 + s.x1) / 2} y=${(s.z0 + s.z1) / 2 + 1.6} textAnchor="middle" fill="#fff" fontSize=${s.id === 'edificio' || s.id === 'futbol' || s.id === 'patio' ? 5 : 3.6} fontWeight="600" fontFamily="Space Grotesk, sans-serif">${s.corto}</text>
+    <svg viewBox="-70 -70 180 128" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Plano del campus">
+      <rect x="-68" y="-68" width="176" height="124" rx="4" fill="#f6f1e7" stroke="#c9a978" strokeWidth=".8" />
+      <rect x="-3" y="54" width="6" height="12" fill="#e2d6bf" />
+      ${zonas.map(s => html`<g key=${s.id} className="zona" onClick=${() => seleccionar(s.id)} tabIndex="0" role="button" aria-label=${s.nombre}
+          onKeyDown=${e => { if (e.key === 'Enter') seleccionar(s.id); }}>
+        <rect x=${s.x0} y=${s.z0} width=${s.x1 - s.x0} height=${s.z1 - s.z0} rx="2" fill=${s.color} fillOpacity=${s.id === 'edificio' ? 0.9 : 0.6} stroke="#ffffff" strokeWidth=".8" />
+        <text x=${(s.x0 + s.x1) / 2} y=${(s.z0 + s.z1) / 2 + 1.6} textAnchor="middle" fill="#fff" fontSize=${s.id === 'edificio' || s.id === 'futbol' || s.id === 'patio' ? 4.6 : 3.6} fontWeight="700" fontFamily="Inter, sans-serif">${s.corto}</text>
       </g>`)}
-      <text x="0" y="66" textAnchor="middle" fill="#7fdcff" fontSize="3.6" fontFamily="Space Grotesk">Entrada</text>
-      <text x="128" y="-74" textAnchor="end" fill="rgba(255,255,255,.5)" fontSize="4" fontFamily="Orbitron">N ↑</text>
+      <text x="0" y="64" textAnchor="middle" fill="#14285a" fontSize="3.6" fontFamily="Inter, sans-serif" fontWeight="600">Entrada</text>
+      <text x="104" y="-60" textAnchor="end" fill="#14285a" fontSize="4" fontFamily="Inter, sans-serif" fontWeight="700">N ↑</text>
     </svg>
     <div className="plano-leyenda">Plano del campus · haz clic en una zona</div>
   </div>`;
@@ -97,35 +110,47 @@ function Plano() {
 
 function SeccionColegio() {
   return html`<section className="seccion" id="colegio">
-    <${Cabecera} num="01" etiqueta="Nuestro colegio" titulo="Un campus del futuro" grad="en España"
-      lead=${html`Nuestro colegio está en <b>Valencia</b>, cerca del mar Mediterráneo. Es un colegio-internado moderno: los alumnos <b>estudian</b>, <b>viven</b> y <b>practican deporte</b> en el mismo lugar.`} />
-    <div className="colegio-grid">
-      <${Plano} />
-      <div className="zonas">
-        ${ZONAS_CAMPUS.map(z => html`<div key=${z.id} className="tarjeta revelar" style=${{ '--c': z.color }}>
-          <div className="icono-caja"><${Icono} n=${z.icono} /></div>
-          <h3>${z.t}</h3><p>${z.txt}</p>
-          <${Ver3D} id=${z.id} />
-        </div>`)}
-      </div>
+    <${Cabecera} num="01" etiqueta="Nuestro colegio" titulo="Un colegio moderno," grad="limpio y acogedor"
+      lead=${html`El <b>Colegio Pablo Picasso</b> es un internado en España. Los alumnos viven aquí <b>de lunes a viernes</b> y vuelven a casa <b>el fin de semana</b>.`} />
+    <div className="dos-col">
+      <${Foto} src="fachada" alt="La entrada del Colegio Pablo Picasso" className="revelar alta" />
+      <${Puntos} items=${PRESENTACION} />
     </div>
-    <div className="destacado revelar">
-      <${Icono} n="sol" />
+    <h3 className="sub-titulo revelar">El edificio <span className="linea"></span></h3>
+    <div className="dos-col invertido">
+      <${Foto} src="arquitectura" alt="El edificio y el patio con jardines" className="revelar alta" />
       <div>
-        <p><b>Arquitectura:</b> las fachadas son de cristal y hay luces LED azules. En el techo hay paneles solares: ¡es un colegio ecológico!</p>
-        <div className="chips" style=${{ marginTop: '12px' }}>${ARQUITECTURA.map(a => html`<span key=${a} className="chip">${a}</span>`)}</div>
+        <${Puntos} items=${EDIFICIO.map((e, i) => ({ ...e, icono: ['edificio', 'baja', 'primer', 'sol'][i] }))} />
+        <div className="botones-fila revelar">
+          <button className="btn btn-primario btn-peq" onClick=${() => seleccionar('edificio')}><${Icono} n="cubo" />Ver el edificio en 3D</button>
+          <button className="btn btn-secundario btn-peq" onClick=${() => abrirExplorador('corte')}><${Icono} n="corte" />Vista en corte</button>
+        </div>
       </div>
     </div>
+    <h3 className="sub-titulo revelar">El campus <span className="linea"></span></h3>
+    <div className="dos-col">
+      <${Plano} />
+      <${Foto} src="aerea" alt="Vista aérea del colegio" className="revelar" />
+    </div>
+    <h3 className="sub-titulo revelar">Los espacios comunes <span className="linea"></span></h3>
+    <div className="rejilla rejilla-4">
+      ${COMUNES.map(c => html`<div key=${c.id} className="tarjeta revelar">
+        <div className="icono-caja"><${Icono} n=${c.icono} /></div>
+        <h3>${c.t}</h3><p>${c.txt}</p>
+        <${Ver3D} id=${c.id} />
+      </div>`)}
+    </div>
+    <${Foto} src="espacios-comunes" alt="El comedor, la biblioteca, el salón y los jardines" className="revelar ancha" />
   </section>`;
 }
 
-// ---------------- Nuestras aulas ----------------
-const ICONO_SALA = { mates: 'mates', frances: 'frances', ingles: 'ingles', historia: 'historia', svt: 'svt', fisica: 'fisica', tecno: 'tecno', musica: 'musica', arte: 'estrella', informatica: 'raton', biblioteca: 'libro', recepcion: 'inicio', comedor: 'comida', enfermeria: 'mano', salacomun: 'balon', banos: 'reloj', aseos: 'pin', descanso: 'hoja', juegos: 'balon', comunint: 'inicio', lavanderia: 'camiseta', gimnasio: 'balon', fitness: 'estrella', vestuarios: 'camiseta', piscina: 'sol', futbol: 'balon', baloncesto: 'balon', padel: 'balon' };
+// ---------------- 02 · Nuestras aulas ----------------
+const ICONO_SALA = { mates: 'mates', frances: 'frances', ingles: 'ingles', historia: 'historia', svt: 'svt', fisica: 'fisica', tecno: 'tecno', musica: 'musica', biblioteca: 'libro', entrada: 'inicio', comedor: 'comida', salon1: 'sofa', salon2: 'sofa', gimnasio: 'balon', piscina: 'sol', futbol: 'balon', baloncesto: 'balon' };
 
 function TarjetaSala({ s, planta }) {
   return html`<div className="tarjeta aula-card revelar" style=${{ '--c': s.color }}>
     <span className="franja"></span>
-    <div className="icono-caja"><${Icono} n=${ICONO_SALA[s.id] || ICONO_SALA[s.materia] || 'edificio'} /></div>
+    <div className="icono-caja"><${Icono} n=${ICONO_SALA[s.id] || 'edificio'} /></div>
     ${planta ? html`<div className="planta">${planta}</div>` : null}
     <h3>${s.nombre}</h3>
     <p>${s.desc.split('. ')[0].replace(/\.$/, '')}.</p>
@@ -135,35 +160,43 @@ function TarjetaSala({ s, planta }) {
 
 function SeccionAulas() {
   return html`<section className="seccion seccion-fondo" id="aulas">
-    <${Cabecera} num="02" etiqueta="Nuestras aulas" titulo="La planta baja:" grad="la zona escolar"
-      lead=${html`En la <b>planta baja</b> están las ocho aulas y los espacios comunes. Cada aula es diferente y tiene una <b>pizarra digital</b>. Los alumnos llevan el uniforme del colegio.`} />
-    <div className="rejilla rejilla-4">${AULAS.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Planta baja · Aula" />`)}</div>
-    <h3 className="sub-titulo revelar">Otros espacios de la planta baja <span className="linea"></span></h3>
-    <div className="rejilla rejilla-4">${ESPACIOS_PB.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Planta baja" />`)}</div>
+    <${Cabecera} num="02" etiqueta="Nuestras aulas" titulo="La planta baja:" grad="aulas y laboratorios"
+      lead=${html`En la <b>planta baja</b> están las aulas, los laboratorios, la biblioteca digital y el comedor.`} />
+    <div className="dos-col">
+      <${Foto} src="aula" alt="Alumnos con ordenadores en un aula" className="revelar alta" />
+      <${Puntos} items=${AULAS_TXT.map((a, i) => ({ ...a, icono: ['estrella', 'raton', 'corazon'][i] }))} />
+    </div>
+    <h3 className="sub-titulo revelar">Las aulas y los laboratorios <span className="linea"></span></h3>
+    <div className="rejilla rejilla-4">${AULAS.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta=${s.nombre.startsWith('Laboratorio') ? 'Planta baja · Laboratorio' : 'Planta baja · Aula'} />`)}</div>
+    <h3 className="sub-titulo revelar">Los otros espacios de la planta baja <span className="linea"></span></h3>
+    <div className="rejilla rejilla-3">${ESPACIOS_PB.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Planta baja" />`)}</div>
   </section>`;
 }
 
-// ---------------- Nuestro internado ----------------
+// ---------------- 03 · Nuestro internado ----------------
 function SeccionInternado() {
   return html`<section className="seccion" id="internado">
-    <${Cabecera} num="03" etiqueta="Nuestro internado" titulo="El primer piso:" grad="nuestro internado"
-      lead=${html`Los alumnos internos viven en el colegio de lunes a viernes. <b>Todos los dormitorios están en el primer piso.</b>`} />
-    <div className="aviso-piso revelar"><${Icono} n="primer" size=${26} /><b>PRIMER PISO</b><span>12 habitaciones dobles + baños, aseos, sala de juegos, sala común, zona de descanso y lavandería.</span></div>
-    <div className="internado-grid">
-      <div className="tarjeta hab-destacada revelar" style=${{ '--c': '#8b5cf6' }}>
-        <div className="icono-caja"><${Icono} n="cama" /></div>
-        <h3>Una habitación para dos alumnos</h3>
-        <p>Las habitaciones son modernas, luminosas y muy cómodas. Cada alumno tiene su cama, su escritorio y su armario.</p>
-        <ul className="lista-check">
-          <li>Dos camas cómodas</li><li>Dos escritorios</li><li>Dos sillas</li><li>Dos armarios</li>
-          <li>Lámparas y luces LED</li><li>Una ventana con balcón</li>
-        </ul>
-        <div style=${{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '20px' }}>
+    <${Cabecera} num="03" etiqueta="Nuestro internado" titulo="El primer piso:" grad="los dormitorios"
+      lead=${html`Los alumnos viven en el colegio <b>de lunes a viernes</b>. <b>Todos los dormitorios están en el primer piso.</b>`} />
+    <div className="dos-col">
+      <${Foto} src="dormitorio" alt="Una habitación con dos camas, dos escritorios y dos armarios" className="revelar alta" />
+      <div>
+        <${Puntos} items=${INTERNADO.map((p, i) => ({ ...p, icono: ['primer', 'cama', 'estrella'][i] }))} />
+        <div className="botones-fila revelar">
           <button className="btn btn-primario btn-peq" onClick=${() => seleccionar('hab104')}><${Icono} n="cubo" />Visitar una habitación</button>
           <button className="btn btn-secundario btn-peq" onClick=${() => seleccionar('hab101', { interior: true })}><${Icono} n="ojo" />Entrar en la habitación 101</button>
         </div>
       </div>
-      <div className="rejilla rejilla-2">${COMUNES_INT.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Primer piso" />`)}</div>
+    </div>
+    <h3 className="sub-titulo revelar">Una semana en el internado <span className="linea"></span></h3>
+    <div className="dos-col invertido">
+      <${Foto} src="internado" alt="Alumnos en el salón del internado" className="revelar" />
+      <div>
+        <${Puntos} items=${SEMANA} />
+        <div className="rejilla rejilla-2 revelar" style=${{ marginTop: '18px' }}>
+          ${COMUNES_INT.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Primer piso" />`)}
+        </div>
+      </div>
     </div>
     <h3 className="sub-titulo revelar">La vida en nuestro internado <span className="linea"></span></h3>
     <div className="vida revelar">
@@ -180,37 +213,36 @@ function SeccionInternado() {
   </section>`;
 }
 
-// ---------------- Complejo deportivo ----------------
+// ---------------- 04 · Complejo deportivo ----------------
 function SeccionDeportes() {
   return html`<section className="seccion seccion-fondo" id="deportes">
-    <${Cabecera} num="04" etiqueta="Nuestro complejo deportivo" titulo="Deporte y salud" grad="para todos"
-      lead=${html`El colegio tiene su propio <b>complejo deportivo</b>, al lado del edificio principal. Se ve muy bien desde la vista aérea.`} />
+    <${Cabecera} num="04" etiqueta="Nuestro complejo deportivo" titulo="Deporte" grad="todo el año"
+      lead=${html`El colegio tiene un <b>gimnasio cubierto</b>, un <b>campo de fútbol</b>, una <b>cancha de baloncesto</b> y una <b>piscina olímpica cubierta y climatizada</b>.`} />
     <div className="frases-deporte">
       ${FRASES_DEPORTE.map((f, i) => html`<div key=${i} className="frase-grande revelar"><span>0${i + 1}</span>${f}</div>`)}
     </div>
-    <div className="rejilla rejilla-4">${POR_PLANTA.deporte.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Complejo deportivo" />`)}
-      <div className="tarjeta aula-card revelar" style=${{ '--c': '#22d3ee' }}>
-        <span className="franja"></span>
-        <div className="icono-caja"><${Icono} n="cubo" /></div>
-        <div className="planta">Vista aérea</div>
-        <h3>Todo el complejo</h3>
-        <p>Gimnasio, piscina, fútbol, baloncesto, pádel, fitness, vestuarios y gradas.</p>
-        <button className="ver3d" onClick=${() => { abrirExplorador('completa'); volar(VISTAS.deportes); }}><${Icono} n="cubo" />Ver en 3D</button>
+    <div className="dos-col">
+      <${Foto} src="deportes" alt="El gimnasio, el campo de fútbol y la piscina olímpica" className="revelar alta" />
+      <div className="rejilla rejilla-2">
+        ${POR_PLANTA.deporte.map(s => html`<${TarjetaSala} key=${s.id} s=${s} planta="Complejo deportivo" />`)}
       </div>
+    </div>
+    <div className="centro revelar" style=${{ marginTop: '26px' }}>
+      <button className="btn btn-primario" onClick=${() => { abrirExplorador('completa'); volar(VISTAS.deportes); }}><${Icono} n="cubo" />Ver todo el complejo en 3D</button>
     </div>
   </section>`;
 }
 
-// ---------------- Asignaturas ----------------
+// ---------------- 05 · Asignaturas ----------------
 function SeccionAsignaturas() {
   return html`<section className="seccion" id="asignaturas">
-    <${Cabecera} num="05" etiqueta="Nuestras asignaturas" titulo="Nueve asignaturas," grad="nueve aventuras"
-      lead="En nuestro colegio estudiamos estas asignaturas. Haz clic para ver su aula en 3D." />
+    <${Cabecera} num="05" etiqueta="Nuestras asignaturas" titulo="Nuestras" grad="nueve asignaturas"
+      lead="Estas son las asignaturas de 4º. Haz clic para ver el aula en 3D." />
     <div className="rejilla rejilla-3">
-      ${ASIGNATURAS.map(m => html`<div key=${m.id} className="tarjeta materia revelar" style=${{ '--c': m.color }}>
-        <div className="ilus"><${IlusMateria} m=${m} /></div>
+      ${ASIGNATURAS.map((m, i) => html`<div key=${m.id} className="tarjeta materia revelar" style=${{ '--c': m.color }}>
+        <div className="ilus"><${IlusMateria} m=${m} /><span className="num-materia">${i + 1}</span></div>
         <div className="cuerpo">
-          <div className="cab"><div className="icono-caja"><${Icono} n=${m.icono} /></div><div><h3>${m.nombre}</h3></div></div>
+          <div className="cab"><div className="icono-caja"><${Icono} n=${m.icono} /></div><h3>${m.nombre}</h3></div>
           <p>${m.desc}</p>
           <${Ver3D} id=${m.sala} texto=${m.sala === 'gimnasio' ? 'Ver el gimnasio en 3D' : 'Ver el aula en 3D'} />
         </div>
@@ -219,12 +251,12 @@ function SeccionAsignaturas() {
   </section>`;
 }
 
-// ---------------- Horario ----------------
+// ---------------- 06 · Horario ----------------
 function SeccionHorario() {
   const [act, setAct] = useState(0);
   const h = HORARIO[act];
   return html`<section className="seccion seccion-fondo horario" id="horario">
-    <${Cabecera} num="06" etiqueta="Nuestro horario" titulo="Un día en el" grad="Colegio Aurora" centro
+    <${Cabecera} num="06" etiqueta="Nuestro horario" titulo="Un día en el" grad="internado" centro
       lead="Haz clic en una hora para descubrir el momento del día." />
     <div className="linea-tiempo revelar" role="tablist">
       ${HORARIO.map((p, i) => html`<button key=${p.hora} role="tab" aria-selected=${i === act} className=${'paso' + (i === act ? ' activo' : '')} onClick=${() => setAct(i)}>
@@ -249,11 +281,17 @@ function SeccionHorario() {
   </section>`;
 }
 
-// ---------------- Uniforme ----------------
+// ---------------- 07 · Uniforme ----------------
 function SeccionUniforme() {
   return html`<section className="seccion" id="uniforme">
-    <${Cabecera} num="07" etiqueta="Nuestro uniforme" titulo="Un uniforme" grad="moderno y cómodo"
-      lead="Todos los alumnos llevan el mismo uniforme. Tiene los colores del colegio: azul noche, blanco, gris claro y cian." />
+    <${Cabecera} num="07" etiqueta="Nuestro uniforme" titulo="El uniforme y" grad="la ropa de diario"
+      lead=${html`De <b>lunes a viernes</b> llevamos el uniforme. <b>El fin de semana</b>, en casa, llevamos ropa cómoda.`} />
+    <div className="dos-fotos">
+      <figure className="foto-pie revelar"><${Foto} src="uniforme" alt="El uniforme: polo blanco, chaqueta azul marino con el logo, pantalón y zapatos" />
+        <figcaption><b>El uniforme (de lunes a viernes)</b>Un polo blanco con el cuello azul, una chaqueta azul marino con el logo y un pantalón.</figcaption></figure>
+      <figure className="foto-pie revelar"><${Foto} src="ropa-diario" alt="La ropa de diario: sudadera, vaqueros y zapatillas" />
+        <figcaption><b>La ropa de diario (el fin de semana)</b>Ropa cómoda para el fin de semana en casa.</figcaption></figure>
+    </div>
     <div className="uniforme-grid">
       <div className="revelar"><${VisorUniforme} /></div>
       <div className="piezas">
@@ -261,32 +299,40 @@ function SeccionUniforme() {
           <span className="muestra"></span>
           <div><h3>${p.pieza}</h3><p>${p.detalle}</p></div>
         </div>`)}
+        <div className="tarjeta pieza revelar">
+          <img src="img/logo-256.png" alt="El logo del colegio" width="54" height="54" className="muestra-logo" />
+          <div><h3>El logo del colegio</h3><p>«Disciplina y arte»: un escudo con un libro, una pluma y una antorcha.</p></div>
+        </div>
       </div>
     </div>
   </section>`;
 }
 
-// ---------------- ¿Por qué es ideal? ----------------
+// ---------------- 08 · ¿Por qué es ideal? ----------------
 function SeccionIdeal() {
   const marcar = (frase, exp) => {
     const base0 = exp.replace(/ en$/, '');
     const i = frase.toLowerCase().indexOf(base0.toLowerCase());
-    const base = i >= 0 ? frase.slice(i, i + base0.length) : base0;
     if (i < 0) return frase;
+    const base = frase.slice(i, i + base0.length);
     return html`${frase.slice(0, i)}<mark>${base}</mark>${frase.slice(i + base.length)}`;
   };
   return html`<section className="seccion seccion-fondo" id="ideal">
-    <${Cabecera} num="08" etiqueta="¿Por qué es ideal?" titulo="¿Por qué es" grad="nuestro colegio ideal?" centro
-      lead="Estas son las razones por las que nos encanta el Colegio Aurora." />
-    <div className="razones">
-      ${RAZONES.map((r, i) => html`<div key=${i} className="tarjeta razon revelar" style=${{ '--c': r.color }}>
-        <span className="expresion">${r.exp}</span>
-        <p>${marcar(r.frase, r.exp)}</p>
-      </div>`)}
+    <${Cabecera} num="08" etiqueta="¿Por qué es ideal?" titulo="¿Por qué nos gusta" grad="nuestro colegio?" centro
+      lead="Instalaciones de calidad, profesores simpáticos y ¡sin deberes en casa!" />
+    <div className="ideal-grid">
+      <${Foto} src="colegio-atardecer" alt="El colegio al atardecer" className="revelar alta" />
+      <div className="razones">
+        ${RAZONES.map((r, i) => html`<div key=${i} className="tarjeta razon revelar">
+          <span className="expresion">${r.exp}</span>
+          <p>${marcar(r.frase, r.exp)}</p>
+        </div>`)}
+      </div>
     </div>
     <div className="final revelar">
-      <h3>¿Quieres visitar nuestro colegio?</h3>
-      <p>Entra en la maqueta 3D: gira alrededor del campus, abre el edificio y descubre las aulas, el internado y el complejo deportivo.</p>
+      <img src="img/logo-256.png" alt="" width="96" height="96" />
+      <h3>¡Bienvenidos al Colegio Pablo Picasso!</h3>
+      <p>Entra en la maqueta 3D: gira alrededor del campus, abre el edificio y visita las aulas, el internado y el complejo deportivo.</p>
       <div className="hero-botones">
         <button className="btn btn-primario" onClick=${() => abrirExplorador('completa')}><${Icono} n="cubo" />Explorar nuestro colegio</button>
         <button className="btn btn-secundario" onClick=${() => { seleccionar('edificio'); poner({ guiada: true }); }}><${Icono} n="guia" />Visita guiada</button>
@@ -295,17 +341,26 @@ function SeccionIdeal() {
   </section>`;
 }
 
+// ---------------- 09 · Nuestra presentación ----------------
+function SeccionPresentacion() {
+  return html`<section className="seccion" id="presentacion">
+    <${Cabecera} num="09" etiqueta="Nuestra presentación" titulo="Nuestra" grad="presentación" centro
+      lead="Las 12 diapositivas de nuestro PowerPoint. Usa las flechas o el teclado." />
+    <${Presentacion} />
+  </section>`;
+}
+
 function Pie() {
   return html`<footer className="pie">
-    <div className="marca"><${Logo} size=${30} /><div><b>COLEGIO AURORA</b><small>Proyecto final de español · Nuestro colegio ideal</small></div></div>
-    <span>Un colegio imaginario en Valencia, España.</span>
-    <button className="subir" onClick=${() => irA('inicio')}><${Icono} n="izq" />Volver al inicio</button>
+    <div className="marca"><${Logo} size=${46} /><div><b>COLEGIO PABLO PICASSO</b><small>Proyecto de español (4º) · Nuestro colegio ideal</small></div></div>
+    <span>Un colegio imaginado por alumnos de 4º.</span>
+    <button className="subir" onClick=${() => irA('inicio')}><${Icono} n="arriba" />Volver al inicio</button>
   </footer>`;
 }
 
 export function Sitio() {
   useEffect(() => {
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }), { threshold: 0.08 });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }), { threshold: 0.06 });
     document.querySelectorAll('.revelar').forEach(el => io.observe(el));
     return () => io.disconnect();
   }, []);
@@ -315,7 +370,6 @@ export function Sitio() {
     <${Hero} />
     <main className="contenido">
       <${SeccionColegio} />
-      <div className="separador"></div>
       <${SeccionAulas} />
       <${SeccionInternado} />
       <${SeccionDeportes} />
@@ -323,6 +377,7 @@ export function Sitio() {
       <${SeccionHorario} />
       <${SeccionUniforme} />
       <${SeccionIdeal} />
+      <${SeccionPresentacion} />
     </main>
     <${Pie} />
   `;

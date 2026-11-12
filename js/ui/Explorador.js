@@ -5,6 +5,7 @@ import { html, useEffect, useState, useRef } from '../lib.js';
 import { useEstado, poner, leer, volverInicio, cambiarVista, seleccionar, cerrarSala, alternarInterior, alternarTecho, alternarNoche, alternarLugares } from '../estado.js';
 import { SALAS, ZONAS, AULAS, ESPACIOS_PB, HABITACIONES, COMUNES_INT, POR_PLANTA, RECORRIDO } from '../datos/salas.js';
 import { Icono, Logo } from './Iconos.js';
+import { CapaEtiquetas } from '../3d/etiquetas.js';
 
 const VISTAS_BTN = [
   { id: 'completa', t: 'Vista completa', i: 'cubo' },
@@ -15,8 +16,8 @@ const VISTAS_BTN = [
 
 const INSIGNIA = {
   completa: ['VISTA COMPLETA', 'Gira, acerca y haz clic en un edificio'],
-  baja: ['PLANTA BAJA', 'Zona escolar: aulas y espacios comunes'],
-  primer: ['PRIMER PISO', 'Internado: todos los dormitorios'],
+  baja: ['PLANTA BAJA', 'Aulas, laboratorios, biblioteca y comedor'],
+  primer: ['PRIMER PISO', 'Todos los dormitorios y los salones'],
   corte: ['VISTA EN CORTE', 'Planta baja + primer piso'],
 };
 
@@ -35,12 +36,12 @@ function Lugares() {
     <div className="lugares-cab"><h3>Lugares del colegio</h3><button className="cerrar" onClick=${alternarLugares} aria-label="Cerrar"><${Icono} n="cerrar" /></button></div>
     <div className="lugares-lista">
       <div className="grupo-lugares"><h4>Edificio y exteriores</h4>${[SALAS.edificio, ...POR_PLANTA.exterior].map(item)}</div>
-      <div className="grupo-lugares"><h4>Planta baja · Aulas</h4>${AULAS.map(item)}</div>
-      <div className="grupo-lugares"><h4>Planta baja · Espacios</h4>${ESPACIOS_PB.map(item)}</div>
+      <div className="grupo-lugares"><h4>Planta baja · Aulas y laboratorios</h4>${AULAS.map(item)}</div>
+      <div className="grupo-lugares"><h4>Planta baja · Biblioteca, entrada y comedor</h4>${ESPACIOS_PB.map(item)}</div>
       <div className="grupo-lugares"><h4>Primer piso · Habitaciones</h4>
         <div className="habs">${HABITACIONES.map(s => html`<button key=${s.id} className=${sel === s.id ? 'activo' : ''} onClick=${() => seleccionar(s.id, { mantenerLugares: true })}>${s.num}</button>`)}</div>
       </div>
-      <div className="grupo-lugares"><h4>Primer piso · Espacios comunes</h4>${COMUNES_INT.map(item)}</div>
+      <div className="grupo-lugares"><h4>Primer piso · Salones</h4>${COMUNES_INT.map(item)}</div>
       <div className="grupo-lugares"><h4>Complejo deportivo</h4>${POR_PLANTA.deporte.map(item)}</div>
     </div>
   </div>`;
@@ -131,10 +132,11 @@ export function Explorador() {
   const ins = INSIGNIA[vista];
   const empezarGuia = () => { seleccionar(RECORRIDO[0]); poner({ guiada: true }); };
   return html`<div className="exp">
+    <${CapaEtiquetas} />
     <div className="exp-sup">
       <div className="exp-inicio panel">
         <button className="volver" onClick=${volverInicio}><${Icono} n="izq" />Inicio</button>
-        <div className="marca"><${Logo} size=${30} /><div><b>AURORA</b><small>Visita en 3D</small></div></div>
+        <div className="marca"><${Logo} size=${38} /><div><b>PABLO PICASSO</b><small>Visita en 3D</small></div></div>
       </div>
       <div className="vistas panel" role="toolbar" aria-label="Vistas">
         ${VISTAS_BTN.map(v => html`<button key=${v.id} className=${vista === v.id && !sel ? 'activo' : ''} onClick=${() => cambiarVista(v.id)} title=${v.t}><${Icono} n=${v.i} /><span>${v.t}</span></button>`)}

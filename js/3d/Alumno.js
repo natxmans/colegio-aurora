@@ -1,5 +1,7 @@
 // =========================================================
-// ALUMNOS EN 3D con el uniforme del Colegio Aurora
+// ALUMNOS EN 3D con el uniforme del Colegio Pablo Picasso
+// Uniforme (según el PowerPoint): polo blanco con cuello azul,
+// chaqueta azul marino con el logo y pantalón.
 // Personaje articulado (hombros, codos, caderas, rodillas, cabeza)
 // con muchas posturas: sentado, escribiendo, caminando, nadando...
 // =========================================================
@@ -11,19 +13,22 @@ const PIEL = ['#f5d3b8', '#ebbd98', '#d39b72', '#a8714b', '#6f4a2f'];
 const PELO = ['#2b1d14', '#4a2f1d', '#7a4a26', '#c08a45', '#e3c27c', '#151515', '#6b2f1a'];
 
 export const UNIFORME = {
-  sudadera: '#16224f',  // sudadera azul noche
+  sudadera: '#14285a',  // chaqueta azul marino
   polo: '#ffffff',      // polo blanco
-  pantalon: '#c9d1dd',  // pantalón gris claro
-  falda: '#1c2b62',     // falda azul noche
-  medias: '#1b2550',
-  zapatilla: '#f4f7fb', // zapatillas blancas
-  suela: '#22d3ee',     // suela cian
-  logo: '#22d3ee',      // logo del colegio
-  ribete: '#3d8bff',    // detalles azul eléctrico
+  cuello: '#1f4e9a',    // cuello azul del polo
+  pantalon: '#1b2440',  // pantalón azul marino
+  falda: '#1b2440',
+  medias: '#1b2440',
+  zapatilla: '#5a3a24', // zapatos marrones
+  suela: '#2a1a10',
+  logo: true,           // logo del colegio en el lado izquierdo del pecho
+  ribete: '#14285a',
+  cremallera: '#8f9ab3',
 };
-const ADULTO = { sudadera: '#475569', pantalon: '#1f2937', polo: '#e2e8f0', logo: null, ribete: '#475569', zapatilla: '#1f2937', suela: '#374151' };
-export const ROPA_ENFERMERA = { sudadera: '#f8fafc', pantalon: '#e2e8f0', ribete: '#f8fafc', logo: '#22c55e', zapatilla: '#f8fafc', suela: '#22c55e' };
-export const ROPA_RECEPCION = { sudadera: '#1e3a8a', pantalon: '#1f2937', ribete: '#22d3ee', logo: '#22d3ee' };
+// Ropa de diario (fin de semana): sudadera gris, vaqueros y zapatillas blancas
+export const ROPA_DIARIO = { sudadera: '#a9adb3', polo: '#a9adb3', cuello: '#9a9ea5', pantalon: '#4a6a9a', zapatilla: '#f2f2f2', suela: '#dcdcdc', logo: null, ribete: '#a9adb3', cremallera: '#a9adb3' };
+const ADULTO = { sudadera: '#4b5363', pantalon: '#2a2f3a', polo: '#f1ede4', cuello: '#f1ede4', logo: null, ribete: '#4b5363', zapatilla: '#2a1d14', suela: '#1a120c', cremallera: '#4b5363' };
+export const ROPA_RECEPCION = { sudadera: '#14285a', pantalon: '#1f2937', ribete: '#14285a', logo: true, cuello: '#ffffff' };
 
 const P = (t, p, s, c, r) => html`<${Pieza} t=${t} p=${p} s=${s} c=${c} r=${r} />`;
 
@@ -110,22 +115,22 @@ function angulos(pose, t, asiento) {
 
 const SIN_MOVIMIENTO = new Set(['tumbado', 'durmiendo']);
 
-export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asiento = 0.42, ruta = null, ropa = null, adulto = false, objeto = null, falda, escala = 1, deporte = false, banador = false, velocidad = 1 }) {
+export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asiento = 0.42, ruta = null, ropa = null, adulto = false, objeto = null, falda = false, escala = 1, deporte = false, banador = false, velocidad = 1, logoTex = null }) {
   const a = useMemo(() => {
     const r = azar(seed);
-    return { piel: PIEL[Math.floor(r() * PIEL.length)], pelo: PELO[Math.floor(r() * PELO.length)], estilo: Math.floor(r() * 4), falda: r() < 0.42, alt: 0.93 + r() * 0.1, fase: r() * 30, libro: ['#3d8bff', '#f472b6', '#fbbf24', '#34d399', '#8b5cf6'][Math.floor(r() * 5)] };
+    return { piel: PIEL[Math.floor(r() * PIEL.length)], pelo: PELO[Math.floor(r() * PELO.length)], estilo: Math.floor(r() * 4), falda: r() < 0.42, alt: 0.93 + r() * 0.1, fase: r() * 30, libro: ['#2a62b8', '#b84a55', '#d9a441', '#3f8a5a', '#8a4f8f'][Math.floor(r() * 5)] };
   }, [seed]);
   const R = adulto ? { ...UNIFORME, ...ADULTO, ...(ropa || {}) } : { ...UNIFORME, ...(ropa || {}) };
-  const conFalda = !adulto && !deporte && !banador && (falda ?? a.falda);
+  const conFalda = !adulto && !deporte && !banador && falda === true;
   const piernas = conFalda ? R.medias : R.pantalon;
-  const camiseta = deporte === true ? '#2f6bff' : deporte;
+  const camiseta = deporte === true ? '#1f4e9a' : deporte;
   const col = {
-    torso: banador ? '#1e3a8a' : deporte ? camiseta : R.sudadera,
+    torso: banador ? '#14285a' : deporte ? camiseta : R.sudadera,
     brazo: banador ? a.piel : deporte ? camiseta : R.sudadera,
     antebrazo: banador || deporte ? a.piel : R.sudadera,
-    muslo: banador ? '#1e3a8a' : deporte ? '#14204a' : piernas,
-    espinilla: banador ? a.piel : deporte ? '#f4f7fb' : piernas,
-    pelo: banador ? '#22d3ee' : a.pelo,
+    muslo: banador ? '#14285a' : deporte ? '#14285a' : piernas,
+    espinilla: banador ? a.piel : deporte ? '#f7f4ee' : piernas,
+    pelo: banador ? '#f7f4ee' : a.pelo,
   };
   const raiz = useRef(), cuerpo = useRef(), torso = useRef(), cab = useRef();
   const hI = useRef(), hD = useRef(), cI = useRef(), cD = useRef(), pI = useRef(), pD = useRef(), rI = useRef(), rD = useRef();
@@ -208,9 +213,11 @@ export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asien
       <group matrixAutoUpdate=${false} ref=${torso} position=${[0, 0.9, 0]}>
         ${P('aCapsula', [0, 0.27, 0], [0.32, 0.27, 0.21], col.torso)}
         ${!banador && !deporte ? P('aCil', [0, 0.035, 0], [0.335, 0.05, 0.225], R.polo) : null}
-        ${!banador ? P('aCil', [0, 0.55, 0], [0.17, 0.05, 0.14], deporte ? '#22d3ee' : R.polo) : null}
-        ${R.logo ? P('aCajaL', [0.075, 0.4, 0.106], [0.055, 0.055, 0.012], R.logo) : null}
-        ${!adulto && !banador ? P('aCajaL', [0, 0.27, 0.107], [0.014, 0.36, 0.008], deporte ? '#ffffff' : R.ribete) : null}
+        ${!banador ? P('aCil', [0, 0.55, 0], [0.17, 0.05, 0.14], deporte ? '#f7f4ee' : (R.cuello || R.polo)) : null}
+        ${R.logo && !banador && !deporte ? (logoTex
+          ? html`<mesh position=${[0.08, 0.39, 0.112]}><circleGeometry args=${[0.042, 40]} /><meshBasicMaterial map=${logoTex} transparent toneMapped=${false} /></mesh>`
+          : html`${P('aCil', [0.08, 0.39, 0.103], [0.07, 0.012, 0.07], '#ffffff', [Math.PI / 2, 0, 0])}${P('aCil', [0.08, 0.39, 0.108], [0.05, 0.008, 0.05], '#1f4e9a', [Math.PI / 2, 0, 0])}`) : null}
+        ${!adulto && !banador && !deporte ? P('aCaja', [0, 0.27, 0.106], [0.012, 0.36, 0.006], R.cremallera || '#8f9ab3') : null}
         <group matrixAutoUpdate=${false} ref=${cab} position=${[0, 0.6, 0]}>
           ${P('aCil', [0, 0, 0], [0.09, 0.1, 0.09], a.piel)}
           ${P('aEsfera', [0, 0.13, 0], [0.25, 0.25, 0.25], a.piel)}
@@ -221,8 +228,8 @@ export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asien
           ${ojos ? P('aEsfera', [-0.045, 0.135, 0.112], [0.032, 0.036, 0.02], '#1d2233') : null}
           ${ojos ? P('aEsfera', [0.045, 0.135, 0.112], [0.032, 0.036, 0.02], '#1d2233') : null}
           ${P('aCaja', [0, 0.078, 0.119], [0.045, 0.009, 0.01], '#b4584a')}
-          ${objeto === 'gafasvr' ? html`${P('aCajaB', [0, 0.14, 0.11], [0.24, 0.1, 0.1], '#1f2937')}${P('aCajaL', [0, 0.14, 0.162], [0.2, 0.025, 0.005], '#22d3ee')}` : null}
-          ${objeto === 'cascos' ? html`${P('aToro', [0, 0.15, 0], [0.28, 0.28, 0.28], '#8b5cf6', [0, Math.PI / 2, 0])}` : null}
+          ${objeto === 'gafasvr' ? html`${P('aCajaB', [0, 0.14, 0.11], [0.24, 0.1, 0.1], '#1f2937')}${P('aCajaL', [0, 0.14, 0.162], [0.2, 0.025, 0.005], '#f3dfb2')}` : null}
+          ${objeto === 'cascos' ? html`${P('aToro', [0, 0.15, 0], [0.28, 0.28, 0.28], '#14285a', [0, Math.PI / 2, 0])}` : null}
         </group>
         ${brazo(hI, cI, -1)}
         ${brazo(hD, cD, 1)}
