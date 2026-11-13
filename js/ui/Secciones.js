@@ -301,7 +301,7 @@ function SeccionUniforme() {
         </div>`)}
         <div className="tarjeta pieza revelar">
           <img src="img/logo-256.png" alt="El logo del colegio" width="54" height="54" className="muestra-logo" />
-          <div><h3>El logo del colegio</h3><p>Un escudo azul con un libro, una pluma y una antorcha. Está en la chaqueta, a la izquierda del pecho.</p></div>
+          <div><h3>El logo del colegio</h3><p>Es redondo, azul marino y crema. Lleva el nombre del colegio y nuestro lema. Está en la chaqueta, a la izquierda del pecho.</p></div>
         </div>
       </div>
     </div>

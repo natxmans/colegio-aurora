@@ -76,7 +76,7 @@ export const SEMANA = [
 
 // Diapositiva 6 · Las 9 asignaturas (orden del PowerPoint)
 export const ASIGNATURAS = [
-  { id: 'svt', nombre: 'SVT (Ciencias de la Vida y de la Tierra)', corto: 'SVT', color: '#3f8a5a', icono: 'svt', sala: 'svt',
+  { id: 'svt', nombre: 'Ciencias de la Vida y de la Tierra', corto: 'Ciencias', color: '#3f8a5a', icono: 'svt', sala: 'svt',
     desc: 'Observamos las plantas, los animales y el cuerpo humano.' },
   { id: 'edfisica', nombre: 'Educación Física', corto: 'Educación Física', color: '#2a7ab0', icono: 'edfisica', sala: 'gimnasio',
     desc: 'Hacemos deporte en el gimnasio, en la piscina y en el campo de fútbol.' },

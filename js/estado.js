@@ -47,10 +47,11 @@ export const camara = { ctrl: null, introHecha: false, fov: FOV_BASE };
 const _v = new THREE.Vector3();
 export function encuadre(v) {
   const c = camara.ctrl;
-  const box = CAJAS[v.ajuste];
   const cam = c.camera.clone();
   // el lienzo 3D ocupa toda la ventana: usamos su tamaño real (también en teléfono)
   cam.aspect = Math.max(0.3, innerWidth / Math.max(1, innerHeight));
+  // en pantalla vertical se usa la caja completa (todos los edificios enteros, nada cortado)
+  const box = (cam.aspect < 0.9 && CAJAS[v.ajuste + 'Movil']) || CAJAS[v.ajuste];
   cam.fov = v.fov || FOV_BASE;
   cam.updateProjectionMatrix();
   const mira = new THREE.Vector3((box.x0 + box.x1) / 2, v.y ?? 1, (box.z0 + box.z1) / 2);
@@ -60,9 +61,7 @@ export function encuadre(v) {
   const esquinas = [];
   for (const x of [box.x0, box.x1]) for (const y of [box.y0, box.y1]) for (const z of [box.z0, box.z1]) esquinas.push(new THREE.Vector3(x, y, z));
   const movil = cam.aspect < 0.9;
-  // En teléfono el campus no cabe entero a buen tamaño: se acerca un poco más
-  // (los extremos del campo de fútbol y de la entrada salen del cuadro; se ven al girar)
-  const margen = (v.margen || 0.85) * (movil ? (vertical ? 1.32 : 1.04) : 1);
+  const margen = (v.margen || 0.85) * (movil ? 1.02 : 1);
   let lo = 4, hi = 3000;
   for (let i = 0; i < 32; i++) {
     const d = (lo + hi) / 2;

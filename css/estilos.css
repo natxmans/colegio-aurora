@@ -361,6 +361,7 @@ a { color: inherit; }
 .capa-etiquetas .etq3d { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .25s; will-change: transform; }
 .etq3d { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; padding: 6px 12px 6px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: #fff; background: rgba(20,40,90,.9); border: 1px solid rgba(255,255,255,.4); box-shadow: 0 4px 14px rgba(20,40,90,.3); user-select: none; }
 .etq3d i { width: 8px; height: 8px; border-radius: 50%; background: var(--arena); }
+@media (max-width: 600px) { .etq3d { padding: 3px 8px 3px 6px; font-size: 10.5px; gap: 4px; } .etq3d i { width: 6px; height: 6px; } }
 .etq3d:hover, .etq3d.hover { background: var(--arena); color: var(--marino); }
 .etq-planta { padding: 10px 16px; border-radius: 14px; font-size: 13px; letter-spacing: .1em; font-weight: 700; color: #fff; white-space: nowrap; background: var(--marino); box-shadow: 0 8px 22px rgba(20,40,90,.35); }
 .etq-planta.violeta { background: var(--azul); }

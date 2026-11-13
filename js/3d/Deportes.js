@@ -4,7 +4,7 @@
 // y piscina olímpica cubierta y climatizada
 // =========================================================
 import { html, THREE, useMemo, useRef, useFrame, useLayoutEffect } from '../lib.js';
-import { B, C, S, Cono, Ico, Toro, V, G, Panel, COL, Banco, Farola, Pantalla, Planta, Arbol } from './piezas.js';
+import { B, C, S, Cono, Ico, Toro, V, VT, G, Panel, COL, Banco, Farola, Pantalla, Planta, Arbol } from './piezas.js';
 import { tocar } from './kit.js';
 import { leer } from '../estado.js';
 import { Alumno } from './Alumno.js';
@@ -71,29 +71,60 @@ function Gradas({ p, r, largo = 26, filas = 4, publico = 0, seed = 1 }) {
   return html`<${G} p=${p} r=${r}>${items}<//>`;
 }
 
-// Cubierta en arco (segmentos de piedra/blanco y cristal)
-function Arco({ cx, cz, largo, luz, flecha, alto, eje = 'x', cristal = 2 }) {
-  const R = ((luz / 2) ** 2 + flecha ** 2) / (2 * flecha), yc = alto + flecha - R, a0 = Math.asin(luz / 2 / R);
-  const n = 14, segs = [];
+// Geometría de un arco de cubierta: radio, centro y ángulo (luz = anchura, flecha = altura del arco)
+function arco(luz, flecha, alto) {
+  const R = ((luz / 2) ** 2 + flecha ** 2) / (2 * flecha);
+  return { R, yc: alto + flecha - R, a0: Math.asin(luz / 2 / R) };
+}
+
+// Bóveda CERRADA: paneles que se solapan (sin huecos) y algunas bandas de cristal tintado.
+// eje = dirección de la bóveda ('x' o 'z'); vidrio(i, n) dice qué paneles son lucernarios.
+function Boveda({ cx, cz, largo, luz, flecha, alto, eje = 'x', vidrio = () => false, color = COL.blanco }) {
+  const { R, yc, a0 } = arco(luz, flecha, alto);
+  const n = 16, segs = [];
   for (let i = 0; i < n; i++) {
     const a = -a0 + (i + 0.5) * (2 * a0 / n), lado = R * Math.sin(a), y = yc + R * Math.cos(a);
+    const ancho = (2 * a0 * R) / n + 0.12; // solape: no queda ninguna rendija
     const props = eje === 'x'
-      ? { p: [cx, y, cz + lado], r: [a, 0, 0], s: [largo, 0.28, (2 * a0 * R) / n + 0.06] }
-      : { p: [cx + lado, y, cz], r: [0, 0, -a], s: [(2 * a0 * R) / n + 0.06, 0.28, largo] };
-    segs.push(i % 3 === cristal % 3 || (cristal === 9 && i > 1 && i < n - 2)
-      ? html`<${V} key=${i} ...${props} c="#d6e8f2" />`
-      : html`<${B} key=${i} m="B" ...${props} c=${COL.blanco} />`);
+      ? { p: [cx, y, cz + lado], r: [a, 0, 0], s: [largo, 0.3, ancho] }
+      : { p: [cx + lado, y, cz], r: [0, 0, -a], s: [ancho, 0.3, largo] };
+    segs.push(vidrio(i, n)
+      ? html`<${VT} key=${i} ...${props} />`
+      : html`<${B} key=${i} m="B" ...${props} c=${color} />`);
   }
   return segs;
 }
 
+// Tímpano: pared con forma de segmento de círculo que CIERRA el extremo de la bóveda
+function Timpano({ p, ry = 0, luz, flecha, color = COL.piedra, cristal = false }) {
+  const geo = useMemo(() => {
+    const { R } = arco(luz, flecha, 0);
+    const forma = new THREE.Shape();
+    forma.moveTo(-luz / 2, 0);
+    for (let k = 1; k < 40; k++) {
+      const u = -luz / 2 + (k / 40) * luz;
+      forma.lineTo(u, flecha - R + Math.sqrt(R * R - u * u));
+    }
+    forma.lineTo(luz / 2, 0);
+    forma.closePath();
+    const g = new THREE.ExtrudeGeometry(forma, { depth: 0.3, bevelEnabled: false });
+    g.translate(0, 0, -0.15);
+    return g;
+  }, [luz, flecha]);
+  return html`<mesh geometry=${geo} position=${p} rotation=${[0, ry, 0]} castShadow=${!cristal} receiveShadow renderOrder=${cristal ? 4 : 0}>
+    ${cristal
+      ? html`<meshStandardMaterial color="#a9cbe0" transparent opacity=${0.62} roughness=${0.12} metalness=${0.35} depthWrite=${false} side=${THREE.DoubleSide} />`
+      : html`<meshStandardMaterial color=${color} roughness=${0.75} side=${THREE.DoubleSide} />`}
+  </mesh>`;
+}
+
 // Costilla metálica que sigue el arco del techo (eje z)
 function Costilla({ cx, cz, luz, flecha, alto }) {
-  const R = ((luz / 2) ** 2 + flecha ** 2) / (2 * flecha), yc = alto + flecha - R, a0 = Math.asin(luz / 2 / R);
-  const n = 14, segs = [];
+  const { R, yc, a0 } = arco(luz, flecha, alto);
+  const n = 16, segs = [], r = R + 0.26; // por fuera de la cubierta
   for (let i = 0; i < n; i++) {
     const a = -a0 + (i + 0.5) * (2 * a0 / n);
-    segs.push(html`<${B} key=${i} m="M" p=${[cx + R * Math.sin(a), yc + R * Math.cos(a) + 0.12, cz]} r=${[0, 0, -a]} s=${[(2 * a0 * R) / n + 0.04, 0.22, 0.3]} c=${COL.noche} />`);
+    segs.push(html`<${B} key=${i} m="M" p=${[cx + r * Math.sin(a), yc + r * Math.cos(a), cz]} r=${[0, 0, -a]} s=${[(2 * a0 * r) / n + 0.05, 0.24, 0.32]} c=${COL.noche} />`);
   }
   return segs;
 }
@@ -127,9 +158,13 @@ function Gimnasio() {
     <${B} p=${[cx + 9, 0.13, cz - 5.4]} s=${[2.0, 0.06, 1.2]} c=${COL.elec} /><${B} p=${[cx + 9, 0.13, cz - 4.0]} s=${[2.0, 0.06, 1.2]} c=${COL.noche} />
     <${Alumno} p=${[cx + 9, 0.16, cz - 4.6]} ry=${-PI / 2} pose="sentado_suelo" deporte seed=${1650} />
     <${TechoMovil} y=${0} ids=${['gimnasio']}>
-      <${Arco} cx=${cx} cz=${cz} largo=${w + 1} luz=${d} flecha=${3} alto=${9.6} eje="x" cristal=${1} />
-      <${B} m="M" p=${[cx, 9.65, cz - d / 2]} s=${[w + 1, 0.12, 0.3]} c=${COL.noche} />
-      <${B} m="M" p=${[cx, 9.65, cz + d / 2]} s=${[w + 1, 0.12, 0.3]} c=${COL.noche} />
+      <${Boveda} cx=${cx} cz=${cz} largo=${w + 1.2} luz=${d + 0.6} flecha=${3.1} alto=${9.6} eje="x" color="#e9e6df"
+        vidrio=${(i, n) => i >= n / 2 - 2 && i < n / 2 + 2} />
+      <${Timpano} p=${[cx - w / 2, 9.6, cz]} ry=${PI / 2} luz=${d} flecha=${3} />
+      <${Timpano} p=${[cx + w / 2, 9.6, cz]} ry=${PI / 2} luz=${d} flecha=${3} />
+      <${B} m="M" p=${[cx, 9.65, cz - d / 2]} s=${[w + 1.2, 0.16, 0.36]} c=${COL.noche} />
+      <${B} m="M" p=${[cx, 9.65, cz + d / 2]} s=${[w + 1.2, 0.16, 0.36]} c=${COL.noche} />
+      <${B} m="M" p=${[cx, 12.92, cz]} s=${[w + 1.3, 0.18, 0.6]} c=${COL.noche} />
     <//>
   <//>`;
 }
@@ -190,10 +225,13 @@ function Piscina() {
     <${Panel} p=${[cx + W / 2 + 0.3, 5.6, cz + 10.6]} r=${[0, PI / 2, 0]} w=${2.4} h=${2.4} transp tex=${texLogo()} />
     <${Panel} p=${[cx + W / 2 + 0.3, 5.6, cz + 0.6]} r=${[0, PI / 2, 0]} w=${16} h=${1.9} transp tex=${texRotuloTexto('PISCINA OLÍMPICA CLIMATIZADA', '#ffffff')} />
     <${TechoMovil} y=${0} ids=${['piscina', 'gimnasio']}>
-      <${Arco} cx=${cx} cz=${cz} largo=${D + 0.6} luz=${W} flecha=${4.5} alto=${7} eje="z" cristal=${9} />
+      <${Boveda} cx=${cx} cz=${cz} largo=${D + 0.8} luz=${W + 0.6} flecha=${4.6} alto=${7} eje="z" color=${COL.blanco}
+        vidrio=${(i, n) => i % 4 === 1 || i % 4 === 2} />
+      <${Timpano} p=${[cx, 7, cz + D / 2]} luz=${W} flecha=${4.5} cristal />
+      <${Timpano} p=${[cx, 7, cz - D / 2]} luz=${W} flecha=${4.5} color=${COL.piedra} />
       <${B} m="M" p=${[cx - W / 2, 7.05, cz]} s=${[0.3, 0.14, D + 0.6]} c=${COL.noche} />
       <${B} m="M" p=${[cx + W / 2, 7.05, cz]} s=${[0.3, 0.14, D + 0.6]} c=${COL.noche} />
-      ${[-24, -12, 0, 12, 24].map(z => html`<${Costilla} key=${'v' + z} cx=${cx} cz=${cz + z} luz=${W} flecha=${4.5} alto=${7} />`)}
+      ${[-24, -12, 0, 12, 24].map(z => html`<${Costilla} key=${'v' + z} cx=${cx} cz=${cz + z} luz=${W + 0.6} flecha=${4.6} alto=${7} />`)}
     <//>
   <//>`;
 }

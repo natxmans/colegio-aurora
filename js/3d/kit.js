@@ -32,6 +32,8 @@ export const MAT = {
   metal: new THREE.MeshStandardMaterial({ roughness: 0.3, metalness: 0.85 }),
   luz: new THREE.MeshBasicMaterial({ toneMapped: false }),
   vidrio: new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.2, roughness: 0.04, metalness: 0.6, depthWrite: false, envMapIntensity: 1.6 }),
+  // cristal de cubierta: más opaco y tintado (el techo se ve cerrado)
+  vidrioT: new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.66, roughness: 0.12, metalness: 0.35, depthWrite: false, envMapIntensity: 1.4 }),
   plano: new THREE.MeshStandardMaterial({ roughness: 0.85, flatShading: true }),
 };
 
@@ -42,6 +44,7 @@ const BASE = {
   cajaM: [G.caja, MAT.metal, 5000, true],
   cajaL: [G.caja, MAT.luz, 6000, false],
   vidrio: [G.caja, MAT.vidrio, 3000, false],
+  vidrioT: [G.caja, MAT.vidrioT, 600, false],
   cil: [G.cil, MAT.mate, 3500, true],
   cilB: [G.cil, MAT.brillo, 2500, true],
   cilM: [G.cil, MAT.metal, 3500, true],
@@ -149,7 +152,7 @@ export function KitRoot({ children, sombras = true }) {
     ${Object.entries(TIPOS).map(([k, [geo, mat, lim, sombra]]) => html`
       <instancedMesh key=${k} ref=${m => { if (m) mallas.current[k] = m; }}
         args=${[geo, mat, lim]} frustumCulled=${false}
-        castShadow=${sombras && sombra} receiveShadow=${k !== 'cajaL' && k !== 'vidrio'}
+        castShadow=${sombras && sombra} receiveShadow=${k !== 'cajaL' && k !== 'vidrio' && k !== 'vidrioT'}
         raycast=${() => null} />`)}
     ${children}
   <//>`;

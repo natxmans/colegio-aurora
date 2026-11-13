@@ -218,7 +218,7 @@ export function Alumno({ p = [0, 0, 0], ry = 0, pose = 'de_pie', seed = 1, asien
         ${!banador && !deporte ? P('aCil', [0, 0.035, 0], [0.335, 0.05, 0.225], R.polo) : null}
         ${!banador ? P('aCil', [0, 0.55, 0], [0.17, 0.05, 0.14], deporte ? '#f7f4ee' : (R.cuello || R.polo)) : null}
         ${R.logo && !banador && !deporte ? (logoTex
-          ? html`<mesh position=${[0.08, 0.39, 0.112]}><circleGeometry args=${[0.042, 40]} /><meshBasicMaterial map=${logoTex} transparent toneMapped=${false} /></mesh>`
+          ? html`<mesh position=${[0.08, 0.39, 0.112]}><planeGeometry args=${[0.1, 0.1]} /><meshBasicMaterial map=${logoTex} transparent alphaTest=${0.05} toneMapped=${false} /></mesh>`
           : html`${P('aCil', [0.08, 0.39, 0.103], [0.07, 0.012, 0.07], '#ffffff', [Math.PI / 2, 0, 0])}${P('aCil', [0.08, 0.39, 0.108], [0.05, 0.008, 0.05], '#1f4e9a', [Math.PI / 2, 0, 0])}`) : null}
         ${!adulto && !banador && !deporte ? P('aCaja', [0, 0.27, 0.106], [0.012, 0.36, 0.006], R.cremallera || '#8f9ab3') : null}
         <group matrixAutoUpdate=${false} ref=${cab} position=${[0, 0.6, 0]}>

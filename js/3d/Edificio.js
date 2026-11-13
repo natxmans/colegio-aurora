@@ -26,6 +26,20 @@ function Sala({ s }) {
   return html`<${G} p=${[(s.x0 + s.x1) / 2, 0, (s.z0 + s.z1) / 2]} r=${[0, s.fila === 'sur' ? PI : 0, 0]}><${Comp} s=${s} /><//>`;
 }
 
+// Ventana de las fachadas laterales: cristal, marco azul marino, montante central y alféizar
+function VentanaLateral({ x, z, h, lado }) {
+  const alto = h - 1.3, y = 0.55 + alto / 2, ancho = 2.6, xf = x + lado * 0.03;
+  return html`<${G}>
+    <${B} m="B" p=${[x, y, z]} s=${[0.05, alto, ancho]} c="#3d5f8c" />
+    <${B} m="M" p=${[xf, y + alto / 2 + 0.06, z]} s=${[0.1, 0.12, ancho + 0.24]} c=${COL.noche} />
+    <${B} m="M" p=${[xf, y - alto / 2 - 0.06, z]} s=${[0.1, 0.12, ancho + 0.24]} c=${COL.noche} />
+    <${B} m="M" p=${[xf, y, z - ancho / 2 - 0.06]} s=${[0.1, alto + 0.24, 0.12]} c=${COL.noche} />
+    <${B} m="M" p=${[xf, y, z + ancho / 2 + 0.06]} s=${[0.1, alto + 0.24, 0.12]} c=${COL.noche} />
+    <${B} m="M" p=${[xf, y, z]} s=${[0.08, alto, 0.07]} c=${COL.noche} />
+    <${B} m="B" p=${[x + lado * 0.14, y - alto / 2 - 0.14, z]} s=${[0.3, 0.08, ancho + 0.4]} c=${COL.blanco} />
+  <//>`;
+}
+
 // Tabiques entre salas, fachadas de cristal, pasillo...
 function Estructura({ h, salas, primer = false }) {
   const muros = [];
@@ -62,8 +76,9 @@ function Estructura({ h, salas, primer = false }) {
     ${muros}
     <${B} p=${[-32.15, h / 2, 0]} s=${[0.5, h, 22.6]} c=${COL.piedra} />
     <${B} p=${[32.15, h / 2, 0]} s=${[0.5, h, 22.6]} c=${COL.piedra} />
-    ${[-6, 0, 6].map(z => html`<${V} key=${'ve' + z} p=${[-32.42, h / 2, z]} s=${[0.04, h - 0.9, 1.1]} c="#cfe0ea" />`)}
-    ${[-6, 0, 6].map(z => html`<${V} key=${'vd' + z} p=${[32.42, h / 2, z]} s=${[0.04, h - 0.9, 1.1]} c="#cfe0ea" />`)}
+    ${[-1, 1].map(lado => [-6.5, 0, 6.5].map(z => html`<${VentanaLateral} key=${'vl' + lado + z} x=${lado * 32.42} z=${z} h=${h} lado=${lado} />`))}
+    <${B} m="B" p=${[-32.44, h - 0.25, 0]} s=${[0.1, 0.5, 22.7]} c=${COL.blanco} />
+    <${B} m="B" p=${[32.44, h - 0.25, 0]} s=${[0.1, 0.5, 22.7]} c=${COL.blanco} />
     <${V} p=${[0, h / 2, -11]} s=${[64, h - 0.1, 0.06]} c="#cfe0ea" />
     <${V} p=${[0, h / 2, 11]} s=${[64, h - 0.1, 0.06]} c="#cfe0ea" />
     ${fachada}
@@ -223,7 +238,7 @@ export function Edificio() {
     const k = 1 - Math.exp(-Math.min(dt, 0.05) * 3.4);
     const oc1 = s.vista === 'baja';
     const t1 = oc1 ? 30 : s.vista === 'corte' ? 8 : 0;
-    const ocT = !s.techo || s.vista !== 'completa';
+    const ocT = !s.techo || (s.vista !== 'completa' && s.vista !== 'deportes');
     const tT = ocT ? t1 + 28 : 0;
     pisos.y1 = st.current.y1;
     const gu = guias.current;

@@ -68,6 +68,11 @@
     var f = document.getElementById('carg-foto'); if (f) f.hidden = false;
     el.textContent = ''; bar.parentNode.style.display = 'none';
   };
+  // Si las bibliotecas 3D (Internet) tardan demasiado, se avisa con una imagen del campus;
+  // si la carga termina después, el sitio aparece igualmente
+  setTimeout(function () {
+    if (!window.__yaListo) window.__error('La maqueta 3D tarda mucho en cargar. Espera un poco más o comprueba la conexión a Internet.');
+  }, 60000);
   if (location.protocol === 'file:') {
     window.__error('Para ver la maqueta 3D, abre el sitio con el archivo «LANCER-LE-SITE.bat» (o publícalo en Internet). Un archivo abierto directamente no puede cargar la escena 3D.');
   }

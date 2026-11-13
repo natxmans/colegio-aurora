@@ -52,7 +52,7 @@ export const TEXTOS = [
   "COLEGIO PABLO PICASSO",
   "5. Nuestras nueve asignaturas",
   "Las asignaturas de 4º:",
-  "1. SVT (Ciencias de la Vida y de la Tierra)",
+  "1. Ciencias de la Vida y de la Tierra",
   "2. Educación Física",
   "3. Física y Química",
   "4. Historia y Geografía",

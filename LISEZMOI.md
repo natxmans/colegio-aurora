@@ -3,8 +3,9 @@
 Site web du projet d'espagnol (4e) : un internat moderne en Espagne, avec une maquette 3D
 que l'on peut visiter et la présentation PowerPoint intégrée.
 
-Devise affichée sur le site : **Estudiar · Convivir · Crecer**. Le logo utilisé est le blason
-original du PowerPoint (`img/logo-original-1024.png`) : ne jamais le redessiner ni le déformer.
+Devise officielle : **Estudiar · Convivir · Crecer**. Logo officiel : l'emblème rond « INTERNAT »
+(bleu marine et crème, bannière Colegio Pablo Picasso, devise) → `img/logo-original-1024.png`,
+centré sans déformation dans un carré transparent. Ne jamais le redessiner ni l'étirer.
 
 - **En ligne :** https://natxmans.github.io/colegio-aurora/
 - **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (12 diapositives)
@@ -59,6 +60,7 @@ original du PowerPoint (`img/logo-original-1024.png`) : ne jamais le redessiner 
   - `Salas.js` : bibliothèque numérique, entrée, comedor, chambres, salons
   - `Edificio.js` : bâtiment, étages qui s'écartent, toit
   - `Deportes.js` : gymnase couvert, piscine olympique couverte et chauffée, foot, basket
+    (toitures en voûte fermées : `Boveda` + pignons `Timpano` aux deux extrémités)
   - `Exteriores.js` : patio, jardins, entrée avec le logo, oliveraies
   - `etiquetas.js` : étiquettes des bâtiments sans chevauchement
 - `js/ui/` : menu, sections, visite 3D, uniforme 3D, diaporama (`Presentacion.js`)
@@ -68,7 +70,8 @@ original du PowerPoint (`img/logo-original-1024.png`) : ne jamais le redessiner 
 Le campus est compact (le gymnase, la piscine, le basket et le foot sont collés au bâtiment
 principal) et la « Vista completa » utilise un angle de vision serré : les bâtiments occupent
 environ 2,5 fois plus de place à l'écran qu'avant (mesuré : 48 % de l'écran au lieu de 19 %).
-Pour régler le cadrage : `VISTAS.completa` et `CAJAS.campus` dans `js/datos/salas.js`.
+Pour régler le cadrage : `VISTAS.completa` et `CAJAS.campus` dans `js/datos/salas.js`
+(`CAJAS.campusMovil` pour les téléphones : tout le campus reste visible, rien n'est coupé).
 
 ## Modifier le PowerPoint puis le site
 

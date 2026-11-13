@@ -52,7 +52,7 @@ sala({ id: 'historia', planta: 'baja', fila: 'norte', x0: -8, x1: 0, tipo: 'aula
   desc: 'Aquí estudiamos el pasado y los países del mundo. Hay un gran mapa, un globo terráqueo y una pirámide.',
   hay: ['el mapa del mundo', 'el globo terráqueo', 'la pirámide', 'las columnas romanas', 'los ordenadores'] });
 sala({ id: 'svt', planta: 'baja', fila: 'norte', x0: 0, x1: 8, tipo: 'aula', materia: 'svt', color: '#3f8a5a',
-  nombre: 'Laboratorio de SVT', corto: 'Laboratorio de SVT',
+  nombre: 'Laboratorio de ciencias de la vida y de la Tierra', corto: 'Laboratorio de ciencias',
   desc: 'Es un laboratorio de ciencias de la vida y de la Tierra. Observamos las plantas y los animales con el microscopio.',
   hay: ['los microscopios', 'el acuario', 'las plantas', 'el modelo de ADN', 'los ordenadores'] });
 sala({ id: 'fisica', planta: 'baja', fila: 'norte', x0: 8, x1: 16, tipo: 'aula', materia: 'fisica', color: '#2a7ab0',
@@ -205,7 +205,8 @@ export const VISTAS = {
 
 // Cajas para el encuadre automático
 export const CAJAS = {
-  campus: { x0: -35, x1: 69, z0: -52, z1: 44, y0: 0, y1: 8 },  // edificios y pistas (el fondo del campo de fútbol puede salir del cuadro)
+  campus: { x0: -35, x1: 71.5, z0: -54, z1: 45.5, y0: 0, y1: 8 },  // edificios y pistas, con un pequeño margen (nada se corta)
+  campusMovil: { x0: -36, x1: 71.5, z0: -69, z1: 46, y0: 0, y1: 8 },  // teléfono: todo el campus, gradas incluidas
   edificio: { x0: -33, x1: 33, z0: -12.5, z1: 12.5, y0: 0, y1: 4 },
   deportes: { x0: -34, x1: 70, z0: -62, z1: 45, y0: 0, y1: 8 },
 };

@@ -33,6 +33,8 @@ export const Tronco = ({ dyn, ...p }) => html`<${Pieza} t=${dyn ? 'aTronco' : 't
 export const Ico = ({ dyn, ...p }) => html`<${Pieza} t=${dyn ? 'aIco' : 'ico'} ...${p} />`;
 export const Toro = ({ m, dyn, ...p }) => html`<${Pieza} t=${tipo('toro', m, dyn)} ...${p} />`;
 export const V = ({ c = '#cfe6ff', ...p }) => html`<${Pieza} t="vidrio" c=${c} ...${p} />`;
+// Cristal tintado de cubierta (lucernarios): más opaco que V
+export const VT = ({ c = '#a9cbe0', ...p }) => html`<${Pieza} t="vidrioT" c=${c} ...${p} />`;
 export const G = Grupo;
 
 // Panel con textura (pizarras, pósteres, pantallas)
