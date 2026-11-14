@@ -11,9 +11,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MODELOS, modelo } from './datos/modelos3d.js';
 
-const VERSION = 1; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
+const VERSION = 2; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 const embebido = q.get('embed') === '1';
@@ -39,6 +40,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false; // el edificio y el sol no se mueven: la sombra se calcula una sola vez por modelo
 
 const escena = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -97,7 +99,8 @@ function ajustarLimites() {
   distEsfera = esfera.radius / Math.sin(Math.min(vf, hf) / 2);
   ctrl.maxDistance = distEsfera * 1.08;   // alejado al máximo: el edificio entero se ve desde cualquier lado
   ctrl.minDistance = Math.max(esfera.radius * 0.18, 1.2);
-  camara.near = Math.max(0.05, esfera.radius / 200); camara.far = distEsfera * 6; camara.updateProjectionMatrix();
+  // plano cercano lo más lejos posible (precisión de profundidad: los suelos con textura están a pocos mm de su losa)
+  camara.near = Math.max(0.05, Math.min(ctrl.minDistance * 0.35, esfera.radius / 25)); camara.far = distEsfera * 4; camara.updateProjectionMatrix();
 }
 // el centro de la vista no puede salir del edificio (así no se «pierde» al mover), y cuanto
 // más lejos está la cámara, más vuelve al centro: alejado del todo, el edificio se ve entero
@@ -141,6 +144,43 @@ function animar(ahora) {
   if (k >= 1) anim = null;
 }
 
+// Para dibujar más rápido: las piezas opacas sin textura con el mismo tipo de material se
+// juntan en una sola malla (el color de cada pieza pasa a sus vértices). El aspecto no cambia
+// y la tarjeta gráfica hace ~20 dibujos por imagen en vez de ~350.
+function fusionar(raiz) {
+  raiz.updateMatrixWorld(true);
+  const grupos = new Map(), viejas = [];
+  raiz.traverse(o => {
+    if (!o.isMesh) return;
+    const m = o.material;
+    if (Array.isArray(m) || m.map || m.transparent || m.alphaTest > 0 || m.vertexColors || (m.emissive && m.emissive.getHex() !== 0) || !o.geometry.index) return;
+    const k = [m.roughness.toFixed(2), m.metalness.toFixed(2), m.side].join('|');
+    if (!grupos.has(k)) grupos.set(k, { m, lista: [] });
+    grupos.get(k).lista.push(o);
+  });
+  for (const { m, lista } of grupos.values()) {
+    if (lista.length < 2) continue;
+    const geos = lista.map(o => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', o.geometry.attributes.position.clone());
+      g.setAttribute('normal', o.geometry.attributes.normal.clone());
+      g.setIndex(o.geometry.index.clone());
+      g.applyMatrix4(o.matrixWorld);
+      const n = g.attributes.position.count, c = new Float32Array(n * 3), col = o.material.color;
+      for (let i = 0; i < n; i++) { c[i * 3] = col.r; c[i * 3 + 1] = col.g; c[i * 3 + 2] = col.b; }
+      g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+      return g;
+    });
+    const unida = mergeGeometries(geos);
+    geos.forEach(g => g.dispose());
+    if (!unida) continue;
+    const malla = new THREE.Mesh(unida, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: m.roughness, metalness: m.metalness, side: m.side }));
+    raiz.add(malla);
+    for (const o of lista) { o.parent.remove(o); viejas.push(o); }
+  }
+  for (const o of viejas) { o.geometry.dispose(); o.material.dispose(); }
+}
+
 // ---------- Carga de un modelo ----------
 const cargador = new GLTFLoader();
 let raiz = null, ficha = 0;
@@ -174,6 +214,7 @@ async function cargar(i) {
   if (mio !== ficha) { liberar(gltf.scene); return; }
   if (raiz) { escena.remove(raiz); liberar(raiz); }
   raiz = gltf.scene;
+  fusionar(raiz);
   raiz.traverse(o => { if (o.isMesh) { o.castShadow = !o.material.transparent; o.receiveShadow = true; } });
   escena.add(raiz);
   caja.setFromObject(raiz); caja.getBoundingSphere(esfera); caja.getCenter(centro);
@@ -183,6 +224,7 @@ async function cargar(i) {
   sol.target.position.copy(centro);
   Object.assign(sol.shadow.camera, { left: -r * 1.1, right: r * 1.1, top: r * 1.1, bottom: -r * 1.1, near: r * 0.2, far: r * 4.5 });
   sol.shadow.camera.updateProjectionMatrix();
+  renderer.shadowMap.needsUpdate = true;
   sombraSuelo.scale.set(r * 3, r * 3, 1); sombraSuelo.position.set(centro.x, caja.min.y - 0.02, centro.z);
   ajustarLimites();
   irA(m.giro[0], m.giro[1], true);
@@ -272,7 +314,7 @@ function bucle(t) {
 requestAnimationFrame(bucle);
 
 // para las pruebas automáticas
-Object.assign(estado, { camara, ctrl, caja, esferaR: () => esfera.radius, irA, cargar, distanciaQueCabe, dir,
+Object.assign(estado, { THREE, camara, ctrl, caja, renderer, escena, esferaR: () => esfera.radius, irA, cargar, distanciaQueCabe, dir,
   dentroDelEncuadre: () => esquinas().every(p => { const v = p.clone().project(camara); return v.z < 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 1; }),
   ocupacion: () => { const v = esquinas().map(p => p.clone().project(camara)); const xs = v.map(p => p.x), ys = v.map(p => p.y);
     return [(Math.max(...xs) - Math.min(...xs)) / 2, (Math.max(...ys) - Math.min(...ys)) / 2]; } });

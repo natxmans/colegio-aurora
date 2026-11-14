@@ -8,12 +8,13 @@
 //   giro: vista inicial en el visor [azimut, altura] en grados (azimut 0 = desde el sur (+z), 90 = desde el este (+x))
 //   frente: azimut desde el que se ve la fachada principal (botón «Frente»)
 //   textura: tamaño máximo de las texturas (más pequeño = archivo más ligero)
+//   pxm: píxeles por metro (cada textura según el tamaño real del objeto: archivo ligero y campo de fútbol nítido)
 // =========================================================
 export const MODELOS = [
   {
     id: 'campus', nombre: 'El campus entero', corto: 'El campus',
     desc: 'Todo el colegio: el edificio principal, la residencia, el gimnasio, la piscina, los campos de deporte, el patio y los jardines.',
-    zona: { x0: -66, x1: 72, z0: -68, z1: 47.5 }, y: [-3, 15], estado: { vista: 'completa', techo: true }, giro: [20, 38], textura: 256, frente: 0,
+    zona: { x0: -66, x1: 72, z0: -68, z1: 47.5 }, y: [-3, 15], estado: { vista: 'completa', techo: true }, giro: [20, 38], textura: 1024, pxm: 14, frente: 0,
   },
   {
     id: 'principal', nombre: 'El edificio principal', corto: 'Edificio principal',

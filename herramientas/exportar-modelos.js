@@ -160,10 +160,24 @@ function materialDe(it) {
 }
 // la repetición de la textura se mete en las coordenadas (PowerPoint no entiende las extensiones de glTF)
 // texturas opacas en JPEG (mucho más ligeras); las que tienen partes transparentes, en PNG
-const texturas = new Map();
+// Con def.pxm (píxeles por metro), cada textura se reduce según el tamaño REAL del objeto:
+// el campo de fútbol (64 m) conserva sus líneas, un cartel de 1 m queda pequeño (no se ve más).
+const texturas = new Map(), extension = new Map();
+let pxPorMetro = null, texturaMax = 1024;
 function copiaTextura(t, conAlfa) {
   if (texturas.has(t.uuid)) return texturas.get(t.uuid);
   const c = t.clone();
+  const im = t.image;
+  if (pxPorMetro && im && im.width && extension.has(t.uuid)) {
+    const lado = Math.max(im.width, im.height);
+    const quiero = Math.round(Math.min(texturaMax, Math.max(64, pxPorMetro * extension.get(t.uuid))));
+    if (quiero < lado) {
+      const k = quiero / lado, cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(im.width * k)); cv.height = Math.max(1, Math.round(im.height * k));
+      const g = cv.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, cv.width, cv.height);
+      c.source = new THREE.Source(cv); // imagen nueva: la textura del sitio NO se toca (clone() comparte la imagen)
+    }
+  }
   c.userData = { ...t.userData, mimeType: conAlfa ? 'image/png' : 'image/jpeg' };
   c.repeat.set(1, 1); c.offset.set(0, 0); c.rotation = 0; c.center.set(0, 0);
   c.wrapS = t.wrapS; c.wrapT = t.wrapT; c.needsUpdate = true;
@@ -174,7 +188,8 @@ function copiaTextura(t, conAlfa) {
 function agregar(cubo, it, info, desp) {
   const { g, mundo } = info;
   const plano = it.tipo === 'plano';
-  const mat = mundo ? new THREE.Matrix4().makeTranslation(desp.x, desp.y, desp.z) : new THREE.Matrix4().makeTranslation(desp.x, desp.y, desp.z).multiply(it.matriz);
+  const dy = desp.y + (it.subir || 0);
+  const mat = mundo ? new THREE.Matrix4().makeTranslation(desp.x, dy, desp.z) : new THREE.Matrix4().makeTranslation(desp.x, dy, desp.z).multiply(it.matriz);
   M3.getNormalMatrix(mat);
   const espejo = mat.determinant() < 0;
   const P = g.attributes.position, Nn = g.attributes.normal, UV = g.attributes.uv, COL = g.attributes.color;
@@ -212,7 +227,8 @@ function agregar(cubo, it, info, desp) {
 
 // ---------- 5. Exportar un modelo ----------
 export async function exportar(def, escena) {
-  texturas.clear();
+  texturas.clear(); extension.clear();
+  pxPorMetro = def.pxm || null; texturaMax = def.textura || 1024;
   const items = elegir(recoger(escena), def);
   // caja del modelo (para centrarlo: el suelo a la altura 0 y el centro en x = z = 0)
   const caja = new THREE.Box3();
@@ -225,9 +241,28 @@ export async function exportar(def, escena) {
     const b = info.g.boundingBox.clone();
     if (!info.mundo) b.applyMatrix4(it.matriz);
     caja.union(b);
+    // tamaño real de lo que cubre cada textura (para def.pxm)
+    const mapa = it.mat && it.mat.map;
+    if (mapa) {
+      const s = b.getSize(new THREE.Vector3()), rep = Math.max(1, mapa.repeat.x, mapa.repeat.y);
+      extension.set(mapa.uuid, Math.max(extension.get(mapa.uuid) || 0, Math.max(s.x, s.y, s.z) / rep));
+    }
   }
   const centro = caja.getCenter(new THREE.Vector3());
   const desp = new THREE.Vector3(-centro.x, -caja.min.y, -centro.z);
+  // Los suelos con textura (campo de fútbol, pistas, gimnasio) están a pocos milímetros de su losa:
+  // visto de lejos, la tarjeta gráfica (y PowerPoint) no sabe cuál está delante y el dibujo se pierde.
+  // Se suben lo justo (unos cm, invisible) para quedar claramente encima.
+  const hueco = Math.max(0.01, Math.max(caja.max.x - caja.min.x, caja.max.z - caja.min.z) / 3000);
+  const cajas = infos.map(([it, info]) => { const b = info.g.boundingBox.clone(); if (!info.mundo) b.applyMatrix4(it.matriz); return b; });
+  infos.forEach(([it, info], k) => {
+    const b = cajas[k];
+    if (!(it.mat && it.mat.map) || it.mat.transparent || b.max.y - b.min.y > 0.001 || it.geo.type !== 'PlaneGeometry') return;
+    const cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2, y = b.max.y;
+    let debajo = -Infinity;
+    cajas.forEach((o, j) => { if (j !== k && o.max.y <= y + 1e-4 && o.max.y > y - 0.2 && o.min.x <= cx && o.max.x >= cx && o.min.z <= cz && o.max.z >= cz) debajo = Math.max(debajo, o.max.y); });
+    if (debajo > -Infinity && y - debajo < hueco) it.subir = hueco - (y - debajo);
+  });
   const cubos = new Map();
   for (const [it, info] of infos) {
     const k = claveMaterial(it);

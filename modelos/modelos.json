@@ -22,7 +22,8 @@
    20,
    38
   ],
-  "textura": 256,
+  "textura": 1024,
+  "pxm": 14,
   "frente": 0
  },
  {
