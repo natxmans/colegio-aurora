@@ -1,18 +1,23 @@
 // =========================================================
-// LA PRESENTACIÓN (12 diapositivas) — sin bibliotecas, para que funcione SIEMPRE
+// LA PRESENTACIÓN (17 diapositivas) — sin bibliotecas, para que funcione SIEMPRE
 // (aunque no haya 3D, ni Internet para las bibliotecas).
 // Anterior / siguiente, teclado, deslizar con el dedo, miniaturas,
 // pantalla completa (con plan B para los teléfonos), texto y descarga del .pptx.
+// En las diapositivas con un edificio en 3D, el visor 3D (visor3d.html) se pone
+// EN la diapositiva, en el mismo sitio que el modelo del PowerPoint: se puede girar.
 // =========================================================
 (function () {
-  var N = 12, i = 0, textos = null, completa = false;
+  var i = 0, textos = null, completa = false;
   var $ = function (id) { return document.getElementById(id); };
   var caja = $('ppt'), marco = $('ppt-marco');
   if (!caja || !marco) return;
   var src = function (k) { return 'img/diapositivas/diapositiva-' + (k < 9 ? '0' : '') + (k + 1) + '.jpg'; };
-  var ALT = ['Portada: Colegio Pablo Picasso, nuestro colegio ideal', 'Presentación del colegio', 'El uniforme escolar y la ropa de diario',
-    'El edificio', 'Las aulas y los ordenadores', 'Las nueve asignaturas', 'Los dormitorios', 'El complejo deportivo',
-    'Los espacios comunes', 'La vida en el internado', 'El horario', '¿Por qué nos gusta nuestro colegio?'];
+  var ALT = ['Portada: Colegio Pablo Picasso, nuestro colegio ideal', 'Presentación del colegio (modelo 3D del campus)', 'El uniforme escolar y la ropa de diario',
+    'El edificio (modelo 3D)', 'Las aulas y los ordenadores (modelo 3D de un aula)', 'Los laboratorios (modelo 3D)', 'Las nueve asignaturas',
+    'Los dormitorios: la residencia (modelo 3D)', 'Una habitación doble (modelo 3D)', 'El complejo deportivo: el gimnasio (modelo 3D)',
+    'La piscina olímpica (modelo 3D)', 'El fútbol y el baloncesto (modelo 3D)', 'Los espacios comunes: el comedor (modelo 3D)',
+    'La biblioteca (modelo 3D)', 'La vida en el internado', 'El horario', '¿Por qué nos gusta nuestro colegio?'];
+  var N = ALT.length;
 
   // Imágenes: la primera ya está en la página; las demás se crean cuando hacen falta
   var imgs = [marco.querySelector('img.diapo')];
@@ -52,7 +57,42 @@
     for (var j = 0; j < bs.length; j++) { bs[j].className = j === i ? 'activa' : ''; bs[j].setAttribute('aria-selected', String(j === i)); }
     pintarTexto();
     if (i < N - 1) { var pre = new Image(); pre.src = src(i + 1); }
+    poner3d();
   }
+
+  // ---------- Edificios en 3D dentro de las diapositivas ----------
+  // js/datos/diapositivas3d.json (generado desde el PowerPoint): diapositiva, edificio y zona en %.
+  // Solo hay un visor a la vez (la diapositiva activa) y solo si la presentación está a la vista.
+  var ZONAS = {}, visor = null, espera3d = 0, aLaVista3d = true;
+  var hay3d = !(window.__diag && window.__diag.webgl === false) && !!window.fetch;
+  function quitar3d() { clearTimeout(espera3d); if (visor) { visor.remove(); visor = null; } }
+  function poner3d() {
+    var z = ZONAS[i + 1];
+    if (!z || !aLaVista3d) { quitar3d(); return; }
+    if (visor && visor.getAttribute('data-m') === z.m) return;
+    quitar3d();
+    espera3d = setTimeout(function () { // si se pasa rápido de diapositiva, no se carga nada
+      var f = document.createElement('iframe');
+      f.className = 'diapo-3d'; f.setAttribute('data-m', z.m);
+      f.title = 'Modelo 3D de la diapositiva ' + (i + 1) + ': arrastra para girarlo, rueda o dos dedos para acercarlo';
+      f.src = 'visor3d.html?embed=1&m=' + encodeURIComponent(z.m);
+      f.setAttribute('allow', 'fullscreen');
+      f.style.left = z.x + '%'; f.style.top = z.y + '%'; f.style.width = z.w + '%'; f.style.height = z.h + '%';
+      marco.insertBefore(f, $('ppt-ant'));
+      visor = f;
+    }, 350);
+  }
+  if (hay3d) {
+    fetch('js/datos/diapositivas3d.json').then(function (r) { return r.json(); })
+      .then(function (l) { l.forEach(function (z) { ZONAS[z.n] = z; }); poner3d(); }).catch(function () {});
+    if (window.IntersectionObserver) new IntersectionObserver(function (e) { aLaVista3d = e[0].isIntersecting; poner3d(); }, { rootMargin: '200px 0px' }).observe(caja);
+  }
+  // el visor 3D (dentro de la diapositiva) avisa cuando se pulsan las flechas del teclado
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || !e.data.ppt) return;
+    if (e.data.ppt === 'sig') ir(i + 1);
+    if (e.data.ppt === 'ant') ir(i - 1);
+  });
   $('ppt-ant').onclick = $('ppt-ant2').onclick = function () { ir(i - 1); };
   $('ppt-sig').onclick = $('ppt-sig2').onclick = function () { ir(i + 1); };
 

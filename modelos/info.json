@@ -1,0 +1,145 @@
+{
+ "campus": {
+  "id": "campus",
+  "piezas": 9410,
+  "mallas": 350,
+  "vertices": 431541,
+  "triangulos": 318460,
+  "tam": [
+   138,
+   16.6,
+   116.83
+  ],
+  "bytes": 14623716
+ },
+ "principal": {
+  "id": "principal",
+  "piezas": 4650,
+  "mallas": 249,
+  "vertices": 211379,
+  "triangulos": 132270,
+  "tam": [
+   67.2,
+   10.8,
+   31.6
+  ],
+  "bytes": 9305820
+ },
+ "aula": {
+  "id": "aula",
+  "piezas": 261,
+  "mallas": 42,
+  "vertices": 8334,
+  "triangulos": 4558,
+  "tam": [
+   8.3,
+   4.2,
+   9.55
+  ],
+  "bytes": 446608
+ },
+ "laboratorios": {
+  "id": "laboratorios",
+  "piezas": 547,
+  "mallas": 67,
+  "vertices": 31822,
+  "triangulos": 16280,
+  "tam": [
+   16.3,
+   4.2,
+   9.55
+  ],
+  "bytes": 1283980
+ },
+ "residencia": {
+  "id": "residencia",
+  "piezas": 3443,
+  "mallas": 108,
+  "vertices": 133340,
+  "triangulos": 102406,
+  "tam": [
+   18.86,
+   9.26,
+   42.8
+  ],
+  "bytes": 4890468
+ },
+ "habitacion": {
+  "id": "habitacion",
+  "piezas": 101,
+  "mallas": 30,
+  "vertices": 3689,
+  "triangulos": 2712,
+  "tam": [
+   6.93,
+   3.8,
+   4.39
+  ],
+  "bytes": 245172
+ },
+ "gimnasio": {
+  "id": "gimnasio",
+  "piezas": 235,
+  "mallas": 26,
+  "vertices": 7142,
+  "triangulos": 4072,
+  "tam": [
+   32,
+   13.07,
+   27.2
+  ],
+  "bytes": 695828
+ },
+ "piscina": {
+  "id": "piscina",
+  "piezas": 376,
+  "mallas": 24,
+  "vertices": 10524,
+  "triangulos": 5160,
+  "tam": [
+   62,
+   13.8,
+   33.23
+  ],
+  "bytes": 877616
+ },
+ "pistas": {
+  "id": "pistas",
+  "piezas": 311,
+  "mallas": 28,
+  "vertices": 12134,
+  "triangulos": 6976,
+  "tam": [
+   103.3,
+   14.06,
+   54.61
+  ],
+  "bytes": 461948
+ },
+ "comedor": {
+  "id": "comedor",
+  "piezas": 336,
+  "mallas": 35,
+  "vertices": 17898,
+  "triangulos": 10372,
+  "tam": [
+   28.55,
+   4.2,
+   9.55
+  ],
+  "bytes": 697420
+ },
+ "biblioteca": {
+  "id": "biblioteca",
+  "piezas": 475,
+  "mallas": 56,
+  "vertices": 16882,
+  "triangulos": 10252,
+  "tam": [
+   28.55,
+   4.2,
+   9.55
+  ],
+  "bytes": 1385724
+ }
+}

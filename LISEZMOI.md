@@ -10,7 +10,36 @@ Devise officielle : **Estudiar · Convivir · Crecer**. Logo officiel : l'emblè
 centré sans déformation dans un carré transparent. Ne jamais le redessiner ni l'étirer.
 
 - **En ligne :** https://natxmans.github.io/colegio-aurora/
-- **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (12 diapositives)
+- **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (17 diapositives, dont 11 avec un vrai bâtiment 3D)
+- **Visionneuse 3D :** https://natxmans.github.io/colegio-aurora/visor3d.html (les 11 bâtiments, souris et doigts)
+
+## Les bâtiments en 3D (PowerPoint + visionneuse)
+
+Les 11 modèles (`modelos/*.glb`) sont **exportés de la maquette du site** : mêmes pièces, mêmes corrections,
+toits fermés. Campus entier, bâtiment principal, une salle avec ordinateurs, laboratoires, résidence,
+chambre double, gymnase, piscine, foot et basket, cantine (comedor), bibliothèque.
+Les salles « en coupe » (salle, labos, chambre, cantine, bibliothèque) sont montrées sans le toit.
+
+**Dans PowerPoint (testé dans PowerPoint Microsoft 365)** : les modèles sont de vrais objets 3D.
+- En **mode édition** : clic sur le bâtiment → tirer le **rond du milieu** pour le tourner dans tous les sens
+  (façade, côtés, arrière, toit). Onglet **Modèle 3D → Panoramique et zoom** : la loupe à droite zoome,
+  glisser déplace le bâtiment. Le bâtiment ne sort jamais de sa zone (testé sur 440 positions).
+- En **mode diaporama** (F5), PowerPoint ne permet pas de tourner un modèle 3D (un clic passe à la diapositive
+  suivante) : c'est une limite de PowerPoint. Pour le faire tourner pendant l'exposé, cliquer sur le bouton
+  **« Girar en 3D ↗ »** de la diapositive : il ouvre la visionneuse 3D du site sur ce bâtiment (Internet nécessaire).
+- La molette de la souris, dans PowerPoint, change de diapositive (elle ne zoome pas le modèle).
+
+**Sur le site** : dans la présentation en haut de la page, sur les diapositives 3D, la visionneuse est placée
+dans la diapositive : glisser = tourner à 360°, molette = zoom, clic droit = déplacer ; au doigt : un doigt pour
+tourner, deux doigts pour zoomer et déplacer. Boutons Frente / Lado / Detrás / Arriba / Centrar.
+Le zoom est limité et le centre de la vue reste sur le bâtiment : il ne peut pas sortir du cadre.
+
+**Refaire les modèles et le PowerPoint** (si la maquette change), avec `LANCER-LE-SITE.bat` ouvert :
+1. `python herramientas/exportar_modelos.py` → `modelos/*.glb` (zones dans `js/datos/modelos3d.js`)
+2. `powershell -File herramientas/ppt/anadir_3d.ps1` → PowerPoint (part de `herramientas/ppt/base-12-diapositivas.pptx`,
+   plan dans `herramientas/ppt/plan-3d.json`), images des diapositives et `js/datos/diapositivas3d.json`
+3. `python herramientas/ppt/textos_web.py` → texte des diapositives pour « Ver el texto »
+4. Tests : `python herramientas/prueba_ppt3d.py` (29 tests), `python herramientas/vistas_modelos.py` (photos de chaque modèle)
 
 ## Lancer le site sur ton PC
 
@@ -27,6 +56,8 @@ puis affiche un bouton « Reintentar ».
 
 Flèches ou touches ← →, miniatures, « Ver el texto », plein écran, « Descargar (.pptx) ».
 Elle est écrite sans bibliothèque (`js/presentacion-basica.js`) : rien ne peut la bloquer.
+Sur les 11 diapositives avec un bâtiment, le modèle 3D se manipule directement dans la diapositive
+(sans WebGL : l'image de la diapositive reste affichée).
 
 ## Le campus 3D
 

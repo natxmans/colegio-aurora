@@ -199,3 +199,8 @@ html.explorando .campus3d { position: fixed; inset: 0; z-index: 80; height: auto
   .exp-abrir { font-size: 13px; padding: 8px 12px; }
   .ppt-sigue .btn { width: 100%; }
 }
+
+/* edificios en 3D dentro de las diapositivas (visor3d.html?embed=1 en la zona 3D del PowerPoint) */
+.diapo-marco { container-type: inline-size; }
+.diapo-3d { position: absolute; z-index: 1; border: 0; border-radius: 1.8cqw; background: transparent; }
+.diapo-flecha { z-index: 2; }

@@ -1,0 +1,86 @@
+/* =========================================================
+   VISOR 3D DE LOS EDIFICIOS · azul marino, blanco y beige
+   ========================================================= */
+body.visor { margin: 0; min-height: 100vh; background: var(--crema); color: var(--texto); font-family: var(--texto-f); }
+.v-cab { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 20px; background: var(--marino); color: #fff; }
+.v-marca { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; min-width: 0; }
+.v-marca img { border-radius: 50%; background: #fff; flex-shrink: 0; }
+.v-marca b { display: block; font-family: var(--titulo); font-size: 18px; letter-spacing: .02em; }
+.v-marca small { display: block; color: var(--beige); font-size: 13px; }
+.v-volver { flex-shrink: 0; }
+
+.v-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; padding: 20px; height: calc(100vh - 64px); box-sizing: border-box; }
+.v-escena { position: relative; border-radius: 22px; overflow: hidden; min-height: 320px;
+  background: radial-gradient(120% 90% at 50% 38%, #ffffff 0%, #f6f1e7 55%, #e9dfcb 100%);
+  border: 1px solid var(--borde); box-shadow: var(--sombra-suave); }
+.v-escena canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; outline: none; }
+.v-escena canvas:active { cursor: grabbing; }
+.v-escena canvas:focus-visible { box-shadow: inset 0 0 0 3px var(--arena); }
+.v-escena.pseudo-completa { position: fixed; inset: 0; z-index: 50; border-radius: 0; }
+.v-escena:fullscreen { border-radius: 0; }
+
+.v-carga { position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; text-align: center; pointer-events: none; z-index: 2; }
+.v-carga[hidden] { display: none; }
+.v-barra { width: 220px; height: 5px; margin: 0 auto; border-radius: 5px; background: rgba(20,40,90,.12); overflow: hidden; }
+.v-barra span { display: block; height: 100%; width: 4%; background: var(--marino); border-radius: 5px; transition: width .3s ease; }
+.v-carga p { margin: 0; font-weight: 500; color: var(--marino); }
+.v-carga.error .v-barra { display: none; }
+.v-carga.error p { background: rgba(255,255,255,.92); padding: 10px 16px; border-radius: 12px; }
+.v-imagen { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; }
+.v-imagen[hidden], .v-escena [hidden] { display: none !important; }
+
+.v-vistas { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 3; display: flex; gap: 4px; padding: 4px;
+  background: rgba(255,255,255,.92); border: 1px solid var(--borde); border-radius: 999px; box-shadow: var(--sombra-suave); max-width: calc(100% - 24px); overflow-x: auto; }
+.v-vistas button { border: 0; background: transparent; color: var(--marino); font: 600 13px var(--texto-f); padding: 8px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.v-vistas button:hover { background: var(--beige); }
+.v-vistas button:focus-visible { outline: 2px solid var(--arena); }
+.v-ayuda { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 3; margin: 0; padding: 6px 12px; font-size: 12.5px; color: var(--gris);
+  background: rgba(255,255,255,.85); border-radius: 999px; white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.es-raton .v-tactil, .es-tactil .v-raton { display: none; }
+.sin-webgl .v-vistas, .sin-webgl .v-ayuda { display: none; }
+
+.v-info { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; min-height: 0; }
+.v-etiqueta { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--azul); }
+.v-info h1 { margin: 0; font-family: var(--titulo); font-size: 30px; line-height: 1.15; color: var(--marino); }
+.v-desc { margin: 0; font-size: 16px; line-height: 1.55; color: var(--texto); }
+.v-nav { display: flex; gap: 8px; }
+.v-nav .btn:disabled { opacity: .45; cursor: default; transform: none; }
+.v-lista { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; border-top: 1px solid var(--borde); }
+.v-lista button { border: 1px solid var(--borde-fuerte); background: #fff; color: var(--marino); font: 500 13px var(--texto-f); padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.v-lista button[aria-current="true"] { background: var(--marino); color: #fff; border-color: var(--marino); }
+.v-nota { margin: auto 0 0; font-size: 12.5px; color: var(--gris); }
+
+@media (max-width: 860px) {
+  .v-main { grid-template-columns: 1fr; height: auto; padding: 12px; gap: 14px; }
+  .v-escena { height: 62vh; min-height: 300px; }
+  .v-info h1 { font-size: 24px; }
+  .v-cab { padding: 8px 12px; }
+  .v-marca b { font-size: 16px; }
+  .v-volver { padding: 8px 12px; font-size: 13px; }
+}
+@media (max-width: 420px) { .v-marca small { display: none; } }
+
+/* Dentro de una diapositiva (iframe): solo la escena */
+body.embebido { background: transparent; min-height: 0; }
+body.embebido .v-cab, body.embebido .v-info { display: none; }
+body.embebido .v-main { display: block; padding: 0; height: 100vh; }
+body.embebido .v-escena { height: 100%; border-radius: 0; border: 0; box-shadow: none; }
+body.embebido .v-vistas { bottom: 8px; }
+body.embebido .v-vistas button { padding: 6px 10px; font-size: 12px; }
+body.embebido .v-ayuda { top: 8px; font-size: 11.5px; }
+html.embebido, body.embebido { background: transparent !important; }
+body.embebido .v-escena { background: transparent; }
+body.embebido.cargado .v-escena { background: linear-gradient(180deg, #ffffff 0%, #ece2cf 100%); }
+body.embebido .v-carga p { background: rgba(255,255,255,.92); padding: 6px 12px; border-radius: 999px; font-size: 13px; }
+.v-abrir { display: none; }
+body.embebido .v-abrir { display: block; position: absolute; top: 8px; right: 8px; z-index: 4; padding: 5px 10px; border-radius: 999px;
+  background: var(--marino); color: #fff; font: 600 12px var(--texto-f); text-decoration: none; box-shadow: var(--sombra-suave); }
+body.embebido .v-abrir:hover { background: var(--azul); }
+body.embebido .v-ayuda { left: 10px; transform: none; max-width: calc(100% - 150px); }
+@media (max-width: 460px) {
+  body.embebido .v-ayuda { display: none; }
+  body.embebido .v-vistas { bottom: 4px; padding: 2px; }
+  body.embebido .v-vistas button { padding: 4px 7px; font-size: 10.5px; }
+  body.embebido .v-abrir { top: 4px; right: 4px; padding: 3px 8px; font-size: 10.5px; }
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es" translate="no" class="notranslate">
+<head>
+<meta charset="utf-8" />
+<meta name="google" content="notranslate" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Edificios en 3D · Colegio Pablo Picasso</title>
+<meta name="description" content="Los edificios del Colegio Pablo Picasso en 3D: gíralos, acércate y míralos por todos los lados." />
+<meta name="theme-color" content="#14285a" />
+<link rel="icon" type="image/png" href="img/logo-64.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://esm.sh" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+<link rel="stylesheet" href="css/estilos.css" />
+<link rel="stylesheet" href="css/visor3d.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.169.0",
+    "three/": "https://esm.sh/three@0.169.0/"
+  }
+}
+</script>
+</head>
+<body class="visor">
+  <header class="v-cab">
+    <a class="v-marca" href="./#presentacion" aria-label="Volver al sitio del Colegio Pablo Picasso">
+      <img src="img/logo-64.png" alt="" width="40" height="40" />
+      <span><b>Colegio Pablo Picasso</b><small>Los edificios en 3D</small></span>
+    </a>
+    <a class="btn btn-secundario btn-peq v-volver" href="./#presentacion">Volver a la presentación</a>
+  </header>
+
+  <main class="v-main">
+    <section class="v-escena" id="v-escena" aria-label="Modelo 3D del edificio">
+      <canvas id="v-lienzo" tabindex="0" aria-describedby="v-ayuda"></canvas>
+      <div class="v-carga" id="v-carga">
+        <div class="v-barra"><span id="v-progreso"></span></div>
+        <p id="v-carga-txt">Cargando el modelo 3D…</p>
+      </div>
+      <img class="v-imagen" id="v-imagen" alt="" hidden />
+      <a class="v-abrir" id="v-abrir" href="visor3d.html" target="_blank" rel="noopener" aria-label="Abrir el visor 3D en grande (nueva pestaña)">Abrir en grande ↗</a>
+      <div class="v-vistas" role="group" aria-label="Vistas del edificio">
+        <button type="button" data-vista="frente">Frente</button>
+        <button type="button" data-vista="lado">Lado</button>
+        <button type="button" data-vista="detras">Detrás</button>
+        <button type="button" data-vista="arriba">Arriba</button>
+        <button type="button" data-vista="inicio" aria-label="Volver a la vista de inicio">Centrar</button>
+        <button type="button" id="v-completa" aria-label="Pantalla completa">⛶</button>
+      </div>
+      <p class="v-ayuda" id="v-ayuda">
+        <span class="v-raton">Arrastra para girar · rueda para acercar · clic derecho para mover</span>
+        <span class="v-tactil">Un dedo para girar · dos dedos para acercar y mover</span>
+      </p>
+    </section>
+
+    <aside class="v-info">
+      <p class="v-etiqueta"><span id="v-num">1</span> / <span id="v-total">11</span> · Visita en 3D</p>
+      <h1 id="v-titulo">Colegio Pablo Picasso</h1>
+      <p id="v-desc" class="v-desc"></p>
+      <div class="v-nav">
+        <button type="button" class="btn btn-secundario btn-peq" id="v-ant">← Anterior</button>
+        <button type="button" class="btn btn-primario btn-peq" id="v-sig">Siguiente →</button>
+      </div>
+      <nav class="v-lista" id="v-lista" aria-label="Todos los edificios"></nav>
+      <p class="v-nota">Son los mismos modelos que la maqueta 3D del sitio.</p>
+    </aside>
+  </main>
+
+  <script type="module" src="js/visor3d.js"></script>
+</body>
+</html>

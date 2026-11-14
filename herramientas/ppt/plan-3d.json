@@ -1,0 +1,60 @@
+{
+ "url": "https://natxmans.github.io/colegio-aurora/visor3d.html?m=",
+ "diapositivas": [
+  {
+   "base": 2,
+   "modelo": "campus"
+  },
+  {
+   "base": 4,
+   "modelo": "principal"
+  },
+  {
+   "base": 5,
+   "modelo": "aula"
+  },
+  {
+   "tras": 5,
+   "modelo": "laboratorios",
+   "titulo": "4. Los laboratorios"
+  },
+  {
+   "base": 7,
+   "modelo": "residencia"
+  },
+  {
+   "tras": 7,
+   "modelo": "habitacion",
+   "titulo": "6. Una habitación doble"
+  },
+  {
+   "base": 8,
+   "modelo": "gimnasio"
+  },
+  {
+   "tras": 8,
+   "modelo": "piscina",
+   "titulo": "7. La piscina olímpica"
+  },
+  {
+   "tras": 8,
+   "modelo": "pistas",
+   "titulo": "7. El fútbol y el baloncesto"
+  },
+  {
+   "base": 9,
+   "modelo": "comedor"
+  },
+  {
+   "tras": 9,
+   "modelo": "biblioteca",
+   "titulo": "8. La biblioteca"
+  }
+ ],
+ "textos": {
+  "leyenda": "Modelo 3D · selecciónalo y gira el círculo del centro",
+  "boton": "Girar en 3D  ↗",
+  "pista": "Abrir el edificio en el visor 3D (ratón o dedos para girar y acercar)",
+  "consejo": "En PowerPoint: selecciona el modelo y gira el círculo del centro. Durante la presentación: botón «Girar en 3D»."
+ }
+}
