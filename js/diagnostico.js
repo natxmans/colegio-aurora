@@ -63,11 +63,26 @@
   window.__diag = d;
 
   // Mensajes sobre la carga de la 3D (los usa main.js)
-  window.__errorSitio = function (txt) {
+  // reintentar (opcional): función que vuelve a intentar la carga → se muestra un botón «Reintentar»
+  window.__errorSitio = function (txt, reintentar) {
     var e = document.getElementById('carg-error'), m = document.getElementById('carg-msg');
     if (e) { e.textContent = txt; e.hidden = false; }
     if (m) m.textContent = '';
     var b = document.querySelector('.campus-espera .carg-barra'); if (b) b.style.display = 'none';
+    var caja = document.querySelector('.campus-espera-caja'), btn = document.getElementById('carg-reintentar');
+    if (btn) btn.remove();
+    if (caja && reintentar) {
+      btn = document.createElement('button');
+      btn.id = 'carg-reintentar'; btn.type = 'button'; btn.className = 'btn btn-primario btn-peq carg-reintentar';
+      btn.textContent = 'Reintentar';
+      btn.addEventListener('click', function () {
+        btn.remove(); if (e) e.hidden = true;
+        if (b) b.style.display = '';
+        if (m) m.textContent = 'Cargando de nuevo…';
+        reintentar();
+      });
+      caja.appendChild(btn);
+    }
   };
   window.__progreso3d = function (p, txt) {
     var b = document.getElementById('carg-progreso'), m = document.getElementById('carg-msg');

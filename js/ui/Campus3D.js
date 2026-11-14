@@ -59,17 +59,29 @@ export function Campus3D() {
       if (window.__errorSitio) window.__errorSitio('Este aparato no puede mostrar gráficos 3D (WebGL). Aquí tienes una imagen del campus: la presentación y todo el contenido siguen disponibles.');
       return;
     }
-    let hecho = false, i = 0, p = 4, tm = 0;
-    const empezar = () => {
-      if (hecho) return; hecho = true;
-      tm = setInterval(() => { i = (i + 1) % MENSAJES.length; p = Math.min(92, p + (92 - p) * 0.14); if (window.__progreso3d) window.__progreso3d(p, MENSAJES[i]); }, 700);
+    let hecho = false, i = 0, p = 4, tm = 0, espera = 0, rondas = 0;
+    const recargarPagina = () => { location.hash = 'campus'; location.reload(); };
+    // Una ronda = hasta 3 intentos seguidos (con una pequeña pausa): un corte de red
+    // de un segundo (wifi del aula) no impide ver la maqueta.
+    const cargar = () => {
+      rondas++; p = 4;
+      clearInterval(tm); clearTimeout(espera);
+      tm = setInterval(() => { if (leer().listo3d) { clearInterval(tm); return; } i = (i + 1) % MENSAJES.length; p = Math.min(92, p + (92 - p) * 0.14); if (window.__progreso3d) window.__progreso3d(p, MENSAJES[i]); }, 700);
       if (window.__progreso3d) window.__progreso3d(6, MENSAJES[0]);
-      const espera = setTimeout(() => { if (!leer().listo3d && window.__errorSitio) window.__errorSitio('La maqueta 3D tarda mucho en cargar. Comprueba la conexión a Internet; la presentación sigue disponible arriba.'); }, 70000);
-      import('../3d/Escena.js').then(m => setEscena(() => m.Escena)).catch(e => {
-        console.error(e); clearInterval(tm); clearTimeout(espera);
-        if (window.__errorSitio) window.__errorSitio('No se ha podido cargar la maqueta 3D (se necesita Internet). La presentación y los textos siguen disponibles.');
-      });
+      espera = setTimeout(() => { if (!leer().listo3d && window.__errorSitio) window.__errorSitio('La maqueta 3D tarda mucho en cargar. Comprueba la conexión a Internet; la presentación sigue disponible arriba.', recargarPagina); }, 70000);
+      let intento = 0;
+      const importar = () => {
+        intento++;
+        import('../3d/Escena.js').then(m => setEscena(() => m.Escena)).catch(e => {
+          if (intento < 3) { console.warn('Maqueta 3D: intento ' + intento + ' fallido, se vuelve a intentar.', e); setTimeout(importar, intento * 2000); return; }
+          console.error(e); clearInterval(tm); clearTimeout(espera);
+          // 1.ª vez: el botón vuelve a intentar sin recargar; después: recarga la página
+          if (window.__errorSitio) window.__errorSitio('No se ha podido cargar la maqueta 3D (se necesita Internet). La presentación y los textos siguen disponibles.', rondas < 2 ? cargar : recargarPagina);
+        });
+      };
+      importar();
     };
+    const empezar = () => { if (hecho) return; hecho = true; cargar(); };
     const sec = document.getElementById('campus');
     const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) empezar(); }, { rootMargin: '500px 0px' });
     io.observe(sec);

@@ -154,9 +154,12 @@
 </script>
 <script type="module">
   // El resto del sitio se carga DESPUÉS de la presentación: si algo falla, la presentación sigue funcionando
+  // Hasta 3 intentos (un corte de red breve no basta para perder la 3D), después un botón «Reintentar»
+  let intento = 0;
   const cargar = () => import('./js/main.js').catch((e) => {
+    if (++intento < 3) { console.warn('Bibliotecas: intento ' + intento + ' fallido, se vuelve a intentar.', e); setTimeout(cargar, intento * 2000); return; }
     console.error(e);
-    if (window.__errorSitio) window.__errorSitio('No se han podido cargar las bibliotecas del sitio (se necesita Internet). La presentación sigue disponible arriba.');
+    if (window.__errorSitio) window.__errorSitio('No se han podido cargar las bibliotecas del sitio (se necesita Internet). La presentación sigue disponible arriba.', () => { location.hash = 'campus'; location.reload(); });
   });
   if (location.protocol === 'file:') {
     if (window.__errorSitio) window.__errorSitio('Para ver la maqueta 3D, abre el sitio con el archivo «LANCER-LE-SITE.bat» (o publícalo en Internet). La presentación de arriba sí funciona.');

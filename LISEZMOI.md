@@ -20,6 +20,8 @@ centré sans déformation dans un carré transparent. Ne jamais le redessiner ni
 
 ⚠️ La 3D a besoin d'**Internet** (React, Three.js et Drei viennent de `esm.sh`).
 La présentation, elle, marche même sans Internet et sans 3D.
+Si la connexion coupe un instant (Wi-Fi de la classe), le site réessaie tout seul jusqu'à 3 fois,
+puis affiche un bouton « Reintentar ».
 
 ## La présentation (haut de la page)
 
