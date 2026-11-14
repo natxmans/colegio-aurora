@@ -1,7 +1,9 @@
 # Colegio Pablo Picasso · Nuestro colegio ideal
 
-Site web du projet d'espagnol (4e) : un internat moderne en Espagne, avec une maquette 3D
-que l'on peut visiter et la présentation PowerPoint intégrée.
+Site web du projet d'espagnol (4e) : un internat moderne en Espagne.
+- **D'abord la présentation PowerPoint** (12 diapositives), en grand en haut de la page.
+- **Ensuite le campus 3D vivant** : les élèves et les professeurs suivent leur journée tout seuls,
+  avec un vrai cycle jour/nuit.
 
 Devise officielle : **Estudiar · Convivir · Crecer**. Logo officiel : l'emblème rond « INTERNAT »
 (bleu marine et crème, bannière Colegio Pablo Picasso, devise) → `img/logo-original-1024.png`,
@@ -16,74 +18,82 @@ centré sans déformation dans un carré transparent. Ne jamais le redessiner ni
 2. Le navigateur s'ouvre sur `http://localhost:8820`.
 3. Laisse la fenêtre noire ouverte pendant la présentation.
 
-⚠️ Il faut **Internet** : React, Three.js et Drei se chargent depuis `esm.sh`.
+⚠️ La 3D a besoin d'**Internet** (React, Three.js et Drei viennent de `esm.sh`).
+La présentation, elle, marche même sans Internet et sans 3D.
 
-## Pendant la présentation
+## La présentation (haut de la page)
+
+Flèches ou touches ← →, miniatures, « Ver el texto », plein écran, « Descargar (.pptx) ».
+Elle est écrite sans bibliothèque (`js/presentacion-basica.js`) : rien ne peut la bloquer.
+
+## Le campus 3D
 
 | Action | Comment |
 |---|---|
-| Tourner autour | clic gauche + glisser (tablette/téléphone : 1 doigt) |
-| Zoomer | molette (tablette/téléphone : pincer) |
-| Déplacer la vue | clic droit + glisser (2 doigts) |
+| Ouvrir en grand | « Explorar a pantalla completa » (Échap pour sortir) |
+| Tourner / zoomer / déplacer | clic gauche + glisser / molette / clic droit (en plein écran) |
 | Visiter un bâtiment ou une salle | clic dessus ou sur son étiquette |
-| Entrer dans la salle | bouton « Entrar en la sala » |
-| Vues | `Vista completa`, `Planta baja`, `Primer piso`, `Vista en corte` (touches 1 2 3 4) |
-| Toit, jour/nuit | « Ocultar techo », « Día / Noche » |
-| Visite automatique | « Visita guiada » (15 étapes) |
-| Diaporama | section « Nuestra presentación » : flèches, miniatures, plein écran, téléchargement |
+| Vues | Vista general, Planta baja, Primer piso, Residencia, Deportes, En corte (touches 1 à 6) |
+| Toits | « Quitar techos » / « Poner techos » |
+| Visite automatique | « Visita guiada » (18 étapes) |
+| Le temps | panneau en bas à gauche : pause, Lento / Normal / Rápido / Muy rápido, Hora real |
+| Aller à une heure | « ¿Qué pasa? » → 07:45, 08:00, 10:00, 12:20, 14:00, 17:00, 21:00, Día, Noche |
+| Voir ce que fait chaque classe | « ¿Qué pasa? » : les 4 classes, les absences, « Simular la ausencia de un profesor », « Seguir a un alumno » |
+
+Cliquer sur un élève ne fait rien (choix voulu : c'est une présentation). Les assistants des élèves
+sont dans la section « Asistentes IA ».
 
 ### Liens directs (pratique en classe)
 
-- `…/?vista=completa` : ouvre directement la maquette 3D
-- `…/?vista=corte` : vue en coupe des deux étages
+- `…/?hora=10:00&vista=completa` : le campus à l'heure de la récréation
+- `…/?vista=residencia` : la résidence (chambres doubles)
 - `…/?sala=hab101&dentro=1` : à l'intérieur de la chambre 101
-- `…/?sala=piscina`, `…/?sala=mates`, `…/?sala=comedor`… : un lieu précis
-- `…/?seccion=presentacion` : le diaporama
+- `…/?sala=permanencia`, `…/?sala=comedor`, `…/?sala=piscina`… : un lieu précis
+- `…/?ritmo=rapido` : le temps passe plus vite
+- `…/?calidad=ligera` (ou `normal`, `alta`) : forcer une qualité
+
+## Comment marche la vie du collège
+
+- **Horaire officiel** (`js/sim/horario.js`) : 07:45 réveil, 08:00 cours, 10:00 récréation de 20 min,
+  12:20 repas, 14:00 cours, 17:00 fin des cours, 21:00 coucher. 4 classes (4ºA à 4ºD), 9 matières,
+  9 professeurs, du personnel (accueil, bibliothèque, cuisine, vie scolaire, permanence, maître-nageur, éducateur de nuit).
+- **Absences** : certains jours un professeur manque ; ses élèves vont à la **permanencia**.
+- **Déplacements** (`js/sim/navegacion.js`) : un plan de circulation est calculé à partir des vrais
+  murs et meubles de la maquette. Les élèves passent par les portes, les couloirs et les escaliers :
+  ils ne traversent pas les murs. Toutes les places (766 chaises, lits, bureaux…) sont accessibles à pied.
+- **Corps articulés** (`js/sim/cuerpo.js`) : bassin, colonne, cou, tête, épaules, coudes, poignets,
+  hanches, genoux, chevilles. Animations : marcher, courir, s'asseoir, écrire, ordinateur, lire,
+  manger, discuter, nager, se coucher, dormir, football, basket, exercices…
+- **Le temps** (`js/sim/reloj.js`) : quand beaucoup d'élèves marchent, l'horloge ralentit pour qu'on
+  les voie marcher (pas de téléportation). La nuit, quand tout le monde dort, elle accélère.
+  Seul le bouton « Ir a… » replace directement tout le monde (c'est un saut dans le temps voulu).
+- **Jour/nuit** : soleil, ciel, lune, étoiles, fenêtres allumées quand il y a du monde,
+  lumières des chambres éteintes peu à peu à partir de 21:00, lampadaires le soir.
+
+## Diagnostic et qualité
+
+`js/diagnostico.js` vérifie au chargement : navigateur, WebGL, textures, mémoire, processeur,
+connexion, écran. Résultat dans le menu : « Compatible », « Compatible con rendimiento reducido »
+ou « Algunas funciones no están disponibles ». Trois qualités (`js/calidad.js`) :
+Alta (44 élèves, ombres), Normal (32), Ligera (16, sans ombres). Si la 3D est trop lente,
+la qualité baisse toute seule. Sans WebGL : image du campus + message, le reste du site marche.
+
+## L'assistant IA de chaque élève
+
+Section « Asistentes IA ». Tant qu'aucun serveur n'est configuré, il fonctionne en
+**modo demostración** (affiché clairement : réponses tirées des données du collège, ce n'est pas une IA).
+La clé d'API ne doit jamais être dans le site : voir `servidor-ia/LISEZMOI.md`.
 
 ## Organisation du code
 
-- `index.html` : écran de chargement + « import map » des bibliothèques
-- `css/estilos.css` : tout le design (bleu marine, blanc, beige)
-- `img/` : logo original (`logo-original-1024.png`), photos sans filigrane (`fotos/`), diapositives (`diapositivas/`),
-  `campus-3d.jpg` (image fixe du campus, affichée si la 3D ne peut pas se charger)
-- `presentacion/` : le PowerPoint final téléchargeable
-- `js/main.js` : application React (+ liens directs)
-- `js/estado.js` : état de la visite et cadrage automatique de la caméra (ordinateur, tablette, téléphone)
-- `js/datos/salas.js` : tous les espaces (position, texte en espagnol, caméra) et les vues générales
-  (`VISTAS` : angle, cadrage, `fov` = angle de vision ; `CAJAS` = zone à cadrer)
-- `js/datos/contenido.js` : textes des sections (fidèles au PowerPoint)
-- `js/datos/diapositivas.js` : texte des 12 diapositives
-- `js/3d/` : la maquette
-  - `kit.js` : moteur d'instanciation (des milliers de pièces en peu d'appels de dessin)
-  - `Alumno.js` : élèves en uniforme (polo blanc à col bleu, veste bleu marine avec le logo, pantalon ou jupe)
-  - `Aulas.js` : les 8 salles (tables individuelles, ordinateurs en classe)
-  - `Salas.js` : bibliothèque numérique, entrée, comedor, chambres, salons
-  - `Edificio.js` : bâtiment, étages qui s'écartent, toit
-  - `Deportes.js` : gymnase couvert, piscine olympique couverte et chauffée, foot, basket
-    (toitures en voûte fermées : `Boveda` + pignons `Timpano` aux deux extrémités)
-  - `Exteriores.js` : patio, jardins, entrée avec le logo, oliveraies
-  - `etiquetas.js` : étiquettes des bâtiments sans chevauchement
-- `js/ui/` : menu, sections, visite 3D, uniforme 3D, diaporama (`Presentacion.js`)
-
-## Taille des bâtiments dans la 3D
-
-Le campus est compact (le gymnase, la piscine, le basket et le foot sont collés au bâtiment
-principal) et la « Vista completa » utilise un angle de vision serré : les bâtiments occupent
-environ 2,5 fois plus de place à l'écran qu'avant (mesuré : 48 % de l'écran au lieu de 19 %).
-Pour régler le cadrage : `VISTAS.completa` et `CAJAS.campus` dans `js/datos/salas.js`
-(`CAJAS.campusMovil` pour les téléphones : tout le campus reste visible, rien n'est coupé).
-
-## Modifier le PowerPoint puis le site
-
-1. Modifie `presentacion/nuestro_colegio_ideal.pptx`.
-2. Exporte chaque diapositive en image JPG (1600 × 900) dans `img/diapositivas/diapositiva-01.jpg` … `-12.jpg`.
-3. Publie (voir ci-dessous).
-
-## Publier les changements
-
-```
-git add -A
-git commit -m "Mise à jour"
-git push
-```
-GitHub Pages met le site à jour en 1 à 2 minutes.
+- `index.html` : en-tête, présentation (HTML simple), emplacement du campus 3D
+- `css/estilos.css` + `css/sitio.css` : le design (bleu marine, blanc, beige)
+- `js/main.js` : monte le campus 3D (chargé seulement quand on arrive à la section), les sections et l'assistant
+- `js/estado.js` : état de la visite ; `js/3d/camara.js` : cadrage automatique sur les bâtiments
+- `js/datos/salas.js` : tous les espaces (bâtiment principal, résidence, sport, extérieurs) et les vues
+- `js/datos/contenido.js` : textes des sections ; `js/datos/diapositivas.json` : texte des 12 diapositives
+- `js/3d/` : la maquette (`Edificio.js`, `Residencia.js`, `Salas.js`, `Aulas.js`, `Deportes.js`,
+  `Exteriores.js`, `Personas.js`, `LucesNoche.js`, `Escena.js`, `puntos.js` = places utilisables)
+- `js/sim/` : la simulation (horloge, horaire, plan de circulation, corps, vie des personnages)
+- `js/ui/` : interface (campus, horloge, assistant, sections)
+- `servidor-ia/` : serveur sécurisé pour l'assistant IA (à héberger, avec la clé côté serveur)

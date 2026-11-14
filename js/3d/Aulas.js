@@ -2,9 +2,9 @@
 // LAS 8 AULAS DE LA PLANTA BAJA (cada una diferente)
 // Coordenadas "canónicas": pasillo y pizarra hacia +z, ventanas hacia -z
 // =========================================================
-import { html, THREE, useMemo, useRef, useFrame } from '../lib.js';
+import { html, THREE, useMemo, useRef, useFrame } from '../lib3d.js';
 import { B, C, S, Cono, Ico, Toro, V, G, Panel, COL, Pupitre, Silla, Portatil, Monitor, Cuaderno, Libro, Planta, Estanteria, Frente, TirasLed, Suelo, Mesa, Taburete, Gira, azar, Pantalla } from './piezas.js';
-import { Alumno } from './Alumno.js';
+import { Punto } from './puntos.js';
 import { texPizarra, texPoster, texMapa, texGlobo, texTabla, texLomos } from './texturas.js';
 
 const SUELO = { mates: '#e4eaf4', frances: '#e7e8f5', ingles: '#f2e8ea', historia: '#f2ece1', svt: '#e4f2ea', fisica: '#e3eff3', tecno: '#ebe7f5', musica: '#f2e7f2' };
@@ -21,37 +21,32 @@ function Pizarra({ m, d, col }) {
   <//>`;
 }
 
-function MesaProfesor({ d, conProfe, seed, m }) {
+function MesaProfesor({ s, d }) {
   const z = d / 2 - 1.55;
   return html`<${G}>
     <${Mesa} p=${[2.3, 0, z]} w=${1.6} d=${0.7} c=${COL.blanco} />
     <${Monitor} p=${[2.3, 0.76, z + 0.05]} r=${[0, Math.PI, 0]} pantalla="#5aa2ff" />
     <${Silla} p=${[2.3, 0, z + 0.65]} r=${[0, Math.PI, 0]} c=${COL.noche} />
     <${Libro} p=${[1.75, 0.78, z]} c="#f97316" />
-    ${conProfe ? html`<${Alumno} p=${[-2.55, 0, d / 2 - 0.85]} ry=${Math.PI + 0.25} pose="explicando" adulto seed=${seed + 99} />` : null}
+    <${Punto} t="mesaprof" sala=${s.id} p=${[2.3, 0, z + 0.65]} ry=${Math.PI} asiento=${0.45} ap=${[0, -0.75]} />
   <//>`;
 }
 
 // Mesas individuales con ordenador (como en el PowerPoint), en 3 filas de 4,
 // con los alumnos sentados mirando la pizarra
 const PANTALLAS = ['#5b8fd6', '#7fa7dc', '#9bb8e0', '#6d97c9'];
-function Pupitres({ s, col, objeto = 'monitor', poses = ['tecleando', 'sentado'], vacios = 2, seed }) {
-  const r = useMemo(() => azar(seed), [seed]);
+function Pupitres({ s, col, objeto = 'monitor', seed }) {
   const filas = [-2.8, -1.25, 0.3], columnas = [-2.55, -0.85, 0.85, 2.55];
   const items = [];
   let k = 0;
-  const huecos = new Set();
-  while (huecos.size < vacios) huecos.add(Math.floor(r() * 12));
   for (const z of filas) for (const x of columnas) {
     const i = k++;
     items.push(html`<${Pupitre} key=${'p' + i} p=${[x, 0, z]} ancho=${0.82} c=${COL.blanco} led=${COL.maderaC} />`);
     items.push(html`<${Silla} key=${'s' + i} p=${[x, 0, z - 0.56]} c=${i % 2 ? col : COL.noche} />`);
     if (objeto === 'microscopio' && i % 3 === 0) items.push(html`<${Microscopio} key=${'o' + i} p=${[x, 0.74, z + 0.05]} />`);
     else items.push(html`<${Monitor} key=${'o' + i} p=${[x, 0.74, z + 0.12]} ancho=${0.46} pantalla=${PANTALLAS[i % 4]} />`);
-    if (!huecos.has(i)) {
-      const pose = objeto === 'microscopio' && i % 3 === 0 ? 'escribiendo' : poses[Math.floor(r() * poses.length)];
-      items.push(html`<${Alumno} key=${'a' + i} p=${[x, 0, z - 0.56]} pose=${pose} seed=${seed * 31 + i * 7} />`);
-    }
+    // el alumno llega por el pasillo de la derecha y se sienta mirando la pizarra
+    items.push(html`<${Punto} key=${'q' + i} t="pupitre" sala=${s.id} i=${i} p=${[x, 0, z - 0.56]} asiento=${0.45} ap=${[s.materia === 'ingles' && x > 2 && z < -2 ? -0.85 : 0.85, 0]} accion=${objeto === 'microscopio' && i % 3 === 0 ? 'microscopio' : 'ordenador'} />`);
   }
   return items;
 }
@@ -271,15 +266,14 @@ function Atril({ p, r }) {
   <//>`;
 }
 
-function SillasMusica({ col, seed }) {
+function SillasMusica({ s, col }) {
   const items = [];
-  const r = azar(seed);
   let k = 0;
-  for (const [radio, angs] of [[3.0, [-0.75, -0.38, 0, 0.38, 0.75]], [4.6, [-0.55, -0.28, 0, 0.28, 0.55]]]) {
+  for (const [radio, angs] of [[2.6, [-0.8, -0.4, 0, 0.4, 0.8]], [4.0, [-0.62, -0.36, -0.12, 0.12, 0.36, 0.62]]]) {
     for (const a of angs) {
       const x = Math.sin(a) * radio, z = 2.7 - Math.cos(a) * radio, ry = -a;
       items.push(html`<${Silla} key=${'s' + k} p=${[x, 0, z]} r=${[0, ry, 0]} c=${k % 2 ? col : COL.noche} />`);
-      if (k !== 3 && k !== 8) items.push(html`<${Alumno} key=${'a' + k} p=${[x, 0, z]} ry=${ry} pose=${r() < 0.3 ? 'aplaudiendo' : 'sentado'} seed=${seed * 13 + k} />`);
+      items.push(html`<${Punto} key=${'q' + k} t="pupitre" sala=${s.id} i=${k} p=${[x, 0, z]} ry=${ry} asiento=${0.45} ap=${[0, -0.65]} accion="musica" />`);
       k++;
     }
   }
@@ -361,7 +355,7 @@ export function Aula({ s }) {
     ${estanteO} ${posterE('programacion')}`;
   if (m === 'musica') deco = html`
     <${Piano} p=${[-w / 2 + 0.45, 0, -0.8]} r=${[0, Math.PI / 2, 0]} />
-    <${Alumno} p=${[-w / 2 + 1.12, 0, -0.8]} ry=${-Math.PI / 2} pose="tecleando" asiento=${0.5} seed=${seed + 5} />
+    <${Punto} t="pupitre" sala=${s.id} i=${11} p=${[-w / 2 + 1.12, 0, -0.8]} ry=${-Math.PI / 2} asiento=${0.5} ap=${[0, -0.7]} accion="piano" />
     <${Bateria} p=${[2.6, 0, -3.1]} r=${[0, -0.4, 0]} />
     <${Guitarra} p=${[-2.4, 0, -3.95]} c="#ef4444" /><${Guitarra} p=${[-1.8, 0, -3.95]} c=${COL.elec} /><${Guitarra} p=${[-1.2, 0, -3.95]} c="#e2c49b" />
     <${Altavoz} p=${[-2.4, 0, d / 2 - 0.5]} r=${[0, Math.PI, 0]} /><${Altavoz} p=${[2.4, 0, d / 2 - 0.5]} r=${[0, Math.PI, 0]} />
@@ -373,14 +367,12 @@ export function Aula({ s }) {
     <${Frente} w=${w} d=${d} h=${h} macizo=${[-2.4, 2.4]} puerta=${3.05} />
     <${TirasLed} w=${w} d=${d} h=${h} c=${col} />
     <${Pizarra} m=${m} d=${d} col=${col} />
-    ${m !== 'musica' && m !== 'fisica' ? html`<${MesaProfesor} d=${d} conProfe=${m === 'mates' || m === 'historia' || m === 'ingles'} seed=${seed} m=${m} />` : null}
-    ${m === 'fisica' ? html`<${Alumno} p=${[-1.7, 0, d / 2 - 0.85]} ry=${Math.PI} pose="explicando" adulto seed=${seed + 99} />` : null}
-    ${m === 'musica' ? html`<${Alumno} p=${[0.6, 0, d / 2 - 1.2]} ry=${Math.PI} pose="hablando" adulto seed=${seed + 98} />` : null}
+    ${m !== 'musica' && m !== 'fisica' ? html`<${MesaProfesor} s=${s} d=${d} />` : null}
+    <${Punto} t="profe" sala=${s.id} p=${m === 'musica' ? [0.6, 0, d / 2 - 1.2] : m === 'fisica' ? [-1.7, 0, d / 2 - 0.85] : [-2.55, 0, d / 2 - 0.85]} ry=${Math.PI} />
     ${m !== 'musica' && m !== 'fisica' && m !== 'svt' && m !== 'tecno' ? html`<${MuebleTrasero} w=${w} d=${d} col=${col} />` : null}
     ${m === 'svt' || m === 'fisica' || m === 'tecno' ? html`<${MuebleTrasero} w=${w} d=${d} col=${col} />` : null}
-    ${m === 'musica' ? html`<${SillasMusica} col=${col} seed=${seed} />` : html`<${Pupitres} s=${s} col=${col} seed=${seed}
-        objeto=${m === 'svt' ? 'microscopio' : 'monitor'}
-        poses=${['tecleando', 'sentado', 'tecleando', 'escribiendo']} vacios=${m === 'fisica' ? 3 : 2} />`}
+    ${m === 'musica' ? html`<${SillasMusica} s=${s} col=${col} />` : html`<${Pupitres} s=${s} col=${col} seed=${seed}
+        objeto=${m === 'svt' ? 'microscopio' : 'monitor'} />`}
     ${deco}
   <//>`;
 }

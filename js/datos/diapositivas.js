@@ -22,10 +22,10 @@ export const TEXTOS = [
  [
   "COLEGIO PABLO PICASSO",
   "2. El uniforme y la ropa de diario",
-  "EL UNIFORME (de lunes a viernes)",
-  "Polo blanco con cuello azul, chaqueta azul marino con el logo y pantalón o falda azul marino.",
-  "LA ROPA DE DIARIO (el fin de semana)",
-  "Ropa cómoda para el fin de semana en casa."
+  "Uniforme escolar",
+  "De lunes a viernes: polo blanco con cuello azul marino, chaqueta azul marino con el logo y pantalón o falda azul marino.",
+  "Ropa de diario",
+  "El fin de semana, en casa: ropa cómoda."
  ],
  [
   "COLEGIO PABLO PICASSO",
@@ -34,7 +34,7 @@ export const TEXTOS = [
   "• Es un edificio práctico y seguro.",
   "Las dos plantas",
   "• En la planta baja: las aulas, los laboratorios, la biblioteca y el comedor.",
-  "• En el primer piso: los dormitorios y los salones.",
+  "• En el primer piso: la vida escolar, la permanencia y los salones.",
   "Mucha luz natural",
   "• Hay grandes ventanas y patios con jardines."
  ],
@@ -65,8 +65,8 @@ export const TEXTOS = [
  [
   "COLEGIO PABLO PICASSO",
   "6. Los dormitorios",
-  "En el primer piso",
-  "• Todos los dormitorios están en el primer piso.",
+  "En la residencia",
+  "• Todos los dormitorios están en la residencia, un edificio al lado del colegio.",
   "Habitaciones para dos alumnos",
   "• Cada habitación es para dos compañeros.",
   "Todo lo necesario",

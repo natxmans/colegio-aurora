@@ -5,7 +5,7 @@
 <meta name="google" content="notranslate" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Colegio Pablo Picasso · Nuestro colegio ideal</title>
-<meta name="description" content="Colegio Pablo Picasso: nuestro colegio-internado ideal en España. Maqueta 3D interactiva y presentación." />
+<meta name="description" content="Colegio Pablo Picasso: nuestro colegio-internado ideal en España. Presentación, campus 3D vivo con la vida diaria de los alumnos y asistentes." />
 <meta name="theme-color" content="#14285a" />
 <link rel="icon" type="image/png" href="img/logo-64.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://esm.sh" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap" />
 <link rel="stylesheet" href="css/estilos.css" />
+<link rel="stylesheet" href="css/sitio.css" />
+<link rel="preload" as="image" href="img/diapositivas/diapositiva-01.jpg" fetchpriority="high" />
 <script type="importmap">
 {
   "imports": {
@@ -28,63 +30,138 @@
   }
 }
 </script>
+<!-- Comprobación del aparato (WebGL, memoria, conexión...) antes de cargar la 3D -->
+<script src="js/diagnostico.js"></script>
 </head>
 <body>
-<div id="cargador" role="status" aria-live="polite">
-    <img class="carg-foto" id="carg-foto" src="img/campus-3d.jpg" alt="" hidden />
-    <div class="carg-centro">
-    <img class="carg-logo" src="img/logo-256.png" alt="" width="128" height="128" />
-    <div class="carg-nombre">COLEGIO PABLO PICASSO</div>
-    <div class="carg-sub">Nuestro colegio ideal · España</div>
-    <div class="carg-barra"><span id="carg-progreso"></span></div>
-    <div class="carg-msg" id="carg-msg">Preparando el campus…</div>
-    <div class="carg-error" id="carg-error" hidden>
-      <p id="carg-error-txt"></p>
-      <button type="button" onclick="location.reload()">Volver a intentar</button>
-    </div>
-  </div>
+<a class="saltar" href="#presentacion">Ir a la presentación</a>
+<header class="cab" id="cab">
+  <a class="marca" href="#presentacion">
+    <img class="logo-img" src="img/logo-64.png" alt="" width="44" height="44" />
+    <div><b>COLEGIO PABLO PICASSO</b><small>Nuestro colegio ideal</small></div>
+  </a>
+  <nav class="cab-links" aria-label="Menú principal">
+    <a href="#presentacion">Presentación</a>
+    <a href="#campus">Campus 3D</a>
+    <a href="#vida">Vida diaria</a>
+    <a href="#permanencia">Permanencia</a>
+    <a href="#vidaescolar">Vida escolar</a>
+    <a href="#asistentes">Asistentes IA</a>
+    <a href="#colegio">El colegio</a>
+  </nav>
+  <button type="button" class="diag-pill" id="diag-pill" aria-haspopup="dialog" aria-controls="diag-panel"><i></i><span>Comprobando…</span></button>
+  <button type="button" class="hamburguesa" id="menu-btn" aria-expanded="false" aria-controls="menu-movil">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg><span>Menú</span>
+  </button>
+</header>
+<div class="menu-movil" id="menu-movil" hidden>
+  <a href="#presentacion">Presentación</a><a href="#campus">Campus 3D</a><a href="#vida">Vida diaria</a>
+  <a href="#permanencia">Permanencia</a><a href="#vidaescolar">Vida escolar</a><a href="#asistentes">Asistentes IA</a>
+  <a href="#colegio">El colegio</a><a href="#aulas">Las aulas</a><a href="#internado">La residencia</a>
+  <a href="#deportes">Deportes</a><a href="#asignaturas">Asignaturas</a><a href="#horario">Horario</a>
+  <a href="#uniforme">Uniforme</a><a href="#ideal">¿Por qué es ideal?</a>
 </div>
-<div id="raiz"></div>
-<noscript><p style="color:#fff;padding:2rem;font-family:sans-serif">Activa JavaScript para ver la maqueta 3D del Colegio Pablo Picasso.</p></noscript>
+<div class="diag-panel" id="diag-panel" role="dialog" aria-label="¿Tu aparato puede mostrar el sitio?" hidden></div>
+
+<main id="principal">
+  <!-- ============ 1. LA PRESENTACIÓN (elemento principal) ============ -->
+  <section class="ppt-sec" id="presentacion">
+    <div class="ppt-cab">
+      <span class="etiqueta">Proyecto de español (4º)</span>
+      <h1>Nuestro colegio ideal <span>· Colegio Pablo Picasso</span></h1>
+      <p class="lema">Estudiar · Convivir · Crecer</p>
+    </div>
+    <div class="presentacion" id="ppt">
+      <div class="diapo-marco" id="ppt-marco">
+        <img class="diapo activa" src="img/diapositivas/diapositiva-01.jpg" alt="Diapositiva 1: Colegio Pablo Picasso, nuestro colegio ideal" width="1600" height="900" fetchpriority="high" draggable="false" />
+        <button type="button" class="diapo-flecha izq" id="ppt-ant" aria-label="Diapositiva anterior" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button type="button" class="diapo-flecha der" id="ppt-sig" aria-label="Diapositiva siguiente">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="diapo-barra">
+        <button type="button" class="btn btn-secundario btn-peq" id="ppt-ant2" disabled>Anterior</button>
+        <span class="diapo-num" aria-live="polite"><b id="ppt-num">1</b> / 12</span>
+        <button type="button" class="btn btn-secundario btn-peq" id="ppt-sig2">Siguiente</button>
+        <span class="diapo-espacio"></span>
+        <button type="button" class="btn btn-texto btn-peq" id="ppt-ver-texto" aria-expanded="false">Ver el texto</button>
+        <button type="button" class="btn btn-secundario btn-peq" id="ppt-completa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Pantalla completa</span>
+        </button>
+        <a class="btn btn-primario btn-peq" id="ppt-descarga" href="presentacion/nuestro_colegio_ideal.pptx" download="Colegio_Pablo_Picasso_Nuestro_colegio_ideal.pptx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>Descargar (.pptx)
+        </a>
+      </div>
+      <div class="diapo-texto" id="ppt-texto" hidden></div>
+      <div class="diapo-miniaturas" id="ppt-minis" role="tablist" aria-label="Las 12 diapositivas"></div>
+    </div>
+    <noscript>
+      <div class="ppt-sin-js">
+        <p>Sin JavaScript, aquí tienes las 12 diapositivas una debajo de otra:</p>
+        <img src="img/diapositivas/diapositiva-01.jpg" alt="Diapositiva 1" /><img src="img/diapositivas/diapositiva-02.jpg" alt="Diapositiva 2" />
+        <img src="img/diapositivas/diapositiva-03.jpg" alt="Diapositiva 3" /><img src="img/diapositivas/diapositiva-04.jpg" alt="Diapositiva 4" />
+        <img src="img/diapositivas/diapositiva-05.jpg" alt="Diapositiva 5" /><img src="img/diapositivas/diapositiva-06.jpg" alt="Diapositiva 6" />
+        <img src="img/diapositivas/diapositiva-07.jpg" alt="Diapositiva 7" /><img src="img/diapositivas/diapositiva-08.jpg" alt="Diapositiva 8" />
+        <img src="img/diapositivas/diapositiva-09.jpg" alt="Diapositiva 9" /><img src="img/diapositivas/diapositiva-10.jpg" alt="Diapositiva 10" />
+        <img src="img/diapositivas/diapositiva-11.jpg" alt="Diapositiva 11" /><img src="img/diapositivas/diapositiva-12.jpg" alt="Diapositiva 12" />
+      </div>
+    </noscript>
+    <div class="ppt-sigue">
+      <a class="btn btn-primario" href="#campus">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8.5 4.8v9.4L12 21.5l-8.5-4.8V7.3zM12 12l8.5-4.7M12 12v9.5M12 12L3.5 7.3"/></svg>Visitar el campus en 3D
+      </a>
+      <a class="btn btn-secundario" href="#vida">La vida en el colegio</a>
+      <a class="btn btn-secundario" href="#asistentes">Los asistentes de los alumnos</a>
+    </div>
+  </section>
+
+  <!-- ============ 2. EL CAMPUS 3D (la maqueta viva) ============ -->
+  <section class="campus-sec" id="campus">
+    <div class="campus-cab">
+      <div>
+        <span class="etiqueta">El campus en 3D</span>
+        <h2>Un colegio <span class="grad">que vive</span></h2>
+        <p class="lead">Los alumnos se despiertan, van a clase, salen al recreo, comen, hacen deporte y duermen en la residencia. El día y la noche siguen la hora del colegio.</p>
+      </div>
+    </div>
+    <div class="campus3d" id="campus3d">
+      <div class="campus-espera" id="campus-espera">
+        <img src="img/campus-3d.jpg" alt="Vista general del campus del Colegio Pablo Picasso" loading="lazy" />
+        <div class="campus-espera-caja">
+          <div class="carg-barra"><span id="carg-progreso"></span></div>
+          <p id="carg-msg">La maqueta 3D se cargará en cuanto llegues aquí.</p>
+          <p class="carg-error" id="carg-error" hidden></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. El resto del sitio (React) ============ -->
+  <div id="raiz"></div>
+  <noscript><p class="aviso-js">Activa JavaScript para ver la maqueta 3D y el resto del sitio. La presentación de arriba se puede ver igualmente.</p></noscript>
+</main>
+
+<script src="js/presentacion-basica.js"></script>
 <script>
-(function () {
-  var msgs = ['Preparando el campus…', 'Construyendo las aulas…', 'Colocando los pupitres…', 'Llegan los alumnos…', 'Encendiendo las luces LED…', 'Llenando la piscina…', 'Plantando los árboles…'];
-  var i = 0, p = 4;
-  var el = document.getElementById('carg-msg'), bar = document.getElementById('carg-progreso');
-  window.__cargaTimer = setInterval(function () {
-    i = (i + 1) % msgs.length; el.textContent = msgs[i];
-    p = Math.min(94, p + (94 - p) * 0.16); bar.style.width = p + '%';
-  }, 850);
-  window.__listo = function () {
-    if (window.__yaListo) return; window.__yaListo = true;
-    clearInterval(window.__cargaTimer); bar.style.width = '100%'; el.textContent = '¡Bienvenidos!';
-    setTimeout(function () { var c = document.getElementById('cargador'); if (c) c.classList.add('oculto'); }, 450);
-    setTimeout(function () { var c = document.getElementById('cargador'); if (c) c.remove(); }, 1500);
-  };
-  window.__error = function (txt) {
-    clearInterval(window.__cargaTimer);
-    var b = document.getElementById('carg-error'); if (!b) return;
-    document.getElementById('carg-error-txt').textContent = txt; b.hidden = false;
-    var f = document.getElementById('carg-foto'); if (f) f.hidden = false;
-    el.textContent = ''; bar.parentNode.style.display = 'none';
-  };
-  // Si las bibliotecas 3D (Internet) tardan demasiado, se avisa con una imagen del campus;
-  // si la carga termina después, el sitio aparece igualmente
-  setTimeout(function () {
-    if (!window.__yaListo) window.__error('La maqueta 3D tarda mucho en cargar. Espera un poco más o comprueba la conexión a Internet.');
-  }, 60000);
-  if (location.protocol === 'file:') {
-    window.__error('Para ver la maqueta 3D, abre el sitio con el archivo «LANCER-LE-SITE.bat» (o publícalo en Internet). Un archivo abierto directamente no puede cargar la escena 3D.');
-  }
-})();
+  // Menú del teléfono (sin bibliotecas)
+  (function () {
+    var b = document.getElementById('menu-btn'), m = document.getElementById('menu-movil');
+    b.addEventListener('click', function () { m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); });
+    m.addEventListener('click', function (e) { if (e.target.tagName === 'A') { m.hidden = true; b.setAttribute('aria-expanded', 'false'); } });
+  })();
 </script>
 <script type="module">
-  if (location.protocol !== 'file:') {
-    import('./js/main.js').catch(function (e) {
-      console.error(e);
-      window.__error('No se ha podido cargar la maqueta 3D. Comprueba la conexión a Internet y vuelve a intentarlo.');
-    });
-  }
+  // El resto del sitio se carga DESPUÉS de la presentación: si algo falla, la presentación sigue funcionando
+  const cargar = () => import('./js/main.js').catch((e) => {
+    console.error(e);
+    if (window.__errorSitio) window.__errorSitio('No se han podido cargar las bibliotecas del sitio (se necesita Internet). La presentación sigue disponible arriba.');
+  });
+  if (location.protocol === 'file:') {
+    if (window.__errorSitio) window.__errorSitio('Para ver la maqueta 3D, abre el sitio con el archivo «LANCER-LE-SITE.bat» (o publícalo en Internet). La presentación de arriba sí funciona.');
+  } else if (document.readyState === 'complete') cargar();
+  else window.addEventListener('load', cargar, { once: true });
 </script>
 </body>
 </html>

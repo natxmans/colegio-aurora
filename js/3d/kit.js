@@ -5,7 +5,7 @@
 // piezas del mismo tipo se dibujan juntas con un solo InstancedMesh.
 // Cada <Pieza> es un Object3D invisible: el kit copia su posición mundial.
 // =========================================================
-import { html, THREE, useFrame, useThree, useRef, useMemo, useLayoutEffect, createContext, useContext } from '../lib.js';
+import { html, THREE, useFrame, useThree, useRef, useMemo, useLayoutEffect, createContext, useContext } from '../lib3d.js';
 
 const G = {
   caja: new THREE.BoxGeometry(1, 1, 1),
@@ -88,6 +88,8 @@ const ES_DIN = Object.fromEntries(Object.keys(TIPOS).map(k => [k, k in DINAMICOS
 
 // Cuando algo estático cambia (montaje, color, planta que se mueve...) se "toca" el kit
 let VERSION = 1;
+// Acceso al registro de piezas (lo usa el plano de navegación de las personas)
+export const KIT = { reg: null, mallas: null, TIPOS: null };
 export const tocar = () => { VERSION++; };
 
 const Ctx = createContext(null);
@@ -106,6 +108,7 @@ export function KitRoot({ children, sombras = true }) {
   const mallas = useRef({});
   const ultima = useRef(0);
   const { scene } = useThree();
+  KIT.reg = reg; KIT.mallas = mallas.current; KIT.TIPOS = TIPOS;
 
   useLayoutEffect(() => {
     scene.matrixWorldAutoUpdate = false; // lo hacemos nosotros una sola vez por imagen

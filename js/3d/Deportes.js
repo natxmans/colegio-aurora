@@ -3,11 +3,12 @@
 // gimnasio cubierto, campo de fútbol, cancha de baloncesto
 // y piscina olímpica cubierta y climatizada
 // =========================================================
-import { html, THREE, useMemo, useRef, useFrame, useLayoutEffect } from '../lib.js';
+import { html, THREE, useMemo, useRef, useFrame, useLayoutEffect } from '../lib3d.js';
 import { B, C, S, Cono, Ico, Toro, V, VT, G, Panel, COL, Banco, Farola, Pantalla, Planta, Arbol } from './piezas.js';
 import { tocar } from './kit.js';
 import { leer } from '../estado.js';
-import { Alumno } from './Alumno.js';
+import { Punto } from './puntos.js';
+import { GYM } from '../datos/salas.js';
 import { Zonas } from './Interaccion.js';
 import { texPistaGym, texPistaBasket, texCampoFutbol, texPiscinaFondo, texPantalla, texLogo, texRotuloTexto } from './texturas.js';
 
@@ -56,7 +57,7 @@ function Balon({ c = '#d0612a', radio = 0.12, mover }) {
   return html`<mesh ref=${ref} castShadow><sphereGeometry args=${[radio, 16, 12]} /><meshStandardMaterial color=${c} roughness=${0.5} /></mesh>`;
 }
 
-function Gradas({ p, r, largo = 26, filas = 4, publico = 0, seed = 1 }) {
+function Gradas({ p, r, largo = 26, filas = 4, sala = null }) {
   const items = [];
   for (let i = 0; i < filas; i++) {
     const y = 0.45 * (i + 1), z = -i * 0.95;
@@ -64,9 +65,8 @@ function Gradas({ p, r, largo = 26, filas = 4, publico = 0, seed = 1 }) {
     const n = Math.floor(largo / 0.62);
     for (let k = 0; k < n; k++) items.push(html`<${B} key=${'s' + i + '-' + k} m="B" p=${[-largo / 2 + 0.31 + k * 0.62, y + 0.06, z - 0.05]} s=${[0.48, 0.1, 0.42]} c=${(i + k) % 3 ? COL.noche : COL.elec} />`);
   }
-  for (let j = 0; j < publico; j++) {
-    const i = j % filas, k = (j * 7) % Math.floor(largo / 0.62);
-    items.push(html`<${Alumno} key=${'a' + j} p=${[-largo / 2 + 0.31 + k * 0.62, 0, -i * 0.95]} pose=${j % 3 ? 'aplaudiendo' : 'sentado'} asiento=${0.45 * (i + 1) + 0.1} seed=${seed + j * 13} />`);
+  if (sala) for (let k = 1, n = Math.floor(largo / 0.62); k < n - 1; k += 2) {
+    items.push(html`<${Punto} key=${'q' + k} t="grada" sala=${sala} i=${k} p=${[-largo / 2 + 0.31 + k * 0.62, 0, -0.05]} asiento=${0.56} ap=${[0, 0.85]} accion="mirar" />`);
   }
   return html`<${G} p=${p} r=${r}>${items}<//>`;
 }
@@ -131,14 +131,23 @@ function Costilla({ cx, cz, luz, flecha, alto }) {
 
 // ---------------- GIMNASIO CUBIERTO ----------------
 function Gimnasio() {
-  const cx = 49, cz = 0, w = 28, d = 24;
+  const { cx, cz, w, d } = GYM;
   const columnas = [];
-  for (let x = cx - w / 2; x <= cx + w / 2 + 0.01; x += 4) for (const z of [cz - d / 2, cz + d / 2]) columnas.push(html`<${B} key=${'c' + x + z} m="M" p=${[x, 4.8, z]} s=${[0.3, 9.6, 0.3]} c=${COL.noche} />`);
+  for (let x = cx - w / 2; x <= cx + w / 2 + 0.01; x += w / 6) for (const z of [cz - d / 2, cz + d / 2]) columnas.push(html`<${B} key=${'c' + x + z} m="M" p=${[x, 4.8, z]} s=${[0.3, 9.6, 0.3]} c=${COL.noche} />`);
+  // sitios para los ejercicios de educación física (mirando al profesor, hacia -x)
+  const ejercicios = [];
+  let k = 0;
+  for (let x = cx - 7.5; x <= cx + 7.6; x += 3) for (const z of [cz - 1.5, cz + 1.5, cz + 4.5]) ejercicios.push(html`<${Punto} key=${'ej' + k} t="ejercicio" sala="gimnasio" i=${k++} p=${[x, 0.1, z]} ry=${-PI / 2} accion="ejercicio" />`);
   return html`<${G}>
     <${B} p=${[cx, 0.05, cz]} s=${[w, 0.1, d]} c="#c99a62" />
     <${Suelo} p=${[cx, cz + 1.5]} w=${25} d=${15.6} tex=${texPistaGym()} y=${0.11} />
     <${V} p=${[cx, 1.9, cz - d / 2]} s=${[w, 3.8, 0.08]} /><${V} p=${[cx, 1.9, cz + d / 2]} s=${[w, 3.8, 0.08]} />
-    <${V} p=${[cx - w / 2, 1.9, cz]} s=${[0.08, 3.8, d]} /><${V} p=${[cx + w / 2, 1.9, cz]} s=${[0.08, 3.8, d]} />
+    <${V} p=${[cx - w / 2, 1.9, cz - (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} /><${V} p=${[cx - w / 2, 1.9, cz + (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} />
+    <${V} p=${[cx - w / 2, 3.2, cz]} s=${[0.08, 1.2, 3]} />
+    <${B} m="M" p=${[cx - w / 2 - 0.05, 1.3, cz - 1.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
+    <${B} m="M" p=${[cx - w / 2 - 0.05, 1.3, cz + 1.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
+    <${B} m="M" p=${[cx - w / 2 - 0.05, 2.6, cz]} s=${[0.12, 0.1, 3.2]} c=${COL.noche} />
+    <${V} p=${[cx + w / 2, 1.9, cz]} s=${[0.08, 3.8, d]} />
     <${B} m="B" p=${[cx, 6.7, cz - d / 2]} s=${[w, 5.8, 0.3]} c=${COL.piedra} />
     <${B} m="B" p=${[cx, 6.7, cz + d / 2]} s=${[w, 5.8, 0.3]} c=${COL.piedra} />
     <${B} m="B" p=${[cx - w / 2, 6.7, cz]} s=${[0.3, 5.8, d]} c=${COL.piedra} />
@@ -149,14 +158,13 @@ function Gimnasio() {
     <${Panel} p=${[cx + 2.5, 7.6, cz + d / 2 + 0.37]} w=${12} h=${1.45} transp tex=${texRotuloTexto('GIMNASIO', '#ffffff')} />
     <${Canasta} p=${[cx - 12.3, 0, cz + 1.5]} lado=${1} />
     <${Canasta} p=${[cx + 12.3, 0, cz + 1.5]} lado=${-1} />
-    <${Gradas} p=${[cx, 0.1, cz - 7.6]} largo=${24} filas=${4} publico=${10} seed=${1500} />
+    <${Gradas} p=${[cx, 0.1, cz - 7.6]} largo=${24} filas=${4} sala="gimnasio" />
     <${Pantalla} p=${[cx - w / 2 + 0.25, 6.4, cz + 1.5]} r=${[0, PI / 2, 0]} w=${5} h=${2.8} tex=${texPantalla('marcador')} />
-    ${[[-4, -2], [-3.5, 5], [-8, 2], [4, -1], [3.5, 5.5], [8, 2.5]].map(([dx, dz], i) => html`<${Alumno} key=${'v' + i} p=${[cx + dx, 0.1, cz + 1.5 + dz]}
-      ry=${dx < 0 ? PI / 2 : -PI / 2} pose=${i % 3 === 0 ? 'saltando' : 'corriendo'} deporte=${dx < 0 ? true : '#c9a978'} seed=${1600 + i}
-      ruta=${i % 3 === 0 ? null : { tipo: 'vaiven', c: [cx + dx, cz + 1.5 + dz], ax: 1.6, az: 1.6, w1: 0.6 + i * 0.1, w2: 0.5 }} />`)}
-    <${Balon} radio=${0.12} mover=${(p, t) => p.set(cx + Math.sin(t * 0.9) * 6, 0.4 + Math.abs(Math.sin(t * 2.6)) * 1.6, cz + 1.5 + Math.sin(t * 0.7) * 3)} />
+    ${ejercicios}
+    <${Punto} t="profe" sala="gimnasio" p=${[cx - 10.8, 0.1, cz + 1.5]} ry=${PI / 2} />
     <${B} p=${[cx + 9, 0.13, cz - 5.4]} s=${[2.0, 0.06, 1.2]} c=${COL.elec} /><${B} p=${[cx + 9, 0.13, cz - 4.0]} s=${[2.0, 0.06, 1.2]} c=${COL.noche} />
-    <${Alumno} p=${[cx + 9, 0.16, cz - 4.6]} ry=${-PI / 2} pose="sentado_suelo" deporte seed=${1650} />
+    <${Punto} t="colchoneta" sala="gimnasio" i=${0} p=${[cx + 9, 0.16, cz - 5.4]} ry=${-PI / 2} accion="estirar" />
+    <${Punto} t="colchoneta" sala="gimnasio" i=${1} p=${[cx + 9, 0.16, cz - 4.0]} ry=${-PI / 2} accion="estirar" />
     <${TechoMovil} y=${0} ids=${['gimnasio']}>
       <${Boveda} cx=${cx} cz=${cz} largo=${w + 1.2} luz=${d + 0.6} flecha=${3.1} alto=${9.6} eje="x" color="#e9e6df"
         vidrio=${(i, n) => i >= n / 2 - 2 && i < n / 2 + 2} />
@@ -202,21 +210,31 @@ function Piscina() {
     <${Agua} p=${[cx, 0.02, cz]} w=${pw} d=${pd} />
     ${cuerdas}
     ${[...Array(8)].map((_, i) => html`<${B} key=${'p' + i} m="B" p=${[x0 + (i + 0.5) * (pw / 8), 0.55, z1 + 0.5]} s=${[0.55, 0.7, 0.6]} c=${COL.blanco} />`)}
-    ${[1, 2, 4, 5, 6].map((carril, i) => html`<${Alumno} key=${'n' + i} p=${[0, -0.08, 0]} pose="nadando" banador seed=${1800 + i}
-      velocidad=${0.8 + i * 0.1} ruta=${{ tipo: 'linea', a: [x0 + (carril + 0.5) * (pw / 8), z0 + 1.5], b: [x0 + (carril + 0.5) * (pw / 8), z1 - 1.5], vel: 1.2 }} />`)}
-    <${Gradas} p=${[cx - W / 2 + 4.6, 0.2, cz]} r=${[0, PI / 2, 0]} largo=${40} filas=${3} publico=${9} seed=${1830} />
+    ${[...Array(8)].map((_, i) => html`<${Punto} key=${'cb' + i} t="carril" sala="piscina" i=${i} p=${[x0 + (i + 0.5) * (pw / 8), 0.2, z1 + 1.0]} ry=${PI} accion="nadar" />`)}
+    <${Gradas} p=${[cx - W / 2 + 4.6, 0.2, cz]} r=${[0, PI / 2, 0]} largo=${40} filas=${3} sala="piscina" />
     <${G} p=${[x1 + 2.2, 0.2, cz]}>
       ${[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b], i) => html`<${B} key=${i} m="B" p=${[a * 0.35, 0.9, b * 0.35]} s=${[0.07, 1.8, 0.07]} c=${COL.blanco} />`)}
       <${B} m="B" p=${[0, 1.8, 0]} s=${[0.8, 0.08, 0.8]} c=${COL.blanco} />
     <//>
-    <${Alumno} p=${[x1 + 2.2, 0.2, cz]} ry=${-PI / 2} pose="sentado" asiento=${1.84} adulto ropa=${{ sudadera: '#b84a55', ribete: '#b84a55', cremallera: '#b84a55' }} seed=${1813} />
-    <${Alumno} p=${[x1 + 2.6, 0.2, cz + 12]} ry=${-PI / 2} pose="hablando" banador seed=${1814} />
-    <${Alumno} p=${[x1 + 2.6, 0.2, cz + 13]} ry=${-PI / 2 + 0.4} pose="de_pie" banador seed=${1815} />
-    <${V} p=${[cx - W / 2, 3.5, cz]} s=${[0.08, 7, D]} c="#d6e8f2" />
+    <${Punto} t="trabajo" sala="piscina" rol="socorrista" p=${[x1 + 1.3, 0.2, cz + 1.4]} ry=${-PI / 2} accion="vigilar" />
+    <${V} p=${[cx - W / 2, 3.5, (cz - D / 2 + 13.5) / 2]} s=${[0.08, 7, 13.5 + D / 2]} c="#d6e8f2" />
+    <${V} p=${[cx - W / 2, 3.5, (16.5 + D / 2) / 2]} s=${[0.08, 7, D / 2 - 16.5]} c="#d6e8f2" />
+    <${V} p=${[cx - W / 2, 4.8, 15]} s=${[0.08, 4.4, 3]} c="#d6e8f2" />
+    <${B} m="M" p=${[cx - W / 2 - 0.05, 1.3, 13.45]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
+    <${B} m="M" p=${[cx - W / 2 - 0.05, 1.3, 16.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
+    <${B} m="M" p=${[cx - W / 2 - 0.05, 2.6, 15]} s=${[0.12, 0.1, 3.2]} c=${COL.noche} />
+    <${B} p=${[cx - W / 2 - 0.6, 0.1, 15]} s=${[1.2, 0.2, 3]} c="#ece6da" />
     <${V} p=${[cx + W / 2, 3.5, cz]} s=${[0.08, 7, D]} c="#d6e8f2" />
     <${B} m="B" p=${[cx, 3.5, cz - D / 2]} s=${[W, 7, 0.4]} c=${COL.piedra} />
-    <${V} p=${[cx, 3.5, cz + D / 2]} s=${[W, 7, 0.08]} c="#d6e8f2" />
-    <${B} m="B" p=${[cx, 0.45, cz + D / 2]} s=${[W, 0.9, 0.3]} c=${COL.piedra} />
+    <${V} p=${[(cx - W / 2 - 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#d6e8f2" />
+    <${V} p=${[(cx + W / 2 + 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#d6e8f2" />
+    <${V} p=${[cx, 4.8, cz + D / 2]} s=${[3, 4.4, 0.08]} c="#d6e8f2" />
+    <${B} m="B" p=${[(cx - W / 2 - 1.5) / 2, 0.45, cz + D / 2]} s=${[W / 2 - 1.5, 0.9, 0.3]} c=${COL.piedra} />
+    <${B} m="B" p=${[(cx + W / 2 + 1.5) / 2, 0.45, cz + D / 2]} s=${[W / 2 - 1.5, 0.9, 0.3]} c=${COL.piedra} />
+    <${B} m="M" p=${[cx - 1.55, 1.3, cz + D / 2 + 0.05]} s=${[0.1, 2.6, 0.12]} c=${COL.noche} />
+    <${B} m="M" p=${[cx + 1.55, 1.3, cz + D / 2 + 0.05]} s=${[0.1, 2.6, 0.12]} c=${COL.noche} />
+    <${B} m="M" p=${[cx, 2.6, cz + D / 2 + 0.05]} s=${[3.2, 0.1, 0.12]} c=${COL.noche} />
+    <${B} p=${[cx, 0.1, cz + D / 2 + 0.6]} s=${[3, 0.2, 1.2]} c="#ece6da" />
     ${columnas}
     <${Panel} p=${[cx - 9, 5.4, cz + D / 2 + 0.06]} w=${2.6} h=${2.6} transp tex=${texLogo()} />
     <${B} m="B" p=${[cx + 3, 5.4, cz + D / 2 + 0.04]} s=${[15, 1.6, 0.06]} c=${COL.noche} />
@@ -256,23 +274,12 @@ function Foco({ p, r }) {
 
 function Futbol() {
   const cx = -1, cz = -39;
-  const jugadores = [];
-  for (let i = 0; i < 10; i++) {
-    const eq = i < 5;
-    const fx = cx + (eq ? -1 : 1) * (5 + (i % 5) * 4.5), fz = cz + ((i * 7) % 5 - 2) * 5.5;
-    jugadores.push(html`<${Alumno} key=${i} p=${[0, 0.07, 0]} pose="corriendo" deporte=${eq ? true : '#c9a978'} seed=${1900 + i}
-      velocidad=${0.9} ruta=${{ tipo: 'vaiven', c: [fx, fz], ax: 4 + (i % 3) * 2, az: 3 + (i % 4), w1: 0.25 + (i % 5) * 0.04, w2: 0.2 + (i % 3) * 0.05 }} />`);
-  }
   return html`<${G}>
     <${B} p=${[cx, 0.02, cz]} s=${[68, 0.04, 44]} c="#4f9a4c" />
     <${Suelo} p=${[cx, cz]} w=${64} d=${40} tex=${texCampoFutbol()} y=${0.045} />
     <${Porteria} p=${[cx - 31.5, 0, cz]} lado=${1} />
     <${Porteria} p=${[cx + 31.5, 0, cz]} lado=${-1} />
-    ${jugadores}
-    <${Alumno} p=${[cx - 30.6, 0.07, cz]} ry=${PI / 2} pose="portero" deporte="#14285a" seed=${1920} />
-    <${Alumno} p=${[cx + 30.6, 0.07, cz]} ry=${-PI / 2} pose="portero" deporte="#14285a" seed=${1921} />
-    <${Balon} c="#ffffff" radio=${0.13} mover=${(p, t) => p.set(cx + Math.sin(t * 0.3) * 18, 0.2 + Math.abs(Math.sin(t * 2.4)) * 0.6, cz + Math.sin(t * 0.47) * 10)} />
-    <${Gradas} p=${[cx, 0, cz - 23.2]} largo=${34} filas=${4} publico=${12} seed=${1950} />
+    <${Gradas} p=${[cx, 0, cz - 23.2]} largo=${34} filas=${4} sala="futbol" />
     <${B} m="B" p=${[cx, 4.6, cz - 25.6]} r=${[0.16, 0, 0]} s=${[38, 0.25, 5.2]} c=${COL.blanco} />
     ${[-16, -8, 0, 8, 16].map(x => html`<${B} key=${x} m="M" p=${[cx + x, 2.4, cz - 27.6]} s=${[0.25, 4.8, 0.25]} c=${COL.noche} />`)}
     <${Foco} p=${[cx - 35, 0, cz - 23]} r=${[0, PI * 0.25, 0]} />
@@ -283,12 +290,17 @@ function Futbol() {
 }
 
 // ---------------- CANCHA DE BALONCESTO ----------------
-function Valla({ x0, x1, z0, z1, h = 3 }) {
+function Valla({ x0, x1, z0, z1, h = 3, puerta = null }) {
   const w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
   const postes = [];
-  for (let x = x0; x <= x1 + 0.01; x += w / 6) for (const z of [z0, z1]) postes.push(html`<${C} key=${'a' + x + z} m="M" p=${[x, h / 2, z]} s=${[0.08, h, 0.08]} c=${COL.noche} />`);
+  for (let x = x0; x <= x1 + 0.01; x += w / 6) for (const z of [z0, z1]) if (!(puerta && z === z1 && x > puerta[0] - 0.2 && x < puerta[1] + 0.2)) postes.push(html`<${C} key=${'a' + x + z} m="M" p=${[x, h / 2, z]} s=${[0.08, h, 0.08]} c=${COL.noche} />`);
   return html`<${G}>
-    <${V} p=${[cx, h / 2, z0]} s=${[w, h, 0.03]} c="#e2e8f0" /><${V} p=${[cx, h / 2, z1]} s=${[w, h, 0.03]} c="#e2e8f0" />
+    <${V} p=${[cx, h / 2, z0]} s=${[w, h, 0.03]} c="#e2e8f0" />
+    ${puerta ? html`
+      <${V} p=${[(x0 + puerta[0]) / 2, h / 2, z1]} s=${[puerta[0] - x0, h, 0.03]} c="#e2e8f0" />
+      <${V} p=${[(puerta[1] + x1) / 2, h / 2, z1]} s=${[x1 - puerta[1], h, 0.03]} c="#e2e8f0" />
+      <${C} m="M" p=${[puerta[0], h / 2, z1]} s=${[0.1, h, 0.1]} c=${COL.noche} /><${C} m="M" p=${[puerta[1], h / 2, z1]} s=${[0.1, h, 0.1]} c=${COL.noche} />
+    ` : html`<${V} p=${[cx, h / 2, z1]} s=${[w, h, 0.03]} c="#e2e8f0" />`}
     <${V} p=${[x0, h / 2, cz]} s=${[0.03, h, d]} c="#e2e8f0" /><${V} p=${[x1, h / 2, cz]} s=${[0.03, h, d]} c="#e2e8f0" />
     ${postes}
   <//>`;
@@ -301,13 +313,9 @@ function Baloncesto() {
     <${Suelo} p=${[cx, cz]} w=${28} d=${15} tex=${texPistaBasket()} y=${0.065} />
     <${Canasta} p=${[cx - 13.4, 0, cz]} lado=${1} />
     <${Canasta} p=${[cx + 13.4, 0, cz]} lado=${-1} />
-    <${Valla} x0=${cx - 15} x1=${cx + 15} z0=${cz - 9.5} z1=${cz + 9.5} h=${2.6} />
-    ${[0, 1, 2, 3, 4].map(i => html`<${Alumno} key=${i} p=${[0, 0.07, 0]} pose="corriendo" deporte=${i % 2 ? '#c9a978' : true} seed=${2000 + i}
-      velocidad=${0.8} ruta=${{ tipo: 'vaiven', c: [cx + 5 + (i % 3) * 1.5, cz + (i - 2) * 1.6], ax: 3.5, az: 3, w1: 0.45 + i * 0.05, w2: 0.38 + i * 0.04 }} />`)}
-    <${Alumno} p=${[cx + 10.2, 0.07, cz]} ry=${PI / 2} pose="saltando" deporte seed=${2006} />
-    <${Balon} mover=${(p, t) => p.set(cx + 8 + Math.sin(t * 0.9) * 4, 0.3 + Math.abs(Math.sin(t * 3.5)) * 1.1, cz + Math.sin(t * 0.7) * 3)} />
+    <${Valla} x0=${cx - 15} x1=${cx + 15} z0=${cz - 9.5} z1=${cz + 9.5} h=${2.6} puerta=${[cx - 1.3, cx + 1.3]} />
     <${Banco} p=${[cx - 6, 0.06, cz + 8.4]} r=${[0, PI, 0]} w=${2.4} /><${Banco} p=${[cx + 6, 0.06, cz + 8.4]} r=${[0, PI, 0]} w=${2.4} />
-    <${Alumno} p=${[cx - 6.4, 0.06, cz + 8.4]} ry=${PI} pose="aplaudiendo" asiento=${0.45} seed=${2007} />
+    ${[[-6.5, 0], [-5.5, 1], [5.5, 2], [6.5, 3]].map(([dx, i]) => html`<${Punto} key=${'bb' + i} t="banco" sala="baloncesto" i=${i} p=${[cx + dx, 0.06, cz + 8.4]} ry=${PI} asiento=${0.45} ap=${[0, 0.75]} accion="mirar" />`)}
   <//>`;
 }
 

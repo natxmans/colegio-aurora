@@ -1,7 +1,7 @@
 // =========================================================
 // Texturas dibujadas con <canvas> (no hace falta descargar imágenes)
 // =========================================================
-import { THREE } from '../lib.js';
+import { THREE } from '../lib3d.js';
 
 const cache = new Map();
 const F = '"Space Grotesk", "Segoe UI", Arial, sans-serif';

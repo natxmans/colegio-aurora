@@ -43,7 +43,7 @@ export const PRESENTACION = [
 export const EDIFICIO = [
   { t: 'Un edificio moderno de dos plantas', txt: 'Es un edificio práctico y seguro.' },
   { t: 'La planta baja', txt: 'Aquí están las aulas, los laboratorios, la biblioteca y el comedor.' },
-  { t: 'El primer piso', txt: 'Aquí están los dormitorios de los alumnos y los salones.' },
+  { t: 'El primer piso', txt: 'Aquí están la vida escolar, la permanencia, la sala de estudio y los salones.' },
   { t: 'Mucha luz natural', txt: 'Hay grandes ventanas y patios con jardines.' },
 ];
 
@@ -64,7 +64,7 @@ export const COMUNES = [
 
 // Diapositivas 7 y 10 · El internado
 export const INTERNADO = [
-  { t: 'En el primer piso', txt: 'Todos los dormitorios están en el primer piso.' },
+  { t: 'En la residencia', txt: 'Todos los dormitorios están en la residencia, un edificio de dos plantas al lado del colegio.' },
   { t: 'Habitaciones para dos alumnos', txt: 'Cada habitación es para dos compañeros.' },
   { t: 'Todo lo necesario', txt: 'Hay dos camas individuales, dos escritorios y dos armarios.' },
 ];
@@ -110,7 +110,7 @@ export const HORARIO = [
 // La vida en nuestro internado (frases sencillas: verbo IR, diptongos, la hora, los gustos)
 export const VIDA = [
   { hora: '07:45', titulo: 'Nos despertamos', icono: 'despertar', sala: 'hab101',
-    texto: 'Nos despertamos en el primer piso. Nos ponemos el uniforme.' },
+    texto: 'Nos despertamos en la residencia. Nos ponemos el uniforme.' },
   { hora: '08:00', titulo: 'Las clases', icono: 'clases', sala: 'mates',
     texto: 'Las clases empiezan a las ocho. Vamos a las aulas de la planta baja.' },
   { hora: '10:00', titulo: 'El recreo', icono: 'recreo', sala: 'patio',
@@ -128,14 +128,14 @@ export const VIDA = [
 // Diapositiva 8 · El complejo deportivo
 export const FRASES_DEPORTE = [
   'Tenemos clases de educación física en el gimnasio.',
-  'Podemos jugar al fútbol y al baloncesto en el recreo.',
+  'Después de las clases jugamos al fútbol y al baloncesto.',
   'Hay agua caliente en la piscina: nadamos todo el año.',
   'Nos encanta hacer deporte con los amigos.',
 ];
 
 // Diapositiva 3 · El uniforme y la ropa de diario
 export const UNIFORME_PIEZAS = [
-  { pieza: 'Un polo blanco', detalle: 'Tiene el cuello azul.', color: '#ffffff' },
+  { pieza: 'Un polo blanco', detalle: 'Tiene el cuello azul marino.', color: '#ffffff' },
   { pieza: 'Una chaqueta azul marino', detalle: 'Lleva el logo del colegio a la izquierda del pecho.', color: '#14285a' },
   { pieza: 'Un pantalón o una falda azul marino', detalle: 'Cada alumno elige. Es cómodo y elegante.', color: '#1b2440' },
   { pieza: 'Unos zapatos marrones', detalle: 'Los llevamos de lunes a viernes.', color: '#5a3a24' },

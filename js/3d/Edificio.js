@@ -2,14 +2,14 @@
 // EDIFICIO PRINCIPAL: planta baja (zona escolar) + primer piso (internado) + techo
 // Las plantas se separan con animación: vista en corte, planta baja, primer piso...
 // =========================================================
-import { html, useRef, useFrame, useLayoutEffect } from '../lib.js';
-import { B, C, S, V, G, Ico, Panel, COL, Planta, Banco, Pantalla, Arbol } from './piezas.js';
+import { html, useRef, useFrame, useLayoutEffect } from '../lib3d.js';
+import { B, C, S, V, VT, G, Ico, Panel, COL, Planta, Banco, Pantalla, Arbol } from './piezas.js';
 import { tocar } from './kit.js';
 import { POR_PLANTA, Y1, H0, H1 } from '../datos/salas.js';
 import { leer } from '../estado.js';
 import { Aula } from './Aulas.js';
 import * as SL from './Salas.js';
-import { Alumno } from './Alumno.js';
+import { Punto } from './puntos.js';
 import { Zonas, EtiquetaPlanta } from './Interaccion.js';
 import { pisos } from './etiquetas.js';
 import { texRotuloTexto, texLogo, texPantalla } from './texturas.js';
@@ -17,13 +17,14 @@ import { texRotuloTexto, texLogo, texPantalla } from './texturas.js';
 const PI = Math.PI;
 const COMP = {
   aula: Aula, biblioteca: SL.Biblioteca, recepcion: SL.Recepcion, comedor: SL.Comedor,
-  habitacion: SL.Habitacion, descanso: SL.ZonaDescanso, salon: SL.Salon,
+  descanso: SL.ZonaDescanso, salon: SL.Salon, vidaescolar: SL.VidaEscolar, permanencia: SL.Permanencia,
+  profesores: SL.SalaProfesores, estudio: SL.SalaEstudio, lectura: SL.SalonLectura, juegos: SL.SalaJuegos,
 };
 
-function Sala({ s }) {
-  const Comp = COMP[s.tipo];
+export function Sala({ s, comp = COMP }) {
+  const Comp = comp[s.tipo];
   if (!Comp) return null;
-  return html`<${G} p=${[(s.x0 + s.x1) / 2, 0, (s.z0 + s.z1) / 2]} r=${[0, s.fila === 'sur' ? PI : 0, 0]}><${Comp} s=${s} /><//>`;
+  return html`<${G} p=${[s.cx, 0, s.cz]} r=${[0, s.ry, 0]}><${Comp} s=${s} /><//>`;
 }
 
 // Ventana de las fachadas laterales: cristal, marco azul marino, montante central y alféizar
@@ -41,6 +42,9 @@ function VentanaLateral({ x, z, h, lado }) {
 }
 
 // Tabiques entre salas, fachadas de cristal, pasillo...
+// En la planta baja hay TRES PUERTAS: la entrada principal (fachada sur, x de -1.8 a 1.8)
+// y una puerta a cada lado, al final del pasillo (hacia la residencia y hacia el gimnasio).
+const PUERTA_SUR = [-1.8, 1.8], PUERTA_LADO = [-1.3, 1.3];
 function Estructura({ h, salas, primer = false }) {
   const muros = [];
   for (const fila of ['norte', 'sur']) {
@@ -48,16 +52,37 @@ function Estructura({ h, salas, primer = false }) {
     const xs = [...new Set(salas.filter(s => s.fila === fila).map(s => s.x0))].filter(x => x > -31.9);
     for (const x of xs) muros.push(html`<${B} key=${fila + x} p=${[x, h / 2, zc]} s=${[0.18, h, 9]} c=${COL.blanco} />`);
   }
+  const enPuerta = (x, z) => !primer && z > 0 && x > PUERTA_SUR[0] - 0.3 && x < PUERTA_SUR[1] + 0.3;
   // Fachadas: pilares de piedra beige cada 8 m, montantes azul marino y franja baja blanca
   const fachada = [];
   for (const z of [-11, 11]) {
     const sgn = z > 0 ? 1 : -1;
     for (let x = -32; x <= 32.01; x += 2) {
+      if (enPuerta(x, z)) continue;
       if (Math.abs(x % 8) < 0.01) fachada.push(html`<${B} key=${'p' + z + x} p=${[x, h / 2, z + sgn * 0.12]} s=${[0.55, h, 0.5]} c=${COL.piedra} />`);
       else fachada.push(html`<${B} key=${'m' + z + x} m="M" p=${[x, h / 2, z]} s=${[0.07, h, 0.12]} c=${COL.noche} />`);
     }
-    fachada.push(html`<${B} key=${'t' + z} m="M" p=${[0, primer ? 1.05 : 0.9, z]} s=${[64, 0.06, 0.1]} c=${COL.noche} />`);
   }
+  // tramos de una línea horizontal (sin cortar la puerta de la fachada sur)
+  const tramos = (z) => (!primer && z > 0) ? [[-32, PUERTA_SUR[0]], [PUERTA_SUR[1], 32]] : [[-32, 32]];
+  const linea = (z, y, alto, prof, c, m, k) => tramos(z).map(([a, b], i) => html`<${B} key=${k + i} m=${m} p=${[(a + b) / 2, y, z]} s=${[b - a, alto, prof]} c=${c} />`);
+  const vidrio = (z) => tramos(z).map(([a, b], i) => html`<${V} key=${'vz' + z + i} p=${[(a + b) / 2, h / 2, z]} s=${[b - a, h - 0.1, 0.06]} c="#cfe0ea" />`);
+  // muros laterales (con una puerta en la planta baja)
+  const lateral = (lado) => {
+    const x = lado * 32.15;
+    if (primer) return html`<${B} key=${'lat' + lado} p=${[x, h / 2, 0]} s=${[0.5, h, 22.6]} c=${COL.piedra} />`;
+    const [a, b] = PUERTA_LADO;
+    return html`<${G} key=${'lat' + lado}>
+      <${B} p=${[x, h / 2, (-11.3 + a) / 2]} s=${[0.5, h, a + 11.3]} c=${COL.piedra} />
+      <${B} p=${[x, h / 2, (11.3 + b) / 2]} s=${[0.5, h, 11.3 - b]} c=${COL.piedra} />
+      <${B} p=${[x, 2.45 + (h - 2.45) / 2, 0]} s=${[0.5, h - 2.45, b - a]} c=${COL.piedra} />
+      <${B} m="M" p=${[x + lado * 0.27, 1.2, a - 0.05]} s=${[0.08, 2.4, 0.1]} c=${COL.noche} />
+      <${B} m="M" p=${[x + lado * 0.27, 1.2, b + 0.05]} s=${[0.08, 2.4, 0.1]} c=${COL.noche} />
+      <${B} m="M" p=${[x + lado * 0.27, 2.42, 0]} s=${[0.08, 0.1, b - a + 0.2]} c=${COL.noche} />
+      <${B} m="L" p=${[x + lado * 0.29, 2.55, 0]} s=${[0.03, 0.04, b - a]} c=${COL.cian} />
+      <${B} p=${[x, 0.01, 0]} s=${[0.6, 0.02, b - a]} c="#ddd3c2" />
+    <//>`;
+  };
   return html`<${G}>
     ${primer ? html`
       <${B} p=${[-18.15, -0.2, 0]} s=${[28.3, 0.4, 22.6]} c="#e8e2d6" />
@@ -69,19 +94,25 @@ function Estructura({ h, salas, primer = false }) {
     ` : html`
       <${B} p=${[0, -0.2, 0]} s=${[64.6, 0.4, 22.6]} c="#e8e2d6" />
       <${B} m="B" p=${[0, 0.2, -11.2]} s=${[64.8, 0.4, 0.42]} c=${COL.piedra} />
-      <${B} m="B" p=${[0, 0.2, 11.2]} s=${[64.8, 0.4, 0.42]} c=${COL.piedra} />
+      ${tramos(11).map(([a, b], i) => html`<${B} key=${'zo' + i} m="B" p=${[(a + b) / 2 + (i ? 0.2 : -0.2), 0.2, 11.2]} s=${[b - a + 0.4, 0.4, 0.42]} c=${COL.piedra} />`)}
+      <${B} p=${[0, 0.01, 11.2]} s=${[PUERTA_SUR[1] - PUERTA_SUR[0], 0.02, 0.5]} c="#ddd3c2" />
+      <${B} m="M" p=${[PUERTA_SUR[0] - 0.05, 1.2, 11.08]} s=${[0.1, 2.4, 0.14]} c=${COL.noche} />
+      <${B} m="M" p=${[PUERTA_SUR[1] + 0.05, 1.2, 11.08]} s=${[0.1, 2.4, 0.14]} c=${COL.noche} />
+      <${B} m="M" p=${[0, 2.45, 11.0]} s=${[PUERTA_SUR[1] - PUERTA_SUR[0] + 0.2, 0.12, 0.14]} c=${COL.noche} />
+      <${V} p=${[0, 2.5 + (h - 2.5) / 2, 11]} s=${[PUERTA_SUR[1] - PUERTA_SUR[0], h - 2.55, 0.06]} c="#cfe0ea" />
+      <${B} m="L" p=${[0, 2.58, 11.1]} s=${[PUERTA_SUR[1] - PUERTA_SUR[0], 0.03, 0.03]} c=${COL.cian} />
     `}
     <${B} p=${[0, 0.02, 0]} s=${[64, 0.04, 4]} c=${primer ? '#c9b48e' : '#ddd3c2'} />
     <${B} p=${[0, 0.045, 0]} s=${[63, 0.01, 0.9]} c=${primer ? '#20345f' : '#cfc3ad'} />
     ${muros}
-    <${B} p=${[-32.15, h / 2, 0]} s=${[0.5, h, 22.6]} c=${COL.piedra} />
-    <${B} p=${[32.15, h / 2, 0]} s=${[0.5, h, 22.6]} c=${COL.piedra} />
-    ${[-1, 1].map(lado => [-6.5, 0, 6.5].map(z => html`<${VentanaLateral} key=${'vl' + lado + z} x=${lado * 32.42} z=${z} h=${h} lado=${lado} />`))}
+    ${lateral(-1)} ${lateral(1)}
+    ${[-1, 1].map(lado => (primer ? [-6.5, 0, 6.5] : [-6.5, 6.5]).map(z => html`<${VentanaLateral} key=${'vl' + lado + z} x=${lado * 32.42} z=${z} h=${h} lado=${lado} />`))}
     <${B} m="B" p=${[-32.44, h - 0.25, 0]} s=${[0.1, 0.5, 22.7]} c=${COL.blanco} />
     <${B} m="B" p=${[32.44, h - 0.25, 0]} s=${[0.1, 0.5, 22.7]} c=${COL.blanco} />
-    <${V} p=${[0, h / 2, -11]} s=${[64, h - 0.1, 0.06]} c="#cfe0ea" />
-    <${V} p=${[0, h / 2, 11]} s=${[64, h - 0.1, 0.06]} c="#cfe0ea" />
+    ${vidrio(-11)} ${vidrio(11)}
     ${fachada}
+    ${linea(-11, primer ? 1.05 : 0.9, 0.06, 0.1, COL.noche, 'M', 'tn')}
+    ${linea(11, primer ? 1.05 : 0.9, 0.06, 0.1, COL.noche, 'M', 'ts')}
     <${B} m="M" p=${[0, h - 0.08, -11]} s=${[64, 0.16, 0.18]} c=${COL.noche} />
     <${B} m="M" p=${[0, h - 0.08, 11]} s=${[64, 0.16, 0.18]} c=${COL.noche} />
   <//>`;
@@ -89,18 +120,16 @@ function Estructura({ h, salas, primer = false }) {
 
 function PasilloPB() {
   return html`<${G}>
-    ${[-26, -14, 14, 26].map((x, i) => html`<${Banco} key=${'b' + i} p=${[x, 0, -1.55]} w=${2.2} />`)}
+    ${[-21, -4.5, 11, 27].map((x, i) => html`<${G} key=${'b' + i}>
+      <${Banco} p=${[x, 0, -1.55]} w=${2.2} />
+      <${Punto} t="banco" sala="pasillo0" i=${i * 2} p=${[x - 0.5, 0, -1.55]} asiento=${0.45} ap=${[0, 0.75]} accion="charlar" />
+      <${Punto} t="banco" sala="pasillo0" i=${i * 2 + 1} p=${[x + 0.5, 0, -1.55]} asiento=${0.45} ap=${[0, 0.75]} accion="charlar" />
+    <//>`)}
     ${[-20, -6, 8, 20].map((x, i) => html`<${Planta} key=${'p' + i} p=${[x, 0, 1.55]} s=${1.0} tipo=${i % 3} />`)}
     ${[-10, 22].map((x, i) => html`<${G} key=${'t' + i} p=${[x, 0, 1.6]}>
       <${B} m="B" p=${[0, 0.95, 0]} s=${[0.7, 1.9, 0.12]} c=${COL.negro} />
       <${Panel} p=${[0, 1.15, -0.065]} r=${[0, PI, 0]} w=${0.6} h=${1.05} tex=${texPantalla('horario')} />
     <//>`)}
-    <${Alumno} p=${[0, 0, -0.6]} ruta=${{ tipo: 'linea', a: [-28, -0.6], b: [28, -0.6], vel: 1.1 }} pose="caminando" seed=${1101} />
-    <${Alumno} p=${[0, 0, 0.7]} ruta=${{ tipo: 'linea', a: [26, 0.7], b: [-24, 0.7], vel: 1.0 }} pose="caminando" seed=${1102} />
-    <${Alumno} p=${[0, 0, 0.1]} ruta=${{ tipo: 'linea', a: [-12, 0.1], b: [12, 0.1], vel: 0.9 }} pose="caminando" seed=${1103} />
-    <${Alumno} p=${[-26, 0, -1.0]} ry=${PI} pose="hablando" seed=${1104} />
-    <${Alumno} p=${[-25.2, 0, -0.6]} ry=${-2.2} pose="de_pie" seed=${1105} />
-    <${Alumno} p=${[13.6, 0, -1.55]} ry=${PI} pose="sentado" asiento=${0.45} seed=${1106} />
   <//>`;
 }
 
@@ -109,10 +138,6 @@ function PasilloPP() {
     ${[-24, -8, 10, 26].map((x, i) => html`<${Planta} key=${'p' + i} p=${[x, 0, -1.55]} s=${1.0} tipo=${(i + 1) % 3} />`)}
     <${B} p=${[0, 0.05, -1.85]} s=${[63, 0.01, 0.06]} c=${COL.maderaC} />
     <${B} p=${[0, 0.05, 1.85]} s=${[63, 0.01, 0.06]} c=${COL.maderaC} />
-    <${Alumno} p=${[0, 0, 0.4]} ruta=${{ tipo: 'linea', a: [-26, 0.4], b: [24, 0.4], vel: 0.9 }} pose="caminando" seed=${1201} />
-    <${Alumno} p=${[0, 0, -0.5]} ruta=${{ tipo: 'linea', a: [20, -0.5], b: [-14, -0.5], vel: 1.0 }} pose="caminando" seed=${1202} />
-    <${Alumno} p=${[-17, 0, 0.9]} ry=${-PI / 2} pose="hablando" seed=${1203} />
-    <${Alumno} p=${[-17.8, 0, 0.9]} ry=${PI / 2} pose="de_pie" seed=${1204} />
   <//>`;
 }
 
@@ -189,8 +214,11 @@ function Techo() {
     <${B} p=${[18, 0.6, 6]} s=${[6, 0.06, 9]} c=${COL.madera} />
     ${[[10, 3.2], [13, 8.5], [24, 3.0], [27, 8.4], [21, 9.2]].map(([x, z], i) => html`<${Arbol} key=${'a' + i} p=${[x, 0.6, z]} s=${0.45} c=${i % 2 ? '#5e8a4c' : '#7da35f'} />`)}
     <${Banco} p=${[16, 0.62, 4]} w=${2} /><${Banco} p=${[20, 0.62, 8]} r=${[0, PI, 0]} w=${2} />
-    <${V} p=${[0, 0.95, 6.5]} s=${[6.4, 0.9, 6.4]} />
-    <${B} m="M" p=${[0, 1.42, 6.5]} s=${[6.5, 0.06, 6.5]} c=${COL.noche} />
+    <${VT} p=${[0, 0.95, 6.5]} s=${[6.4, 0.9, 6.4]} c="#bcd6e8" />
+    ${[-3.2, 3.2].map(d => html`<${B} key=${'lx' + d} m="M" p=${[d, 1.42, 6.5]} s=${[0.1, 0.08, 6.5]} c=${COL.noche} />`)}
+    ${[-3.2, 3.2].map(d => html`<${B} key=${'lz' + d} m="M" p=${[0, 1.42, 6.5 + d]} s=${[6.5, 0.08, 0.1]} c=${COL.noche} />`)}
+    <${B} m="M" p=${[0, 1.42, 6.5]} s=${[0.08, 0.06, 6.4]} c=${COL.noche} />
+    <${B} m="M" p=${[0, 1.42, 6.5]} s=${[6.4, 0.06, 0.08]} c=${COL.noche} />
     <${Panel} p=${[-18, 0.54, 6.5]} r=${[-PI / 2, 0, 0]} w=${6.5} h=${6.5} transp tex=${texLogo()} />
   <//>`;
 }

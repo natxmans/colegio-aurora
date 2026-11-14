@@ -1,7 +1,7 @@
 // =========================================================
 // Piezas básicas y muebles reutilizables
 // =========================================================
-import { html, THREE, useMemo, useRef, useFrame } from '../lib.js';
+import { html, THREE, useMemo, useRef, useFrame } from '../lib3d.js';
 import { Pieza, Grupo } from './kit.js';
 
 // Paleta del Colegio Pablo Picasso: azul marino, blanco y beige (+ madera y luz cálida)
@@ -261,11 +261,12 @@ export function Farola({ p, h = 4.2 }) {
   <//>`;
 }
 
-// Pared de cristal del pasillo con puerta (coordenadas canónicas de la sala)
+// Pared de cristal del pasillo con puerta(s) (coordenadas canónicas de la sala)
+// puerta: número o lista de números (centro de cada puerta, en x)
 export function Frente({ w, d, h, puerta = null, macizo = null, c = COL.blanco }) {
   const z = d / 2;
-  const pz = puerta ?? w / 2 - 1.2;
-  const huecos = [[pz - 0.55, pz + 0.55]];
+  const puertas = Array.isArray(puerta) ? puerta : [puerta ?? w / 2 - 1.2];
+  const huecos = puertas.map(pz => [pz - 0.55, pz + 0.55]);
   if (macizo) huecos.push(macizo);
   huecos.sort((a, b) => a[0] - b[0]);
   const tramos = [];
@@ -276,11 +277,13 @@ export function Frente({ w, d, h, puerta = null, macizo = null, c = COL.blanco }
     ${tramos.map(([a, b], i) => html`<${V} key=${'v' + i} p=${[(a + b) / 2, h / 2, z]} s=${[b - a, h - 0.1, 0.05]} />`)}
     ${tramos.map(([a, b], i) => html`<${B} key=${'m' + i} m="M" p=${[(a + b) / 2, 1.05, z]} s=${[b - a, 0.04, 0.07]} c=${COL.grisO} />`)}
     ${macizo ? html`<${B} p=${[(macizo[0] + macizo[1]) / 2, h / 2, z]} s=${[macizo[1] - macizo[0], h, 0.16]} c=${c} />` : null}
-    <${B} m="M" p=${[pz - 0.58, h / 2, z]} s=${[0.07, h, 0.12]} c=${COL.grisO} />
-    <${B} m="M" p=${[pz + 0.58, h / 2, z]} s=${[0.07, h, 0.12]} c=${COL.grisO} />
-    <${B} m="M" p=${[pz, 2.25, z]} s=${[1.2, 0.08, 0.12]} c=${COL.grisO} />
-    <${V} p=${[pz + 0.95, 1.1, z + 0.06]} s=${[1.05, 2.15, 0.04]} c="#d8ecff" />
-    <${B} m="L" p=${[pz, 2.32, z + 0.07]} s=${[1.1, 0.03, 0.02]} c=${COL.cian} />
+    ${puertas.map((pz, i) => html`<${G} key=${'p' + i}>
+      <${B} m="M" p=${[pz - 0.58, h / 2, z]} s=${[0.07, h, 0.12]} c=${COL.grisO} />
+      <${B} m="M" p=${[pz + 0.58, h / 2, z]} s=${[0.07, h, 0.12]} c=${COL.grisO} />
+      <${B} m="M" p=${[pz, 2.25, z]} s=${[1.2, 0.08, 0.12]} c=${COL.grisO} />
+      <${V} p=${[pz, 2.25 + (h - 2.25) / 2, z]} s=${[1.1, h - 2.3, 0.05]} />
+      <${B} m="L" p=${[pz, 2.32, z + 0.07]} s=${[1.1, 0.03, 0.02]} c=${COL.cian} />
+    <//>`)}
     <${B} m="M" p=${[0, h - 0.04, z]} s=${[w - 0.2, 0.08, 0.1]} c=${COL.grisO} />
   <//>`;
 }

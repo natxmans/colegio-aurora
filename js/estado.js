@@ -1,18 +1,26 @@
-// Estado global muy simple (sin librerías) + acciones de la visita
-import { useSyncExternalStore, THREE } from './lib.js';
-import { SALAS, VISTAS, CAJAS, camaraSala, camaraInterior } from './datos/salas.js';
+// Estado global muy simple (sin librerías) + acciones de la visita 3D
+// (este archivo no carga Three.js: la página y la presentación funcionan sin 3D)
+import { useSyncExternalStore } from './lib.js';
+import { SALAS, VISTAS, camaraSala, camaraInterior } from './datos/salas.js';
 
 let estado = {
-  modo: 'inicio',      // 'inicio' (portada) | 'explorar' (visita 3D)
-  vista: 'completa',   // 'completa' | 'baja' | 'primer' | 'corte'
+  modo: 'inicio',      // 'inicio' (página) | 'explorar' (visita 3D a pantalla completa)
+  vista: 'completa',   // 'completa' | 'baja' | 'primer' | 'corte' | 'deportes' | 'residencia'
+  resVista: null,      // residencia: null | 'res1' (primer piso) | 'res0' (planta baja)
   techo: true,
   sel: null,           // id de la sala seleccionada
   interior: false,     // cámara dentro de la sala
-  noche: false,
+  noche: false,        // lo calcula la simulación (sol bajo el horizonte)
   hover: null,
   guiada: false,
   lugares: false,
-  heroVisible: true,
+  campusVisible: false, // la sección del campus está en pantalla
+  persona: null,       // persona seleccionada (ficha + asistente)
+  seguir: null,        // persona que sigue la cámara
+  chat: null,          // persona con la que se habla (asistente IA)
+  calidad: null,       // 'alta' | 'normal' | 'ligera'
+  aviso: null,         // mensaje corto en la vista 3D
+  listo3d: false,
 };
 const subs = new Set();
 export const leer = () => estado;
@@ -28,63 +36,27 @@ export function useEstado(sel) { return useSyncExternalStore(suscribir, () => se
 let _webgl = null;
 export function hayWebGL() {
   if (_webgl === null) {
-    try {
-      const c = document.createElement('canvas');
-      _webgl = !!(c.getContext('webgl2') || c.getContext('webgl'));
-    } catch (e) { _webgl = false; }
+    if (window.__diag && typeof window.__diag.webgl === 'boolean') _webgl = window.__diag.webgl;
+    else {
+      try {
+        const c = document.createElement('canvas');
+        _webgl = !!(c.getContext('webgl2') || c.getContext('webgl'));
+      } catch (e) { _webgl = false; }
+    }
   }
   return _webgl;
 }
 
-// Referencia a los controles de cámara (CameraControls de Drei)
-// fov: ángulo de visión deseado. Las vistas generales usan un ángulo más cerrado (menos
-// deformación: los edificios del fondo no se ven diminutos) y las salas uno más abierto.
+// Cámara: la escena 3D rellena camara.ctrl y camara.encuadre cuando está lista.
+// fov: ángulo de visión deseado (las vistas generales usan un ángulo más cerrado)
 export const FOV_BASE = 45;
-export const camara = { ctrl: null, introHecha: false, fov: FOV_BASE };
-
-// Encuadre automático: busca la distancia para que la caja ocupe ~85 % de la pantalla
-// (funciona igual en ordenador, tableta y teléfono)
-const _v = new THREE.Vector3();
-export function encuadre(v) {
-  const c = camara.ctrl;
-  const cam = c.camera.clone();
-  // el lienzo 3D ocupa toda la ventana: usamos su tamaño real (también en teléfono)
-  cam.aspect = Math.max(0.3, innerWidth / Math.max(1, innerHeight));
-  // en pantalla vertical se usa la caja completa (todos los edificios enteros, nada cortado)
-  const box = (cam.aspect < 0.9 && CAJAS[v.ajuste + 'Movil']) || CAJAS[v.ajuste];
-  cam.fov = v.fov || FOV_BASE;
-  cam.updateProjectionMatrix();
-  const mira = new THREE.Vector3((box.x0 + box.x1) / 2, v.y ?? 1, (box.z0 + box.z1) / 2);
-  // En teléfono (pantalla vertical) giramos la cámara: el campus, que es ancho, ocupa la altura
-  const vertical = cam.aspect < 0.9 && v.ajuste === 'campus';
-  const dir = new THREE.Vector3().setFromSphericalCoords(1, vertical ? Math.min(v.polar, 0.72) : v.polar, vertical ? v.azimut - 1.32 : v.azimut);
-  const esquinas = [];
-  for (const x of [box.x0, box.x1]) for (const y of [box.y0, box.y1]) for (const z of [box.z0, box.z1]) esquinas.push(new THREE.Vector3(x, y, z));
-  const movil = cam.aspect < 0.9;
-  const margen = (v.margen || 0.85) * (movil ? 1.02 : 1);
-  let lo = 4, hi = 3000;
-  for (let i = 0; i < 32; i++) {
-    const d = (lo + hi) / 2;
-    cam.position.copy(mira).addScaledVector(dir, d);
-    cam.lookAt(mira); cam.updateMatrixWorld();
-    let m = 0;
-    for (const p of esquinas) {
-      _v.copy(p).project(cam);
-      if (_v.z > 1 || _v.z < -1) { m = 9; break; }
-      m = Math.max(m, Math.abs(_v.x), _v.y > 0 ? _v.y * (movil ? 1.3 : 1.14) : -_v.y * (movil ? 1.1 : 1.0));
-    }
-    if (m > margen) lo = d; else hi = d;
-  }
-  const pos = mira.clone().addScaledVector(dir, hi);
-  // En la portada (pantalla ancha), el campus se desplaza a la derecha para dejar sitio al texto
-  const desp = !movil && v.desplazar ? (box.x1 - box.x0) * v.desplazar : 0;
-  return { pos: pos.toArray(), mira: mira.toArray(), desp, fov: v.fov };
-}
+export const camara = { ctrl: null, introHecha: false, fov: FOV_BASE, encuadre: null, pendiente: null };
 
 export function volar(v, suave = true) {
   const c = camara.ctrl;
-  if (!c || !v) return;
-  if (v.ajuste) v = encuadre(v);
+  if (!v) return;
+  if (!c || !camara.encuadre) { camara.pendiente = v; return; }
+  if (v.ajuste) v = camara.encuadre(v);
   camara.fov = v.fov || FOV_BASE;
   c.setFocalOffset(-(v.desp || 0), 0, 0, suave);
   c.setLookAt(v.pos[0], v.pos[1], v.pos[2], v.mira[0], v.mira[1], v.mira[2], suave);
@@ -92,38 +64,46 @@ export function volar(v, suave = true) {
 
 function modoExplorar() {
   document.documentElement.classList.add('explorando');
-  window.scrollTo(0, 0);
 }
 
 export function abrirExplorador(vista = 'completa') {
   modoExplorar();
-  poner({ modo: 'explorar', vista, sel: null, interior: false, lugares: false, guiada: false });
+  poner({ modo: 'explorar', vista, sel: null, interior: false, lugares: false, guiada: false, resVista: vista === 'residencia' ? 'res1' : null });
   volar(VISTAS[vista]);
 }
 
 export function volverInicio() {
   document.documentElement.classList.remove('explorando');
-  poner({ modo: 'inicio', vista: 'completa', sel: null, interior: false, guiada: false, lugares: false, hover: null, techo: true });
+  poner({ modo: 'inicio', vista: 'completa', sel: null, interior: false, guiada: false, lugares: false, hover: null, techo: true, resVista: null, seguir: null });
   document.body.style.cursor = '';
-  volar(VISTAS.inicio);
+  volar(VISTAS.completa);
+  const el = document.getElementById('campus');
+  if (el) el.scrollIntoView({ block: 'start' });
 }
 
 export function cambiarVista(vista) {
-  poner({ vista, sel: null, interior: false });
+  poner({ vista, sel: null, interior: false, seguir: null, resVista: vista === 'residencia' ? 'res1' : null });
   volar(VISTAS[vista]);
+}
+
+export function verResidencia(planta) {
+  poner({ vista: 'completa', resVista: planta, sel: null, interior: false, seguir: null });
+  volar(VISTAS.residencia);
 }
 
 export function seleccionar(id, opciones = {}) {
   const s = SALAS[id];
   if (!s) return;
   if (estado.modo !== 'explorar') modoExplorar();
-  let vista = estado.vista;
+  let vista = estado.vista, resVista = null;
   if (s.planta === 'baja') vista = 'baja';
   else if (s.planta === 'primer') vista = 'primer';
-  else if (s.planta === 'edif') vista = 'completa';
+  else if (s.planta === 'res0' || s.planta === 'res1') { vista = 'completa'; resVista = s.planta; }
+  else if (s.planta === 'residencia') { vista = 'completa'; resVista = 'res1'; }
+  else vista = 'completa';
   const interior = !!opciones.interior;
-  poner({ modo: 'explorar', sel: id, vista, interior, lugares: opciones.mantenerLugares ? estado.lugares : false, noche: opciones.noche ?? estado.noche });
-  const v = interior ? camaraInterior(s) : camaraSala(s);
+  poner({ modo: 'explorar', sel: id, vista, resVista, interior, seguir: null, lugares: opciones.mantenerLugares ? estado.lugares : false });
+  const v = s.planta === 'residencia' ? VISTAS.residencia : interior ? camaraInterior(s) : camaraSala(s);
   volar(v);
 }
 
@@ -136,10 +116,9 @@ export function alternarInterior() {
 }
 
 export function cerrarSala() {
-  poner({ sel: null, interior: false, guiada: false });
+  poner({ sel: null, interior: false, guiada: false, resVista: null });
   volar(VISTAS[estado.vista] || VISTAS.completa);
 }
 
 export const alternarTecho = () => poner({ techo: !estado.techo });
-export const alternarNoche = () => poner({ noche: !estado.noche });
 export const alternarLugares = () => poner({ lugares: !estado.lugares });

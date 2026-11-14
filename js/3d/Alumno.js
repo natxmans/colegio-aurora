@@ -5,7 +5,7 @@
 // Personaje articulado (hombros, codos, caderas, rodillas, cabeza)
 // con muchas posturas: sentado, escribiendo, caminando, nadando...
 // =========================================================
-import { html, useRef, useMemo, useFrame, useLayoutEffect } from '../lib.js';
+import { html, useRef, useMemo, useFrame, useLayoutEffect } from '../lib3d.js';
 import { Pieza } from './kit.js';
 import { azar } from './piezas.js';
 

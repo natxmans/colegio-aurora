@@ -1,7 +1,7 @@
 // =========================================================
 // "Nuestro uniforme": un alumno en 3D que gira, con pantalón o falda
 // =========================================================
-import { html, useState, useRef, useEffect, Canvas, useFrame, CameraControls, Environment, Lightformer, Component } from '../lib.js';
+import { html, useState, useRef, useEffect, Canvas, useFrame, CameraControls, Environment, Lightformer, Component } from '../lib3d.js';
 import { hayWebGL } from '../estado.js';
 import { KitRoot } from '../3d/kit.js';
 import { Alumno, ROPA_DIARIO } from '../3d/Alumno.js';
