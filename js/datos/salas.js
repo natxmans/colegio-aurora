@@ -281,8 +281,8 @@ export function camaraInterior(s) {
 
 // Vistas generales de la cámara ('ajuste' = encuadre automático según la pantalla)
 export const VISTAS = {
-  completa: { ajuste: 'principal', azimut: 0.2, polar: 0.72, margen: 0.85, fov: 30, y: 2, azimutMovil: 1.57, polarMovil: 0.62 },
-  inicio: { ajuste: 'principal', azimut: 0.2, polar: 0.72, margen: 0.85, fov: 30, y: 2, azimutMovil: 1.57, polarMovil: 0.62 },
+  completa: { ajuste: 'principal', azimut: 0.2, polar: 0.72, margen: 0.88, fov: 30, y: 2, azimutMovil: 1.57, polarMovil: 0.62 },
+  inicio: { ajuste: 'principal', azimut: 0.2, polar: 0.72, margen: 0.88, fov: 30, y: 2, azimutMovil: 1.57, polarMovil: 0.62 },
   campus: { ajuste: 'campus', azimut: -0.12, polar: 0.92, margen: 0.95, fov: 28 },
   baja: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: 0, fov: 36 },
   primer: { ajuste: 'edificio', azimut: 0, polar: 0.82, margen: 0.9, y: Y1, fov: 36 },
