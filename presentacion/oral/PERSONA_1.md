@@ -13,6 +13,7 @@ Toutes mes interventions, dans l'ordre. **[ENSEMBLE]** = on le dit à deux. Je t
   🇫🇷 *Sa devise est : « Étudier, vivre ensemble, grandir ».*
 - 🇪🇸 **Hemos hecho una maqueta en 3D. Aquí veis el campus entero.**  
   🇫🇷 *Nous avons fait une maquette en 3D. Ici, vous voyez tout le campus.*
+- **▶ CLIC** (fin de la diapositive)
 
 ## Diapo 2 — 1. Presentación del colegio
 - 🇪🇸 **Primero, os presentamos el colegio. Está en España, en un lugar tranquilo y agradable. Es un colegio moderno y limpio.**  

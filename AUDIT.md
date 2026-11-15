@@ -103,3 +103,11 @@ dessin des personnages ≈ 1,1 ms par image, 233 appels de dessin et 612 000 tri
 « instancié »). Images par seconde mesurées à 21:30 dans le Chrome de test sans écran : Alta 60, Normal 34,
 Ligera 58 — ces chiffres varient d'une mesure à l'autre et ne sont **pas** ceux d'un vrai ordinateur : à vérifier sur le PC de la présentation. Les élèves cachés (hors de l'écran,
 étage masqué, « Ocultar personas ») continuent d'exister dans la simulation.
+
+**Journée complète sans saut** (`poblacion.py jornada`, vitesse « Muy rápido », 07:36 → 21:31, 923 mesures) :
+classes complètes et assises à 08:15, 10:30 et 14:15 ; 54 à table + 10 qui arrivent à 12:42 ; 63/64 dans leur
+propre lit à 21:31 (le dernier arrive) ; **0 trajet impossible, 0 réapparition, 0 déplacement brusque,
+0 chevauchement**. 31 positions sur environ 78 000 frôlent un coin de mur ou de meuble pendant la marche (0,04 %).
+Corrections faites pendant ces tests : l'horloge attend un élève en retard pour un cours ; une personne n'« arrive »
+plus jamais de loin (avant : 8 glissements de 14 à 65 m) ; même tolérance pour quitter une place que pour y arriver
+(avant : une place des gradins de la piscine permettait d'arriver mais pas de repartir).

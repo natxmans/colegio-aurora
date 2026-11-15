@@ -202,7 +202,8 @@ function fallo(m, desde, hasta) { FALLOS.push({ m, d: [+desde.x.toFixed(1), +des
 export function buscar(desde, hasta, maxNodos = 700000) {
   if (!NAV.listo) return null;
   const ca = NAV.capas[desde.capa], cb = NAV.capas[hasta.capa];
-  let pa = cercaLibre(desde.capa, desde.x, desde.z, 2.5), pb = cercaLibre(hasta.capa, hasta.x, hasta.z, 3);
+  // misma tolerancia para salir de un sitio que para llegar a él (si no, alguien podía llegar a una plaza y no poder salir)
+  let pa = cercaLibre(desde.capa, desde.x, desde.z, 3), pb = cercaLibre(hasta.capa, hasta.x, hasta.z, 3);
   if (!pa) return fallo('inicio', desde, hasta);
   if (!pb) return fallo('destino', desde, hasta);
   const ini = ca.offset + ca.celda(pa[0], pa[1]), fin = cb.offset + cb.celda(pb[0], pb[1]);

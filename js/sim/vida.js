@@ -744,13 +744,16 @@ export function colocarTodos() {
 
 // Prueba: ¿se puede llegar a pie a todos los puntos (sillas, camas, puestos...) desde el patio?
 export function comprobarAccesos() {
-  const malos = [];
+  const malos = [], salida = [];
   for (const p of SIM.puntos) {
     const [ax, az] = llegada(p);
     const r = buscar({ x: -15, z: 20, capa: 0 }, { x: ax, z: az, capa: p.capa });
     if (!r) malos.push([p.sala, p.t, p.i, +ax.toFixed(2), +az.toFixed(2), p.capa]);
+    // ...y volver a salir de allí (desde el sitio donde se queda al levantarse)
+    const v = buscar({ x: ax, z: az, capa: p.capa }, { x: -15, z: 20, capa: 0 });
+    if (!v) salida.push([p.sala, p.t, p.i, +ax.toFixed(2), +az.toFixed(2), p.capa]);
   }
-  return { total: SIM.puntos.length, malos };
+  return { total: SIM.puntos.length, malos, salida };
 }
 
 // ---------------- UNA IMAGEN DE LA SIMULACIÓN ----------------

@@ -58,12 +58,12 @@ Si une tâche dépasse son heure limite, on décale d'abord les P2, puis les P1 
 | T03 | Répartition définitive des rôles | Les deux | dim. 15:30 | P0 | À faire | lire ce fichier ensemble et le confirmer |
 | T04 | Vérifier le nombre d'élèves et la capacité | Claude + P1 | dim. 16:00 | P0 | **Fait** | 44 élèves avant ; capacité internat = 32 × 2 = **64** ; 100–120 impossible sans nouvelles chambres |
 | T05 | Vérifier les places des salles et des chambres | Claude + P1 | dim. 16:00 | P0 | **Fait** | aulas 12 pupitres, cantine 48 → 64 places, 32 chambres = 2 lits / 2 bureaux / 2 armoires |
-| T06 | Population : 64 élèves, 6 classes, chambres de 2 | Claude + P1 | dim. 18:00 | P0 | En cours | test par heures OK (voir T07) ; reste T06b |
-| T06b | Corriger les trajets impossibles et l'horloge en vitesse rapide | Claude + P1 | dim. 18:30 | P0 | En cours | 12 trajets ratés et 3 « réapparitions » vus dans la journée continue |
-| T07 | Tests de la maquette (9 heures, journée sans saut, 3 qualités, console) | Claude + P1 | dim. 19:30 | P0 | En cours | 9 heures par saut : OK (0 chevauchement, 64/64 au lit) ; journée continue à refaire après T06b |
+| T06 | Population : 64 élèves, 6 classes, chambres de 2 | Claude + P1 | dim. 18:00 | P0 | **Fait** | `poblacion.py saltos` en Alta, Normal et Ligera : classes de 10–11 assises, 64 à la cantine, 64/64 dans leur lit, 0 chevauchement ; captures vérifiées |
+| T06b | Corriger les trajets impossibles et l'horloge en vitesse rapide | Claude + P1 | dim. 18:30 | P0 | **Fait** | journée continue 07:36→21:31 : 0 trajet impossible, 0 réapparition, 0 glissement ; 789 places atteignables **et** quittables |
+| T07 | Tests de la maquette (9 heures, journée sans saut, 3 qualités, console) | Claude + P1 | dim. 19:30 | P0 | **Fait** | 9 heures × 3 qualités OK ; journée continue OK ; `prueba_total` 51/51, `pantallas2` 21/21, `prueba_mision3` 9/9, liens 23/23, visionneuse 37/37, panneau 6 classes OK sur téléphone ; 0 erreur console |
 | T08 | Vérification du site publié (pages, menus, boutons, liens) | P2 | dim. 18:00 | P0 | À faire | grille de la section 7 |
 | T09 | Vérification du PowerPoint (17 diapos, boutons, ouverture) | P2 | dim. 19:00 | P0 | À faire | grille de la section 7 |
-| T10 | Textes oraux v1 (espagnol + français, 2 personnes) | Claude → P2 relit | dim. 19:00 | P0 | En cours | `presentacion/oral/` |
+| T10 | Textes oraux v1 (espagnol + français, 2 personnes) | Claude → P2 relit | dim. 19:00 | P0 | En cours | v1 écrite (379 / 382 mots, ~7 min 40) + PDF à imprimer ; **relecture de P2 à faire** |
 | T11 | Publication de la population sur le site | Claude + P1 | dim. 20:30 | P0 | À faire | après T07 ; vérifier la version en ligne |
 | T12 | Première lecture à voix haute des textes (chacun sa partie) | Les deux | dim. 21:30 | P1 | À faire | noter les mots difficiles |
 | T13 | Bilan du dimanche | Les deux | dim. 22:00 | P0 | À faire | section 9 |
@@ -76,7 +76,7 @@ Si une tâche dépasse son heure limite, on décale d'abord les P2, puis les P1 
 | T20 | Répartition de la parole + transitions définitives | Les deux | lun. 15:30 | P0 | À faire | tableau de `PRESENTACION_ORAL.md` |
 | T21 | Entraînement prononciation (chacun seul) | Les deux | lun. 16:30 | P1 | À faire | fiche « mots difficiles » |
 | T22 | Vérifier le fichier .pptx + test de projection (plein écran, 2e écran si possible) | P2 (+ P1 pour les boutons 3D) | lun. 18:00 | P0 | À faire | |
-| T23 | Copie de secours : .pptx + PDF sur clé USB et dans le cloud | P1 | lun. 18:30 | P0 | À faire | ouvrir la copie pour vérifier |
+| T23 | Copie de secours : .pptx + PDF sur clé USB et dans le cloud | P1 | lun. 18:30 | P0 | En cours | copie .pptx + PDF (17 pages, bâtiments visibles) dans `Sauvegardes/presentation-secours-2026-11-15` (OneDrive) ; **clé USB à faire** |
 | T24 | Répétition complète n° 1, chronométrée | Les deux | lun. 19:30 | P0 | À faire | durée notée |
 | T25 | Corrections importantes après la répétition | Les deux | lun. 20:30 | P0 | À faire | |
 | T26 | Répétition complète n° 2 | Les deux | lun. 21:00 | P1 | À faire | |
@@ -216,8 +216,11 @@ Site en ligne ouvert · PowerPoint ouvert depuis la clé USB · PDF de secours p
 
 | N° | Trouvé par | Où | Description | Priorité | Statut |
 |---|---|---|---|---|---|
-| B01 | Claude (test) | maquette, journée continue | 12 trajets impossibles et 3 personnes qui « réapparaissent » à leur destination | P0 | en cours (T06b) |
-| B02 | Claude (test) | maquette, vitesse « Muy rápido » | l'horloge n'attend pas assez une classe qui marche vers le gymnase : élèves en retard | P1 | en cours (T06b) |
+| B01 | Claude (test) | maquette, journée continue | 12 trajets impossibles et 3 personnes qui « réapparaissent » à leur destination | P0 | **corrigé** : 0 / 0 sur la journée complète |
+| B02 | Claude (test) | maquette, vitesse « Muy rápido » | l'horloge n'attend pas assez une classe qui marche vers le gymnase : élèves en retard | P1 | **corrigé** : journée continue, classes complètes à 8:15, 10:30, 14:15 |
+| B03 | Claude (test) | maquette, journée continue | 8 personnes « glissent » de 14 à 65 m quand leur nouveau trajet n'est pas encore calculé | P0 | **corrigé** : 0 saut brusque sur la journée complète |
+| B05 | Claude (test) | maquette | pendant la marche, environ 0,04 % des positions frôlent un coin de mur ou de meuble (surtout un couloir de la résidence) ; aucun mur traversé | P2 | accepté (déjà le cas avant) |
+| B04 | Claude (test) | `prueba_total.py` | le test attendait encore 4 classes | P1 | **corrigé** : 51/51 |
 
 ---
 
