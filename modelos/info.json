@@ -141,5 +141,57 @@
    9.55
   ],
   "bytes": 1385724
+ },
+ "principal-interior": {
+  "id": "principal-interior",
+  "piezas": 2994,
+  "mallas": 190,
+  "vertices": 138741,
+  "triangulos": 92336,
+  "tam": [
+   67.2,
+   7.4,
+   31.6
+  ],
+  "bytes": 6228796
+ },
+ "residencia-interior": {
+  "id": "residencia-interior",
+  "piezas": 3340,
+  "mallas": 104,
+  "vertices": 127358,
+  "triangulos": 95050,
+  "tam": [
+   18.86,
+   8,
+   42.8
+  ],
+  "bytes": 4699092
+ },
+ "gimnasio-interior": {
+  "id": "gimnasio-interior",
+  "piezas": 214,
+  "mallas": 23,
+  "vertices": 5726,
+  "triangulos": 3524,
+  "tam": [
+   32,
+   9.66,
+   27.2
+  ],
+  "bytes": 655616
+ },
+ "piscina-interior": {
+  "id": "piscina-interior",
+  "piezas": 276,
+  "mallas": 21,
+  "vertices": 7212,
+  "triangulos": 3664,
+  "tam": [
+   62,
+   8.8,
+   33.23
+  ],
+  "bytes": 786120
  }
 }

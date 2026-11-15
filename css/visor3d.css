@@ -102,3 +102,11 @@ body.embebido .v-campus { background: #fff; color: var(--marino); border: 1px so
 .v-campus-btn { align-self: flex-start; }
 body.embebido .v-ayuda { max-width: calc(100% - 330px); }
 @media (max-width: 460px) { body.embebido .v-enlaces { top: 4px; right: 4px; gap: 4px; } body.embebido .v-enlaces a { padding: 3px 7px; font-size: 10.5px; } }
+
+/* Exterior / Interior */
+.v-modo { position: absolute; top: 44px; left: 12px; z-index: 4; display: flex; padding: 3px; gap: 2px; background: rgba(255,255,255,.94); border: 1px solid var(--borde); border-radius: 999px; box-shadow: var(--sombra-suave); }
+.v-modo[hidden] { display: none !important; }
+.v-modo button { border: 0; background: transparent; color: var(--marino); font: 600 12.5px var(--texto-f); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.v-modo button[aria-pressed="true"] { background: var(--marino); color: #fff; }
+body.embebido .v-modo { top: 40px; left: 8px; }
+@media (max-width: 460px) { .v-modo { top: 6px; } .v-modo button { padding: 4px 8px; font-size: 11px; } body.embebido .v-modo { top: 30px; } }

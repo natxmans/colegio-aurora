@@ -66,6 +66,12 @@ export function saltarA(min, mismoDia = false) {
   avisar();
 }
 
+// Pasar al día siguiente (de lunes a viernes; el fin de semana los alumnos están en casa): 07:30, antes del despertar
+export function diaSiguiente() {
+  reloj.dia = (reloj.dia + 1) % 5;
+  saltarA(7 * 60 + 30, true);
+}
+
 export function hora(min = reloj.min) {
   const m = Math.floor(min) % 1440;
   return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');

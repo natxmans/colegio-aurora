@@ -3,7 +3,7 @@
 // día / noche y «¿Qué pasa ahora?» (lo que hace cada grupo, ausencias...)
 // =========================================================
 import { html, useState, useEffect, useSyncExternalStore } from '../lib.js';
-import { reloj, escuchar, avisar, hora, DIAS, RITMOS, ponerRitmo, alternarPausa, saltarA, aMin, luz } from '../sim/reloj.js';
+import { reloj, escuchar, avisar, hora, DIAS, RITMOS, ponerRitmo, alternarPausa, saltarA, aMin, luz, diaSiguiente } from '../sim/reloj.js';
 import { GRUPOS, claseDeGrupo, ausenteDe, ausencias, MATERIAS, PROFES, HORAS, periodoEn, materiaDe } from '../sim/horario.js';
 import { SIM } from '../sim/vida.js';
 import { SALAS } from '../datos/salas.js';
@@ -107,6 +107,11 @@ export function Reloj({ embebido }) {
         <button className="dia" onClick=${() => ir('11:00')}><${Icono} n="sol" size=${14} />Día</button>
         <button className="noche" onClick=${() => ir('22:30')}><${Icono} n="luna" size=${14} />Noche</button>
       </div>
+      <form className="reloj-elegir" onSubmit=${e => { e.preventDefault(); const v = e.currentTarget.elements.h.value; if (/^\d{2}:\d{2}$/.test(v)) saltarA(aMin(v), true); }}>
+        <label>Otra hora: <input name="h" type="time" min="00:00" max="23:59" step="60" defaultValue=${hora(m)} aria-label="Elegir la hora del colegio" /></label>
+        <button type="submit">Ir</button>
+        <button type="button" className="sig-dia" onClick=${diaSiguiente} title="Pasar al día siguiente (07:30)">Día siguiente →</button>
+      </form>
       <p className="reloj-desc">${mo.d}</p>
       <${QuePasa} />` : null}
   </div>`;

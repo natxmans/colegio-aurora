@@ -42,6 +42,8 @@ tourner, deux doigts pour zoomer et déplacer. Boutons Vista frontal / lateral /
 Au survol : curseur « main », le bâtiment s'éclaire un peu et une indication apparaît (il ne tourne jamais tout seul).
 Le zoom est limité et le centre de la vue reste sur le bâtiment : il ne peut pas sortir du cadre.
 Sur la couverture, le campus entier (13 Mo) ne se charge qu'en cliquant sur « Girar el campus en 3D ».
+Dans la visionneuse, bouton **Exterior / Interior** pour le bâtiment principal (rez-de-chaussée), la résidence (chambres
+de l'étage), le gymnase et la piscine : la vue extérieure garde le toit fermé, la vue intérieure l'enlève.
 
 **Refaire les modèles et le PowerPoint** (si la maquette change), avec `LANCER-LE-SITE.bat` ouvert :
 1. `python herramientas/exportar_modelos.py` → `modelos/*.glb` (zones dans `js/datos/modelos3d.js`)
@@ -79,9 +81,11 @@ Sur les 11 diapositives avec un bâtiment, le modèle 3D se manipule directement
 | Visiter un bâtiment ou une salle | clic dessus ou sur son étiquette |
 | Vues | Vista general, Planta baja, Primer piso, Residencia, Deportes, En corte (touches 1 à 6) |
 | Toits | « Quitar techos » / « Poner techos » |
+| Personnages | « Ocultar personas » / « Mostrar personas » (la simulation continue quand ils sont cachés) |
 | Visite automatique | « Visita guiada » (18 étapes) |
 | Le temps | panneau en bas à gauche : pause, Lento / Normal / Rápido / Muy rápido, Hora real |
-| Aller à une heure | « ¿Qué pasa? » → 07:45, 08:00, 10:00, 12:20, 14:00, 17:00, 21:00, Día, Noche |
+| Aller à une heure | « ¿Qué pasa? » → 07:45, 08:00, 10:00, 12:20, 14:00, 17:00, 21:00, Día, Noche, ou « Otra hora » (n'importe quelle heure) |
+| Jour suivant | « ¿Qué pasa? » → « Día siguiente » (07:30 du jour suivant, du lundi au vendredi) |
 | Voir ce que fait chaque classe | « ¿Qué pasa? » : les 4 classes, les absences, « Simular la ausencia de un profesor », « Seguir a un alumno » |
 
 Cliquer sur un élève ne fait rien (choix voulu : c'est une présentation). Les assistants des élèves

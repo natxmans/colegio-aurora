@@ -124,6 +124,7 @@ export function Explorador({ embebido = false }) {
   const vista = useEstado(s => s.vista);
   const resVista = useEstado(s => s.resVista);
   const techo = useEstado(s => s.techo);
+  const verPersonas = useEstado(s => s.verPersonas) !== false;
   const lugares = useEstado(s => s.lugares);
   const sel = useEstado(s => s.sel);
   const persona = useEstado(s => s.persona);
@@ -157,6 +158,7 @@ export function Explorador({ embebido = false }) {
       </div>`}
       ${embebido ? null : html`<div className="toggles panel">
         <button className=${!techo ? 'on' : ''} onClick=${alternarTecho} title=${techo ? 'Quitar los techos' : 'Poner los techos'}><${Icono} n="techo" /><span>${techo ? 'Quitar techos' : 'Poner techos'}</span></button>
+        <button className=${!verPersonas ? 'on' : ''} onClick=${() => poner(s => ({ verPersonas: !s.verPersonas }))} title=${verPersonas ? 'Ocultar a los alumnos y profesores (la vida sigue)' : 'Mostrar a los alumnos y profesores'}><${Icono} n="grupo" /><span>${verPersonas ? 'Ocultar personas' : 'Mostrar personas'}</span></button>
         <button className=${guiada ? 'on' : ''} onClick=${empezarGuia} title="Visita guiada"><${Icono} n="guia" /><span>Visita guiada</span></button>
         <button className=${lugares ? 'on' : ''} onClick=${alternarLugares} title="Lugares"><${Icono} n="lista" /><span>Lugares</span></button>
       </div>`}

@@ -7,6 +7,7 @@
 // =========================================================
 import { html, THREE, useFrame, useThree, useMemo, useRef } from '../lib3d.js';
 import { KIT } from './kit.js';
+import { useEstado } from '../estado.js';
 import { PUNTOS, resolverPuntos } from './puntos.js';
 import { pisos, pisosRes } from './etiquetas.js';
 import { ESTANQUE } from './Exteriores.js';
@@ -96,6 +97,7 @@ const EXTRA = {
 };
 
 export function Personas({ calidad = 'normal' }) {
+  const ver = useEstado(st => st.verPersonas) !== false;
   const cfg = NIVELES[calidad];
   const mallas = useRef({});
   const anillo = useRef(), balones = useRef();
@@ -227,7 +229,7 @@ export function Personas({ calidad = 'normal' }) {
     }
   });
 
-  return html`<group>
+  return html`<group visible=${ver}>
     ${Object.entries(GEO).map(([k, g]) => html`<instancedMesh key=${k} ref=${m => { if (m && !m.instanceColor) { m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(MAXP * (CUENTA[k] || 1) * 3).fill(1), 3); m.count = 0; } if (m) mallas.current[k] = m; }}
       args=${[g, k === 'logo' ? mats.logo : mats.base, MAXP * (CUENTA[k] || 1)]} frustumCulled=${false} castShadow=${cfg.sombras && k !== 'logo'} receiveShadow=${k !== 'logo'} raycast=${() => null} />`)}
     <instancedMesh ref=${m => { if (m && !m.instanceColor) { m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(16 * 3).fill(1), 3); m.count = 0; } balones.current = m; }}

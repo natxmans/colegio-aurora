@@ -12,7 +12,7 @@ export function encuadre(v) {
   const el = c._domElement || null;
   const w = el ? el.clientWidth : innerWidth, h = el ? el.clientHeight : innerHeight;
   cam.aspect = Math.max(0.3, w / Math.max(1, h));
-  const movil = cam.aspect < 0.9;
+  const movil = cam.aspect < 0.75;   // teléfono (vertical): la vista del campus se gira
   const c0 = (movil && CAJAS[v.ajuste + 'Movil']) || CAJAS[v.ajuste];
   const cajas = Array.isArray(c0) ? c0 : [c0];
   const box = { x0: Math.min(...cajas.map(b => b.x0)), x1: Math.max(...cajas.map(b => b.x1)), z0: Math.min(...cajas.map(b => b.z0)), z1: Math.max(...cajas.map(b => b.z1)) };
@@ -22,7 +22,10 @@ export function encuadre(v) {
   // En pantalla vertical (teléfono) giramos la cámara: el campus, que es ancho, ocupa la altura
   const girar = movil && (v.ajuste === 'principal' || v.ajuste === 'campus');
   const az = movil && v.azimutMovil != null ? v.azimutMovil : girar ? v.azimut - 1.32 : v.azimut;
-  const po = movil && v.polarMovil != null ? v.polarMovil : girar ? Math.min(v.polar, 0.8) : v.polar;
+  // Pantalla muy ancha (portátil): la cámara baja un poco. Así el campus, que es más ancho que
+  // profundo, llena mejor la anchura en vez de quedar limitado por la altura (antes: 66 % del ancho).
+  const ancho = !movil && (v.ajuste === 'principal' || v.ajuste === 'campus') ? Math.min(0.24, Math.max(0, (cam.aspect - 1.7) * 0.32)) : 0;
+  const po = movil && v.polarMovil != null ? v.polarMovil : girar ? Math.min(v.polar, 0.8) : v.polar + ancho;
   const dir = new THREE.Vector3().setFromSphericalCoords(1, po, az);
   const esquinas = [];
   for (const b of cajas) for (const x of [b.x0, b.x1]) for (const y of [b.y0, b.y1]) for (const z of [b.z0, b.z1]) esquinas.push(new THREE.Vector3(x, y, z));

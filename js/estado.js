@@ -8,6 +8,7 @@ let estado = {
   vista: 'completa',   // 'completa' | 'baja' | 'primer' | 'corte' | 'deportes' | 'residencia'
   resVista: null,      // residencia: null | 'res1' (primer piso) | 'res0' (planta baja)
   techo: true,
+  verPersonas: true,  // mostrar los personajes (si se ocultan, la vida sigue igual)
   sel: null,           // id de la sala seleccionada
   interior: false,     // cámara dentro de la sala
   noche: false,        // lo calcula la simulación (sol bajo el horizonte)

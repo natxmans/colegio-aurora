@@ -14,7 +14,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MODELOS, modelo } from './datos/modelos3d.js';
 
-const VERSION = 3; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
+const VERSION = 4; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 const embebido = q.get('embed') === '1';
@@ -23,7 +23,10 @@ const tactil = matchMedia('(pointer: coarse)').matches;
 document.body.classList.add(tactil ? 'es-tactil' : 'es-raton');
 const rad = THREE.MathUtils.degToRad;
 
-let actual = Math.max(0, MODELOS.findIndex(m => m.id === q.get('m')));
+// ?m= puede ser un edificio o su vista interior (p. ej. principal-interior)
+const pedido = modelo(q.get('m'));
+let interior = !!(pedido && pedido.exterior);
+let actual = Math.max(0, MODELOS.findIndex(m => m.id === (pedido ? (pedido.exterior || pedido.id) : null)));
 const estado = { listo: false, error: null, id: null, tocado: false };
 window.__visor = estado;
 
@@ -191,9 +194,12 @@ function liberar(o) {
     for (const mat of [].concat(m.material)) { for (const k in mat) if (mat[k] && mat[k].isTexture) mat[k].dispose(); mat.dispose(); }
   });
 }
-async function cargar(i) {
-  const m = MODELOS[i], mio = ++ficha;
+async function cargar(i, verInterior = interior) {
+  const base = MODELOS[i], mio = ++ficha;
+  interior = !!(verInterior && base.interior);
+  const m = interior ? modelo(base.interior) : base;   // vista exterior (techo cerrado) o interior (sin techo)
   actual = i; estado.listo = false; estado.id = m.id; estado.error = null; estado.tocado = false;
+  pintarModo(base);
   document.body.classList.remove('cargado');
   pintarInfo(m);
   $('v-carga').hidden = false; $('v-carga').classList.remove('error'); $('v-progreso').style.width = '4%';
@@ -236,10 +242,18 @@ async function cargar(i) {
   sucio = true;
   // el siguiente se descarga ya, para que el cambio sea rápido
   const sig = MODELOS[i + 1];
+  pintarModo(base);
   if (sig && !embebido) fetch(`modelos/${sig.id}.glb?v=${VERSION}`).catch(() => {});
 }
 
 // ---------- Interfaz ----------
+// Exterior / Interior (solo para los edificios que tienen vista interior)
+function pintarModo(base) {
+  const caja = $('v-modo');
+  caja.hidden = !base.interior;
+  for (const b of caja.querySelectorAll('button')) b.setAttribute('aria-pressed', String((b.dataset.modo === 'int') === interior));
+}
+for (const b of document.querySelectorAll('#v-modo button')) b.onclick = () => { const quiero = b.dataset.modo === 'int'; if (quiero !== interior) cargar(actual, quiero); };
 function pintarInfo(m) {
   document.title = m.nombre + ' · Colegio Pablo Picasso en 3D';
   $('v-titulo').textContent = m.nombre;
@@ -251,7 +265,7 @@ function pintarInfo(m) {
   $('v-abrir').href = 'visor3d.html?m=' + m.id;
   const enCampus = './' + (m.campus || '') + '#campus';   // mismo edificio en el campus 3D vivo (index.html)
   $('v-campus').href = enCampus; $('v-campus-mini').href = enCampus;
-  for (const b of $('v-lista').children) b.setAttribute('aria-current', String(b.dataset.id === m.id));
+  for (const b of $('v-lista').children) b.setAttribute('aria-current', String(b.dataset.id === (m.exterior || m.id)));
 }
 for (const m of MODELOS) {
   const b = document.createElement('button');
@@ -264,7 +278,7 @@ $('v-sig').onclick = () => cargar(Math.min(MODELOS.length - 1, actual + 1));
 for (const b of document.querySelectorAll('[data-vista]')) {
   b.onclick = () => {
     if (!estado.listo) return;
-    const m = MODELOS[actual], f = m.frente || 0;
+    const m = modelo(estado.id) || MODELOS[actual], f = m.frente || 0;
     const v = { frente: [f, 12], lado: [f + 90, 12], detras: [f + 180, 12], arriba: [f, 89.4], inicio: m.giro }[b.dataset.vista];
     irA(v[0], v[1]);
   };
@@ -330,7 +344,7 @@ function redimensionar() {
   const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
   renderer.setSize(w, h, false);
   camara.aspect = w / h; camara.updateProjectionMatrix();
-  if (estado.listo) { ajustarLimites(); if (!estado.tocado && !anim) irA(MODELOS[actual].giro[0], MODELOS[actual].giro[1], true); }
+  if (estado.listo) { ajustarLimites(); const mm = modelo(estado.id) || MODELOS[actual]; if (!estado.tocado && !anim) irA(mm.giro[0], mm.giro[1], true); }
   sucio = true;
 }
 new ResizeObserver(redimensionar).observe(escenaEl);

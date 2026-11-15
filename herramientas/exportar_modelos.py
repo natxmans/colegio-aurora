@@ -27,7 +27,7 @@ try:
     while time.time() - t0 < 60 and b.js(f"(async () => {E}.leer().listo3d)()") is not True:
         b.esperar(1)
     b.esperar(3)
-    modelos = json.loads(b.js(f"(async () => JSON.stringify({D}.MODELOS))()"))
+    modelos = json.loads(b.js(f"(async () => JSON.stringify({D}.TODOS))()"))   # edificios + vistas interiores
     # copia en JSON para el script del PowerPoint (nombre, descripción, ángulo de vista)
     json.dump(modelos, open(os.path.join(SALIDA, 'modelos.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     ids = [m['id'] for m in modelos]

@@ -49,7 +49,7 @@ const DIA = [
 ];
 function SeccionVida() {
   return html`<section className="seccion" id="vida">
-    <${Cabecera} num="01" etiqueta="La vida diaria" titulo="Un colegio que" grad="vive solo"
+    <${Cabecera} num="05" etiqueta="La vida diaria" titulo="Un colegio que" grad="vive solo"
       lead=${html`En la maqueta, cada alumno tiene <b>su propia rutina</b>: no hace falta hacer clic. La simulación sigue el <b>horario oficial</b> y el día y la noche cambian con la hora.`} />
     <div className="dia-linea revelar">
       ${DIA.map(p => html`<div key=${p.h} className="dia-paso">
@@ -81,7 +81,7 @@ function SeccionPermanencia() {
     setTimeout(() => ver3D('permanencia'), 300);
   };
   return html`<section className="seccion seccion-fondo" id="permanencia">
-    <${Cabecera} num="02" etiqueta="La permanencia" titulo="Cuando falta" grad="un profesor"
+    <${Cabecera} num="07" etiqueta="La permanencia" titulo="Cuando falta" grad="un profesor"
       lead=${html`Si un profesor está ausente, sus alumnos <b>no se quedan solos en un aula vacía</b>: van a la <b>permanencia</b>, en el primer piso del edificio principal.`} />
     <div className="dos-col">
       <${Puntos} items=${[
@@ -105,7 +105,7 @@ function SeccionPermanencia() {
 // ---------------- 03 · La vida escolar ----------------
 function SeccionVidaEscolar() {
   return html`<section className="seccion" id="vidaescolar">
-    <${Cabecera} num="03" etiqueta="La vida escolar" titulo="Siempre hay" grad="alguien para ayudar"
+    <${Cabecera} num="08" etiqueta="La vida escolar" titulo="Siempre hay" grad="alguien para ayudar"
       lead=${html`La <b>vida escolar</b> acompaña a los alumnos todo el día: en el colegio, en el patio y en la residencia.`} />
     <div className="rejilla rejilla-4">
       ${[
@@ -124,7 +124,7 @@ function SeccionAsistentes() {
   const [grupo, setGrupo] = useState(0);
   useEffect(() => { comprobarIA().then(setIa); }, []);
   return html`<section className="seccion seccion-fondo" id="asistentes">
-    <${Cabecera} num="04" etiqueta="Un asistente para cada alumno" titulo="El asistente" grad="de estudio"
+    <${Cabecera} num="11" etiqueta="Un asistente para cada alumno" titulo="El asistente" grad="de estudio"
       lead=${html`Cada alumno virtual tiene <b>su propio asistente</b>: explica las asignaturas, da el horario, dice dónde están los lugares y ayuda a organizar el trabajo. El alumno sigue su rutina aunque nadie hable con su asistente.`} />
     <p className=${'estado-ia revelar' + (ia && ia.ok ? ' ok' : '')}>
       ${ia === null ? 'Comprobando…' : ia.ok ? html`<b>IA conectada</b> · las respuestas vienen de un modelo de IA (pueden contener errores).`
@@ -163,7 +163,7 @@ function Plano() {
 
 function SeccionColegio() {
   return html`<section className="seccion" id="colegio">
-    <${Cabecera} num="05" etiqueta="Nuestro colegio" titulo="Un colegio moderno," grad="limpio y acogedor"
+    <${Cabecera} num="01" etiqueta="Nuestro colegio" titulo="Un colegio moderno," grad="limpio y acogedor"
       lead=${html`El <b>Colegio Pablo Picasso</b> está en España. Tiene un <b>edificio principal de dos plantas</b>, una <b>residencia</b>, patios con jardines y un gran <b>complejo deportivo</b>.`} />
     <div className="dos-col">
       <${Foto} src="fachada" alt="La entrada del Colegio Pablo Picasso" className="revelar alta" />
@@ -210,7 +210,7 @@ function TarjetaSala({ s, planta }) {
 }
 function SeccionAulas() {
   return html`<section className="seccion seccion-fondo" id="aulas">
-    <${Cabecera} num="06" etiqueta="Nuestras aulas" titulo="La planta baja:" grad="aulas y laboratorios"
+    <${Cabecera} num="02" etiqueta="Nuestras aulas" titulo="La planta baja:" grad="aulas y laboratorios"
       lead=${html`En la <b>planta baja</b> están las aulas, los laboratorios, la biblioteca digital y el comedor.`} />
     <div className="dos-col">
       <${Foto} src="aula" alt="Alumnos con ordenadores en un aula" className="revelar alta" />
@@ -228,7 +228,7 @@ function SeccionAulas() {
 // ---------------- 07 · La residencia ----------------
 function SeccionInternado() {
   return html`<section className="seccion" id="internado">
-    <${Cabecera} num="07" etiqueta="Nuestro internado" titulo="La residencia:" grad="los dormitorios"
+    <${Cabecera} num="04" etiqueta="Nuestro internado" titulo="La residencia:" grad="los dormitorios"
       lead=${html`<b>De lunes a viernes</b>, el colegio es también nuestra casa. Los dormitorios están en un <b>edificio aparte</b>: la residencia.`} />
     <div className="dos-col">
       <${Foto} src="dormitorio" alt="Una habitación con dos camas, dos escritorios y dos armarios" className="revelar alta" />
@@ -268,7 +268,7 @@ function SeccionInternado() {
 // ---------------- 08 · Complejo deportivo ----------------
 function SeccionDeportes() {
   return html`<section className="seccion seccion-fondo" id="deportes">
-    <${Cabecera} num="08" etiqueta="Nuestro complejo deportivo" titulo="Deporte" grad="todo el año"
+    <${Cabecera} num="03" etiqueta="Nuestro complejo deportivo" titulo="Deporte" grad="todo el año"
       lead=${html`El colegio tiene un <b>gimnasio cubierto</b>, un <b>campo de fútbol</b>, una <b>cancha de baloncesto</b> y una <b>piscina olímpica cubierta y climatizada</b>.`} />
     <div className="frases-deporte">
       ${FRASES_DEPORTE.map((f, i) => html`<div key=${i} className="frase-grande revelar"><span>0${i + 1}</span>${f}</div>`)}
@@ -308,7 +308,7 @@ function SeccionHorario() {
   const [act, setAct] = useState(0);
   const h = HORARIO[act];
   return html`<section className="seccion seccion-fondo horario" id="horario">
-    <${Cabecera} num="10" etiqueta="Nuestro horario" titulo="Un día en el" grad="internado" centro
+    <${Cabecera} num="06" etiqueta="Nuestro horario" titulo="Un día en el" grad="internado" centro
       lead="Haz clic en una hora para descubrir el momento del día." />
     <div className="linea-tiempo revelar" role="tablist">
       ${HORARIO.map((p, i) => html`<button key=${p.hora} role="tab" aria-selected=${i === act} className=${'paso' + (i === act ? ' activo' : '')} onClick=${() => setAct(i)}>
@@ -349,7 +349,7 @@ const FotoUniforme = () => html`<div className="visor visor-foto"><img src="img/
 
 function SeccionUniforme() {
   return html`<section className="seccion" id="uniforme">
-    <${Cabecera} num="11" etiqueta="Nuestro uniforme" titulo="El uniforme y" grad="la ropa de diario"
+    <${Cabecera} num="10" etiqueta="Nuestro uniforme" titulo="El uniforme y" grad="la ropa de diario"
       lead=${html`De <b>lunes a viernes</b> llevamos el uniforme. <b>El fin de semana</b>, en casa, llevamos ropa cómoda.`} />
     <div className="dos-fotos">
       <figure className="foto-pie revelar"><${Foto} src="uniforme" alt="El uniforme: polo blanco, chaqueta azul marino con el logo, pantalón azul marino y zapatos" />
@@ -422,17 +422,17 @@ export function Sitio() {
   }, []);
   return html`
     <div className="contenido">
-      <${SeccionVida} />
-      <${SeccionPermanencia} />
-      <${SeccionVidaEscolar} />
-      <${SeccionAsistentes} />
       <${SeccionColegio} />
       <${SeccionAulas} />
-      <${SeccionInternado} />
       <${SeccionDeportes} />
-      <${SeccionAsignaturas} />
+      <${SeccionInternado} />
+      <${SeccionVida} />
       <${SeccionHorario} />
+      <${SeccionPermanencia} />
+      <${SeccionVidaEscolar} />
+      <${SeccionAsignaturas} />
       <${SeccionUniforme} />
+      <${SeccionAsistentes} />
       <${SeccionIdeal} />
     </div>
     <${Pie} />
