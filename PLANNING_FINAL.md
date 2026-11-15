@@ -145,7 +145,7 @@ Format : **fichiers · avant elle · résultat attendu · test de fin.**
 - **T16 Choisir les corrections** — section 8 · T15 · une liste courte, P0 d'abord.
 - **T17 Bugs importants** — `js/`, `css/`, `index.html` selon le bug · T16 · bugs P0 corrigés · tests relancés (51 tests, liens, population).
 - **T18 Population à l'écran** — maquette · T17 · seulement si T17 a modifié la maquette (sinon c'est déjà prouvé par T04–T06) · « Otra hora » à 8:15, 12:40, 21:30 + `poblacion.py jornada` en arrière-plan : 0 trajet impossible, 0 glissement.
-- **T19 Publication** — dépôt GitHub · T17, T18 · version en ligne à jour · `prueba_total.py https://natxmans.github.io/colegio-aurora/` = 51/51.
+- **T19 Publication** — dépôt GitHub · T17, T18 · version en ligne à jour · `prueba_total.py https://natxmans.github.io/colegio-pablo-picasso/` = 51/51.
 - **T20 Textes de l'oral** — `herramientas/generar_oral.py` → `presentacion/oral/*` · T12 · phrases simples et justes · chaque phrase correspond à la diapositive projetée.
 - **T21 Répartition de la parole** — `PRESENTACION_ORAL.md` · T20 · chacun sait ses diapositives, ses transitions, qui clique · lecture enchaînée des transitions sans hésiter.
 - **T22 Entraînement** — `PERSONA_1` / `PERSONA_2` · T21 · chacun lit son texte en entier sans bloquer · une lecture chronométrée chacun.
@@ -183,7 +183,7 @@ Liens    : T12 → T20 → T21 → T22 et T23 ; T23 → T24 → T25
 
 ## 7. Grilles de vérification
 
-### Site — https://natxmans.github.io/colegio-aurora/
+### Site — https://natxmans.github.io/colegio-pablo-picasso/
 
 | Vérification | OK ? |
 |---|---|
@@ -225,6 +225,7 @@ Site en ligne ouvert · PowerPoint ouvert depuis la clé USB · PDF de secours p
 | B03 | test automatique | maquette, journée continue | 8 personnes « glissaient » de 14 à 65 m quand leur nouveau trajet n'était pas encore calculé | P0 | **corrigé** : 0 saut brusque sur la journée complète |
 | B04 | test automatique | `prueba_total.py` | le test attendait encore 4 classes | P1 | **corrigé** : 51/51 |
 | B05 | test automatique | maquette | pendant la marche, environ 0,04 % des positions frôlent un coin de mur ou de meuble (surtout un couloir de la résidence) ; aucun mur traversé | P2 | accepté (déjà le cas avant) |
+| B06 | vérification du planning | GitHub | Le dépôt a été renommé vers 18 h 09 (`colegio-aurora` → `colegio-pablo-picasso`) : l'ancienne adresse du site renvoie **404**. Le site marche à la nouvelle adresse, mais les **22 boutons du PowerPoint** (« Girar en 3D », « Ver en el campus 3D ») et le PDF de secours pointent encore vers l'ancienne. Décision à prendre : (A) redonner au dépôt le nom `colegio-aurora`, ou (B) mettre les liens du PowerPoint à la nouvelle adresse (modification du PowerPoint, après copie de sauvegarde) | P0 | **décision à prendre** (avant T23) |
 
 ---
 
