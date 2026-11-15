@@ -68,7 +68,7 @@ export function Campus3D() {
       clearInterval(tm); clearTimeout(espera);
       tm = setInterval(() => { if (leer().listo3d) { clearInterval(tm); return; } i = (i + 1) % MENSAJES.length; p = Math.min(92, p + (92 - p) * 0.14); if (window.__progreso3d) window.__progreso3d(p, MENSAJES[i]); }, 700);
       if (window.__progreso3d) window.__progreso3d(6, MENSAJES[0]);
-      espera = setTimeout(() => { if (!leer().listo3d && window.__errorSitio) window.__errorSitio('La maqueta 3D tarda mucho en cargar. Comprueba la conexión a Internet; la presentación sigue disponible arriba.', recargarPagina); }, 70000);
+      espera = setTimeout(() => { if (!leer().listo3d && window.__errorSitio) clearInterval(tm); if (!leer().listo3d && window.__errorSitio) window.__errorSitio('La maqueta 3D tarda mucho en cargar (conexión lenta o sin Internet). Puedes esperar un poco más o pulsar «Reintentar»; la presentación sigue disponible arriba.', recargarPagina); }, 25000);
       let intento = 0;
       const importar = () => {
         intento++;

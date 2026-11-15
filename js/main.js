@@ -5,7 +5,7 @@
 // =========================================================
 import { html, createRoot } from './lib.js';
 import { poner, seleccionar, abrirExplorador } from './estado.js';
-import { SALAS, VISTAS } from './datos/salas.js';
+import { SALAS, VISTAS, RECORRIDO } from './datos/salas.js';
 import { saltarA, aMin, ponerRitmo, RITMOS } from './sim/reloj.js';
 import { Sitio } from './ui/Secciones.js';
 import { Campus3D } from './ui/Campus3D.js';
@@ -27,7 +27,15 @@ function montar() {
   enlaceDirecto();
 }
 
-// Enlaces directos: ?hora=10:00 · ?vista=completa|baja|primer|corte|deportes|residencia · ?sala=mates (&dentro=1) · ?ritmo=rapido · ?seccion=vida
+// Visita guiada del campus 3D (botón de la página de inicio y enlace ?visita=guiada)
+export function visitaGuiada() {
+  const c = document.getElementById('campus'); if (c) c.scrollIntoView({ behavior: 'smooth' });
+  if (window.__empezar3d) window.__empezar3d();
+  seleccionar(RECORRIDO[0]); poner({ guiada: true });
+}
+window.__visitaGuiada = visitaGuiada;
+
+// Enlaces directos: ?hora=10:00 · ?vista=completa|baja|primer|corte|deportes|residencia · ?sala=mates (&dentro=1) · ?ritmo=rapido · ?seccion=vida · ?visita=guiada
 function enlaceDirecto() {
   const q = new URLSearchParams(location.search);
   const h = q.get('hora');
@@ -35,7 +43,8 @@ function enlaceDirecto() {
   if (q.get('ritmo') && RITMOS[q.get('ritmo')]) ponerRitmo(q.get('ritmo'));
   if (q.get('techo') === '0') poner({ techo: false });
   const vista = q.get('vista'), sala = q.get('sala'), seccion = q.get('seccion');
-  if (sala && SALAS[sala]) { if (window.__empezar3d) window.__empezar3d(); seleccionar(sala, { interior: q.get('dentro') === '1' }); }
+  if (q.get('visita') === 'guiada') visitaGuiada();
+  else if (sala && SALAS[sala]) { if (window.__empezar3d) window.__empezar3d(); seleccionar(sala, { interior: q.get('dentro') === '1' }); }
   else if (vista && VISTAS[vista]) { if (window.__empezar3d) window.__empezar3d(); abrirExplorador(vista); }
   else if (seccion) setTimeout(() => { const el = document.getElementById(seccion); if (el) el.scrollIntoView(); }, 400);
 }
