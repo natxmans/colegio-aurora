@@ -1,13 +1,17 @@
 # =========================================================
-# ANADE LOS EDIFICIOS EN 3D AL POWERPOINT
-# Parte de la presentacion de 12 diapositivas (base-12-diapositivas.pptx) y,
-# siguiendo plan-3d.json:
-#   - cambia la foto de cada diapositiva de edificio por el MODELO 3D real
-#     (los mismos modelos que la maqueta del sitio: modelos/<id>.glb)
-#   - anade una diapositiva por edificio que no tenia la suya
-#   - pone un boton "Girar en 3D" que abre el visor 3D del sitio
-# Despues guarda presentacion/nuestro_colegio_ideal.pptx y exporta las
-# imagenes de las diapositivas para el sitio (img/diapositivas).
+# CONSTRUYE EL POWERPOINT CON LOS EDIFICIOS EN 3D (version 2)
+# Parte de la presentacion original de 12 diapositivas (base-12-diapositivas.pptx)
+# y sigue plan-3d.json, diapositiva por diapositiva y EN ESE ORDEN:
+#   portada : el campus en 3D en lugar de la foto
+#   3d      : titulo + tarjeta de texto corta + zona 3D GRANDE con el modelo real
+#             (modelos/<id>.glb = los mismos modelos que el sitio) + botones
+#             "Girar en 3D" (visor del sitio) y "Ver en el campus 3D" (campus vivo)
+#   imagen  : diapositiva original con una imagen del campus real en vez de la foto
+#   igual   : diapositiva original (solo cambia el numero del titulo)
+# Los modelos se escalan para ocupar la zona SIN salir nunca de ella: se prueban
+# 40 orientaciones y se usa la mas grande (PowerPoint ajusta el marco al girar).
+# Despues: presentacion/nuestro_colegio_ideal.pptx, imagenes de las diapositivas
+# para el sitio (img/diapositivas) y js/datos/diapositivas3d.json.
 # Necesita PowerPoint (Microsoft 365). Uso: powershell -File anadir_3d.ps1
 # (Los textos con acentos estan en plan-3d.json y modelos/modelos.json.)
 # =========================================================
@@ -15,15 +19,17 @@ $ErrorActionPreference = 'Stop'
 $raiz = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $plan = Get-Content (Join-Path $PSScriptRoot 'plan-3d.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $modelos = Get-Content (Join-Path $raiz 'modelos\modelos.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$info = Get-Content (Join-Path $raiz 'modelos\info.json') -Raw -Encoding UTF8 | ConvertFrom-Json   # tamano de cada modelo (m)
 $base = Join-Path $PSScriptRoot 'base-12-diapositivas.pptx'
+$imagenes = Join-Path $PSScriptRoot 'imagenes'
 $trabajo = Join-Path $env:TEMP ('colegio-3d-' + [guid]::NewGuid().ToString('N').Substring(0, 8) + '.pptx')
 $salida = Join-Path $raiz 'presentacion\nuestro_colegio_ideal.pptx'
 $imgDir = Join-Path $raiz 'img\diapositivas'
 $T = $plan.textos
+$BULLET = [string][char]0x2022 + '  '
 
 function Color([int]$r, [int]$g, [int]$b) { return $r + 256 * $g + 65536 * $b }
-$MARINO = Color 20 40 90; $GRIS = Color 91 100 120; $BORDE = Color 208 216 222; $BLANCO = Color 255 255 255; $BEIGE = Color 236 226 207
+$MARINO = Color 20 40 90; $GRIS = Color 91 100 120; $BORDE = Color 208 216 222; $BLANCO = Color 255 255 255
+$BEIGE = Color 236 226 207; $ARENA = Color 201 169 120; $TEXTO = Color 44 62 80
 
 # Angulos de PowerPoint (X, Y, Z) para ver el modelo desde [azimut, altura] como en el visor 3D.
 # PowerPoint gira el modelo con R = Rz . Ry . Rx; queremos R = Rx(altura) . Ry(-azimut).
@@ -34,110 +40,136 @@ function Angulos([double]$az, [double]$alt) {
   return @(($alpha * 180 / [math]::PI), ($beta * 180 / [math]::PI), ($gamma * 180 / [math]::PI))
 }
 function Modelo($id) { foreach ($m in $modelos) { if ($m.id -eq $id) { return $m } }; throw "Modelo desconocido: $id" }
+function PonerTitulo($sl, $texto) { $sl.Shapes.Item('TextBox 1').TextFrame.TextRange.Paragraphs(2).Text = $texto }
+
+function Boton($sl, [double]$L, [double]$Tp, [double]$W, [double]$H, $texto, $url, $pista, [bool]$principal) {
+  $b = $sl.Shapes.AddShape(5, $L, $Tp, $W, $H)
+  $b.Adjustments.Item(1) = 0.5
+  $b.Fill.Solid(); $b.Fill.Transparency = 0; $b.Shadow.Visible = 0
+  if ($principal) { $b.Fill.ForeColor.RGB = $MARINO; $b.Line.Visible = 0 } else { $b.Fill.ForeColor.RGB = $BLANCO; $b.Line.ForeColor.RGB = $MARINO; $b.Line.Weight = 1 }
+  $b.TextFrame.MarginLeft = 4; $b.TextFrame.MarginRight = 4; $b.TextFrame.MarginTop = 0; $b.TextFrame.MarginBottom = 0; $b.TextFrame.WordWrap = 0
+  $r = $b.TextFrame.TextRange; $r.Text = $texto
+  $r.Font.Name = 'Arial'; $r.Font.Size = 10.5; $r.Font.Bold = -1; $r.Font.Color.RGB = $(if ($principal) { $BLANCO } else { $MARINO })
+  $r.ParagraphFormat.Alignment = 2
+  $b.ActionSettings.Item(1).Hyperlink.Address = $url
+  $b.ActionSettings.Item(1).Hyperlink.ScreenTip = $pista
+  return $b
+}
 
 function ZonaDe3D($sl, [double]$L, [double]$Tp, [double]$W, [double]$H, $m) {
   # quitar las fotos de la diapositiva
-  for ($i = $sl.Shapes.Count; $i -ge 1; $i--) { $s = $sl.Shapes.Item($i); if ($s.Type -eq 13) { $s.Delete() } }
-  # fondo de la zona 3D: blanco arriba, beige abajo, borde fino como las tarjetas
+  for ($i = $sl.Shapes.Count; $i -ge 1; $i--) { $s = $sl.Shapes.Item($i); if ($s.Type -eq 13 -and $s.Width -gt 200) { $s.Delete() } }
+  # fondo de la zona 3D: blanco arriba, beige abajo, borde fino como las tarjetas. TODA la zona es para el modelo.
   $p = $sl.Shapes.AddShape(5, $L, $Tp, $W, $H)
   $p.Name = 'Zona 3D'
-  $p.Adjustments.Item(1) = 0.045
+  $p.Adjustments.Item(1) = 0.04
   $p.Fill.TwoColorGradient(1, 1); $p.Fill.ForeColor.RGB = $BLANCO; $p.Fill.BackColor.RGB = $BEIGE
-  $p.Line.ForeColor.RGB = $BORDE; $p.Line.Weight = 0.75
-  $p.Shadow.Visible = 0
-  # leyenda
-  $ley = $sl.Shapes.AddTextbox(1, $L + 12, $Tp + $H - 36, $W - 168, 30)
-  $ley.Name = 'Leyenda 3D'
-  $ley.TextFrame.WordWrap = -1; $ley.TextFrame.AutoSize = 0
-  $ley.TextFrame.MarginLeft = 4; $ley.TextFrame.MarginRight = 0; $ley.TextFrame.MarginTop = 0; $ley.TextFrame.MarginBottom = 0; $ley.TextFrame.VerticalAnchor = 3
-  $r = $ley.TextFrame.TextRange; $r.Text = $T.leyenda
-  $r.Font.Name = 'Arial'; $r.Font.Size = 9.5; $r.Font.Color.RGB = $GRIS
-  # boton que abre el visor 3D del sitio (funciona tambien durante la presentacion)
-  $b = $sl.Shapes.AddShape(5, $L + $W - 150, $Tp + $H - 36, 136, 26)
-  $b.Name = 'Boton Girar en 3D'
-  $b.Adjustments.Item(1) = 0.5
-  $b.Fill.Solid(); $b.Fill.ForeColor.RGB = $MARINO; $b.Fill.Transparency = 0; $b.Line.Visible = 0; $b.Shadow.Visible = 0
-  $b.TextFrame.MarginLeft = 4; $b.TextFrame.MarginRight = 4; $b.TextFrame.MarginTop = 0; $b.TextFrame.MarginBottom = 0
-  $rb = $b.TextFrame.TextRange; $rb.Text = $T.boton
-  $rb.Font.Name = 'Arial'; $rb.Font.Size = 11; $rb.Font.Bold = -1; $rb.Font.Color.RGB = $BLANCO
-  $rb.ParagraphFormat.Alignment = 2
-  $b.ActionSettings.Item(1).Hyperlink.Address = $plan.url + $m.id
-  $b.ActionSettings.Item(1).Hyperlink.ScreenTip = $T.pista
-  # el modelo 3D
-  $iL = $L + 10; $iT = $Tp + 10; $iW = $W - 20; $iH = $H - 10 - 44
+  $p.Line.ForeColor.RGB = $BORDE; $p.Line.Weight = 0.75; $p.Shadow.Visible = 0
+  $iL = $L + 8; $iT = $Tp + 8; $iW = $W - 16; $iH = $H - 16
   $glb = Join-Path $raiz ('modelos\' + $m.id + '.glb')
   $sh = $sl.Shapes.Add3DModel($glb, 0, -1, $iL, $iT, $iW, $iH)
-  # Tamano: PowerPoint ajusta el marco al modelo cada vez que se gira (el edificio nunca se corta).
-  # Para que el marco tampoco salga NUNCA de la zona, el modelo se escala para que su
-  # diagonal quepa en la zona: asi cabe girado en cualquier direccion.
-  # Visto desde arriba (poca profundidad, casi sin perspectiva) el marco mide el ancho x el largo reales del modelo.
-  $tam = @($info.($m.id).tam | ForEach-Object { [double]$_ })
-  $sh.Model3D.RotationX = 90; $sh.Model3D.RotationY = 0; $sh.Model3D.RotationZ = 0
-  $escala = [math]::Min([double]$sh.Width / $tam[0], [double]$sh.Height / $tam[2])   # puntos por metro ahora
-  $diag = [math]::Sqrt($tam[0] * $tam[0] + $tam[1] * $tam[1] + $tam[2] * $tam[2])
-  $objetivo = 0.95 * [math]::Min($iW, $iH) / $diag                             # puntos por metro deseados
-  $ang = Angulos $m.giro[0] $m.giro[1]
-  $sh.Model3D.RotationX = $ang[0]; $sh.Model3D.RotationY = $ang[1]; $sh.Model3D.RotationZ = $ang[2]
   $sh.LockAspectRatio = -1
-  $sh.Width = [single]([double]$sh.Width * $objetivo / $escala)
+  # Tamano maximo que cabe en la zona en TODAS las vistas que se obtienen girando con el raton:
+  # dar la vuelta al edificio (azimut 0-360) e inclinar la vista (altura -20 a 90, hasta el tejado).
+  # PowerPoint ajusta el marco al modelo cada vez que se gira: asi el edificio no se corta y el
+  # marco no sale de la zona. (Prueba real con el raton: una vista del tejado en diagonal hacia
+  # salir el marco con la version anterior, que solo probaba giros alrededor de X y de Y.)
+  $maxW = 0; $maxH = 0
+  foreach ($alt in -20, 0, 20, 40, 60, 75, 90) { foreach ($az in 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340) {
+    $g = Angulos $az $alt
+    $sh.Model3D.RotationX = [single]$g[0]; $sh.Model3D.RotationY = [single]$g[1]; $sh.Model3D.RotationZ = [single]$g[2]
+    if ($sh.Width -gt $maxW) { $maxW = $sh.Width }; if ($sh.Height -gt $maxH) { $maxH = $sh.Height }
+  } }
+  $f = 0.985 * [math]::Min($iW / $maxW, $iH / $maxH)
+  $ang = Angulos $m.giro[0] $m.giro[1]
+  # (siempre en [single]: PowerShell no convierte bien otros tipos para estas propiedades)
+  $sh.Model3D.RotationX = [single]$ang[0]; $sh.Model3D.RotationY = [single]$ang[1]; $sh.Model3D.RotationZ = [single]$ang[2]
+  $sh.Width = [single]([double]$sh.Width * $f)
   $cx = $iL + $iW / 2; $cy = $iT + $iH / 2
   $sh.Left = [single]($cx - $sh.Width / 2); $sh.Top = [single]($cy - $sh.Height / 2)
   $sh.Name = 'Modelo 3D - ' + $m.id
-  $sh.AlternativeText = 'Modelo 3D: ' + $m.nombre + ' (Colegio Pablo Picasso)'
+  $sh.AlternativeText = 'Modelo 3D: ' + $m.nombre + ' (Colegio Pablo Picasso). Se puede girar.'
   return $sh
+}
+
+# Instrucciones + botones (fuera de la zona 3D, en la columna de la izquierda)
+function Mandos($sl, [double]$x, [double]$y, [double]$w, $m, $leyenda, [bool]$apilar) {
+  $ley = $sl.Shapes.AddTextbox(1, $x, $y, $w, 26)
+  $ley.Name = 'Leyenda 3D'
+  $ley.TextFrame.WordWrap = -1; $ley.TextFrame.AutoSize = 0; $ley.TextFrame.VerticalAnchor = 3
+  $ley.TextFrame.MarginLeft = 2; $ley.TextFrame.MarginRight = 0; $ley.TextFrame.MarginTop = 0; $ley.TextFrame.MarginBottom = 0
+  $r = $ley.TextFrame.TextRange; $r.Text = $leyenda
+  $r.Font.Name = 'Arial'; $r.Font.Size = 10; $r.Font.Italic = -1; $r.Font.Color.RGB = $GRIS
+  if ($apilar) { $an = $w; $x2 = $x; $y1 = $y + 30; $y2 = $y + 58 } else { $an = ($w - 8) / 2; $x2 = $x + $an + 8; $y1 = $y + 32; $y2 = $y + 32 }
+  $b1 = Boton $sl $x $y1 $an 24 $T.botonGirar ($plan.url + 'visor3d.html?m=' + $m.id) $T.pistaGirar $true
+  $b1.Name = 'Boton Girar en 3D'
+  $b2 = Boton $sl $x2 $y2 $an 24 $T.botonCampus ($plan.url + $m.campus + '#campus') $T.pistaCampus $false
+  $b2.Name = 'Boton Ver en el campus'
+}
+
+function TarjetaTexto($c, $lineas, [double]$tamTitulo, [double]$tamTexto) {
+  $tr = $c.TextFrame.TextRange
+  $p1 = $tr.Paragraphs(1); $p1.Characters(1, $p1.Length - 1).Text = $lineas[0]
+  $tr.Paragraphs(2).Text = $BULLET + $lineas[1]
+  for ($k = 2; $k -lt $lineas.Count; $k++) { $tr.InsertAfter("`r" + $BULLET + $lineas[$k]) | Out-Null }
+  $tr.Paragraphs(1).Font.Size = $tamTitulo; $tr.Paragraphs(1).ParagraphFormat.SpaceAfter = 8
+  for ($k = 2; $k -le $tr.Paragraphs().Count; $k++) { $p = $tr.Paragraphs($k); $p.Font.Size = $tamTexto; $p.ParagraphFormat.SpaceAfter = 7 }
 }
 
 Copy-Item $base $trabajo -Force
 $app = New-Object -ComObject PowerPoint.Application
 $pres = $app.Presentations.Open($trabajo, 0, 0, 0)
 try {
-  # 1) identificar las 12 diapositivas de la base
   $ids = @{}
   for ($i = 1; $i -le $pres.Slides.Count; $i++) { $ids[$i] = $pres.Slides.Item($i).SlideID }
-  # 2) crear las diapositivas nuevas (copias de la diapositiva de su seccion, colocadas detras)
-  $ultimo = @{}
+  $originales = @($ids.Values)
+  function Copia($n) { $s = $pres.Slides.FindBySlideID($ids[$n]); $d = $s.Duplicate().Item(1); $d.MoveTo($pres.Slides.Count); return $d }
+
   foreach ($e in $plan.diapositivas) {
-    if ($e.tras) {
-      $padre = $pres.Slides.FindBySlideID($ids[[int]$e.tras])
-      $antes = if ($ultimo.ContainsKey([int]$e.tras)) { $pres.Slides.FindBySlideID($ultimo[[int]$e.tras]) } else { $padre }
-      $dup = $padre.Duplicate().Item(1)   # la copia aparece justo detras de la seccion
-      $d = $dup.SlideIndex; $a = $antes.SlideIndex
-      if ($d -lt $a) { $dup.MoveTo($a) } elseif ($d -gt $a + 1) { $dup.MoveTo($a + 1) }   # detras de la ultima copia
-      $ultimo[[int]$e.tras] = $dup.SlideID
-      $e | Add-Member -NotePropertyName id -NotePropertyValue $dup.SlideID -Force
-    } else {
-      $e | Add-Member -NotePropertyName id -NotePropertyValue $ids[[int]$e.base] -Force
-    }
-  }
-  # 3) poner los modelos 3D
-  foreach ($e in $plan.diapositivas) {
-    $sl = $pres.Slides.FindBySlideID($e.id)
-    $m = Modelo $e.modelo
-    if ($e.tras) {
-      # diapositiva nueva: titulo + una tarjeta con la descripcion + una zona 3D grande
-      $sl.Shapes.Item('TextBox 1').TextFrame.TextRange.Paragraphs(2).Text = $e.titulo
-      for ($i = $sl.Shapes.Count; $i -ge 1; $i--) {
-        $s = $sl.Shapes.Item($i)
-        if ($s.Type -eq 1 -and $s.Name -ne 'Rounded Rectangle 3') { $s.Delete() }
+    switch ($e.tipo) {
+      'portada' {
+        $sl = Copia 1
+        ZonaDe3D $sl 446.4 36 477.6 468 (Modelo $e.modelo) | Out-Null
+        Mandos $sl 57.6 404 372 (Modelo $e.modelo) $T.leyendaPortada $false
       }
-      $c = $sl.Shapes.Item('Rounded Rectangle 3')
-      $c.Left = 43.2; $c.Top = 115.2; $c.Width = 273.6; $c.Height = 381.6
-      $c.TextFrame.VerticalAnchor = 3
-      $tr = $c.TextFrame.TextRange
-      $p1 = $tr.Paragraphs(1); $p1.Characters(1, $p1.Length - 1).Text = $m.nombre
-      $tr.Paragraphs(2).Text = [string][char]0x2022 + '  ' + $m.desc
-      $tr.InsertAfter("`r" + [string][char]0x2022 + '  ' + $T.consejo) | Out-Null
-      $tr.Paragraphs(1).Font.Size = 18; $tr.Paragraphs(1).ParagraphFormat.SpaceAfter = 6
-      $tr.Paragraphs(2).Font.Size = 14.5; $tr.Paragraphs(2).ParagraphFormat.SpaceAfter = 10
-      $tr.Paragraphs(3).Font.Size = 11.5; $tr.Paragraphs(3).Font.Italic = -1; $tr.Paragraphs(3).Font.Color.RGB = $GRIS
-      ZonaDe3D $sl 331.2 115.2 583.2 381.6 $m | Out-Null
-    } else {
-      ZonaDe3D $sl 489.6 115.2 424.8 381.6 $m | Out-Null
+      'igual' { $sl = Copia $e.base; PonerTitulo $sl $e.titulo }
+      'imagen' {
+        $sl = Copia $e.base; PonerTitulo $sl $e.titulo
+        $f = $null; foreach ($s in $sl.Shapes) { if ($s.Type -eq 13 -and $s.Width -gt 200) { $f = $s } }
+        $L = $f.Left; $Tp = $f.Top; $W = $f.Width; $H = $f.Height; $f.Delete()
+        $img = $sl.Shapes.AddPicture((Join-Path $imagenes $e.imagen), 0, -1, $L, $Tp, $W, $H)
+        $img.Name = 'Imagen del campus 3D'
+        $img.AlternativeText = 'Imagen del campus 3D del sitio (Colegio Pablo Picasso)'
+        $img.Line.Visible = 0
+        if ($e.tarjetaExtra) {
+          # una tarjeta mas (copia del estilo de las otras) y las tarjetas se reparten la altura
+          $cards = @(); foreach ($s in $sl.Shapes) { if ($s.Type -eq 1 -and $s.HasTextFrame -and $s.Left -lt 100) { $cards += $s } }
+          $nueva = $cards[$cards.Count - 1].Duplicate().Item(1)
+          $tr = $nueva.TextFrame.TextRange
+          $p1 = $tr.Paragraphs(1); $p1.Characters(1, $p1.Length - 1).Text = $e.tarjetaExtra[0]
+          $tr.Paragraphs(2).Text = $BULLET + $e.tarjetaExtra[1]
+          $cards += $nueva
+          $y0 = 115.2; $hueco = 10.8; $alto = (381.6 - $hueco * ($cards.Count - 1)) / $cards.Count
+          for ($k = 0; $k -lt $cards.Count; $k++) { $cards[$k].Left = 43.2; $cards[$k].Width = 424.8; $cards[$k].Top = $y0 + $k * ($alto + $hueco); $cards[$k].Height = $alto }
+        }
+      }
+      '3d' {
+        $sl = Copia 4; PonerTitulo $sl $e.titulo
+        for ($i = $sl.Shapes.Count; $i -ge 1; $i--) { $s = $sl.Shapes.Item($i); if ($s.Type -eq 1 -and $s.Name -ne 'Rounded Rectangle 3') { $s.Delete() } }
+        $c = $sl.Shapes.Item('Rounded Rectangle 3')
+        $c.Left = 43.2; $c.Top = 115.2; $c.Width = 230.4; $c.Height = 306
+        $c.TextFrame.VerticalAnchor = 3; $c.TextFrame.MarginLeft = 14; $c.TextFrame.MarginRight = 12
+        TarjetaTexto $c $e.tarjeta 17 13.5
+        Mandos $sl 43.2 430 230.4 (Modelo $e.modelo) $T.leyenda $true
+        ZonaDe3D $sl 288 108 628.8 408 (Modelo $e.modelo) | Out-Null
+      }
     }
-    Write-Output ("diapositiva {0,2}: {1}" -f $sl.SlideIndex, $m.nombre)
+    $m3 = $null; foreach ($s in $sl.Shapes) { if ($s.Type -eq 30) { $m3 = $s.Name } }
+    Write-Output ("diapositiva {0,2}: {1} {2}" -f $sl.SlideIndex, $e.tipo, $m3)
   }
+  # quitar las 12 diapositivas originales (ya copiadas y modificadas)
+  foreach ($id in $originales) { $pres.Slides.FindBySlideID($id).Delete() }
   $pres.Save()
-  # 4) imagenes para el sitio
   Get-ChildItem $imgDir -Filter 'diapositiva-*.jpg' | Remove-Item
   for ($i = 1; $i -le $pres.Slides.Count; $i++) {
     $pres.Slides.Item($i).Export((Join-Path $imgDir ('diapositiva-{0:D2}.jpg' -f $i)), 'JPG', 1600, 900)
@@ -146,8 +178,7 @@ try {
 } finally {
   $pres.Close(); $app.Quit()
 }
-# 5) PowerPoint guarda los modelos sin comprimir: se vuelve a comprimir el archivo
-#    (mismo contenido, mismo orden; PowerPoint lo abre igual) -> unos 25 MB menos
+# PowerPoint guarda los modelos sin comprimir: se vuelve a comprimir el archivo (mismo contenido)
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $comprimido = $trabajo + '.zip'
 $zin = [System.IO.Compression.ZipFile]::OpenRead($trabajo)
@@ -162,6 +193,4 @@ try {
 Copy-Item $comprimido $salida -Force
 Remove-Item $trabajo, $comprimido
 Write-Output ('guardado: ' + $salida + ' (' + [math]::Round((Get-Item $salida).Length / 1MB, 1) + ' MB)')
-
-# 6) posiciones de las zonas 3D para la presentacion del sitio
 & (Join-Path $PSScriptRoot 'zonas_3d.ps1')

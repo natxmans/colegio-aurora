@@ -17,7 +17,7 @@ const TIPO_MAT = new Map([[MAT.mate, 'mate'], [MAT.brillo, 'brillo'], [MAT.metal
 // materiales del kit → glTF (mismos valores que en el sitio)
 const PBR = {
   mate: { roughness: 0.78, metalness: 0.02 }, brillo: { roughness: 0.26, metalness: 0.12 }, metal: { roughness: 0.3, metalness: 0.85 },
-  plano: { roughness: 0.85, metalness: 0 }, vidrio: { roughness: 0.04, metalness: 0.6, opacity: 0.2 }, vidrioT: { roughness: 0.12, metalness: 0.35, opacity: 0.66 },
+  plano: { roughness: 0.85, metalness: 0 }, vidrio: { roughness: 0.04, metalness: 0.6, opacity: MAT.vidrio.opacity }, vidrioT: { roughness: 0.12, metalness: 0.35, opacity: MAT.vidrioT.opacity },
   luz: { roughness: 0.9, metalness: 0, luz: true },
 };
 

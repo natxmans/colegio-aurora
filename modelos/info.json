@@ -10,7 +10,7 @@
    16.6,
    116.83
   ],
-  "bytes": 13424296
+  "bytes": 13424240
  },
  "principal": {
   "id": "principal",
@@ -23,7 +23,7 @@
    10.8,
    31.6
   ],
-  "bytes": 9305820
+  "bytes": 9305824
  },
  "aula": {
   "id": "aula",
@@ -62,7 +62,7 @@
    9.26,
    42.8
   ],
-  "bytes": 4890468
+  "bytes": 4890464
  },
  "habitacion": {
   "id": "habitacion",
@@ -80,7 +80,7 @@
  "gimnasio": {
   "id": "gimnasio",
   "piezas": 235,
-  "mallas": 26,
+  "mallas": 25,
   "vertices": 7142,
   "triangulos": 4072,
   "tam": [
@@ -88,7 +88,7 @@
    13.07,
    27.2
   ],
-  "bytes": 695828
+  "bytes": 694844
  },
  "piscina": {
   "id": "piscina",
@@ -101,7 +101,7 @@
    13.8,
    33.23
   ],
-  "bytes": 877612
+  "bytes": 877608
  },
  "pistas": {
   "id": "pistas",

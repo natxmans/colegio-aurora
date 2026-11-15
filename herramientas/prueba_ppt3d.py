@@ -50,7 +50,8 @@ try:
     ok('diapositiva 4: el modelo se carga', esperar_listo(b, V))
     b.esperar(1.5)
     r = json.loads(b.js("JSON.stringify((() => { const f = document.querySelector('.diapo-3d').getBoundingClientRect(), m = document.getElementById('ppt-marco').getBoundingClientRect(); return { x: (f.left - m.left) / m.width * 100, y: (f.top - m.top) / m.height * 100, w: f.width / m.width * 100, h: f.height / m.height * 100, cx: f.left + f.width / 2, cy: f.top + f.height / 2, top: f.top }; })())"))
-    ok('el visor ocupa la zona 3D del PowerPoint', abs(r['x'] - 51) < 0.3 and abs(r['w'] - 44.25) < 0.3 and abs(r['y'] - 21.333) < 0.3, json.dumps({k: round(v, 2) for k, v in r.items()}))
+    zp = [z for z in json.load(open(os.path.join(os.path.dirname(AQUI), 'js', 'datos', 'diapositivas3d.json'), encoding='utf-8')) if z['n'] == 4][0]
+    ok('el visor ocupa la zona 3D del PowerPoint', abs(r['x'] - zp['x']) < 0.3 and abs(r['w'] - zp['w']) < 0.3 and abs(r['y'] - zp['y']) < 0.3, json.dumps({k: round(v, 2) for k, v in r.items()}))
     b.foto('ppt3d-diapo4-inicio')
     e0 = estado(b, V)
     ok('encuadre inicial: el edificio entero se ve', e0['cabe'], str(e0))
@@ -90,9 +91,16 @@ try:
     ok('flecha del teclado en el visor → diapositiva siguiente', b.js("document.getElementById('ppt-num').textContent") == '5')
     b.js("window.__ppt.ir(6)"); b.esperar(1.2)  # diapositiva 7: asignaturas (sin 3D)
     ok('diapositiva sin edificio: no hay visor 3D', b.js("document.querySelectorAll('.diapo-3d').length") == 0)
-    b.js("window.__ppt.ir(10)"); b.esperar(1.0)  # diapositiva 11: piscina (diapositiva nueva, zona grande)
-    ok('diapositiva 11: la piscina en 3D', esperar_listo(b, V) and b.js("document.querySelector('.diapo-3d').getAttribute('data-m')") == 'piscina')
-    b.esperar(1.5); b.foto('ppt3d-diapo11')
+    b.js("window.__ppt.ir(12)"); b.esperar(1.0)  # diapositiva 13: la piscina
+    ok('diapositiva 13: la piscina en 3D', esperar_listo(b, V) and b.js("document.querySelector('.diapo-3d').getAttribute('data-m')") == 'piscina')
+    b.esperar(1.5); b.foto('ppt3d-diapo13')
+    en = json.loads(b.js("JSON.stringify([...document.querySelectorAll('.diapo-enlace')].map(a => [a.textContent, a.getAttribute('href')]))"))
+    ok('los botones de la diapositiva se pueden pulsar (Girar en 3D, Ver en el campus 3D)', len(en) == 2 and 'visor3d.html?m=piscina' in en[0][1] and '?sala=piscina#campus' in en[1][1], str(en))
+    # portada: el campus entero solo se carga si se pide
+    b.js("window.__ppt.ir(0)"); b.esperar(1.0)
+    ok('portada: botón «Girar el campus en 3D» (no se carga solo)', b.js("!!document.querySelector('.diapo-3d-boton') && !document.querySelector('.diapo-3d')"))
+    b.js("document.querySelector('.diapo-3d-boton').click()"); b.esperar(1.0)
+    ok('portada: al pulsar, el campus 3D se carga en la diapositiva', esperar_listo(b, V) and b.js("document.querySelector('.diapo-3d').getAttribute('data-m')") == 'campus')
     ok('un solo visor a la vez', b.js("document.querySelectorAll('.diapo-3d').length") == 1)
     ok('sin errores (ordenador)', not b.errores, str(b.errores[:2]))
 finally:
@@ -103,7 +111,7 @@ b = Navegador(9341)
 try:
     b.tam(390, 844, movil=True)
     b.ir(BASE, 6)
-    b.js("window.__ppt.ir(7)"); b.esperar(1.0)  # diapositiva 8: residencia
+    b.js("window.__ppt.ir(9)"); b.esperar(1.0)  # diapositiva 10: residencia
     ok('teléfono: la residencia en 3D en la diapositiva', esperar_listo(b, V))
     b.esperar(1.5)
     r = json.loads(b.js("JSON.stringify((() => { const f = document.querySelector('.diapo-3d').getBoundingClientRect(); return { cx: f.left + f.width / 2, cy: f.top + f.height / 2, w: f.width }; })())"))
@@ -130,6 +138,17 @@ try:
     ok('visor: carga la residencia', esperar_listo(b))
     b.esperar(1)
     ok('visor: título y descripción en español', b.js("document.getElementById('v-titulo').textContent") == 'La residencia' and len(b.js("document.getElementById('v-desc').textContent")) > 40)
+    ok('visor: botones «Vista frontal / lateral / trasera / superior / Restablecer vista»', b.js("[...document.querySelectorAll('.v-vistas .largo')].map(e => e.textContent).join('|')") == 'Vista frontal|Vista lateral|Vista trasera|Vista superior|Restablecer vista')
+    ok('visor: enlace «Ver el edificio en el campus 3D» al mismo edificio', b.js("document.getElementById('v-campus').getAttribute('href')") == './?vista=residencia#campus')
+    r = json.loads(b.js("JSON.stringify((() => { const c = document.getElementById('v-lienzo').getBoundingClientRect(); return [c.left + c.width / 2, c.top + c.height / 2, c.left + 6, c.top + 6]; })())"))
+    az0 = b.js("window.__visor.ctrl.getAzimuthalAngle()"); ex0 = b.js("window.__visor.exposicion()")
+    b.cmd('Input.dispatchMouseEvent', type='mouseMoved', x=r[0] - 20, y=r[1]); b.cmd('Input.dispatchMouseEvent', type='mouseMoved', x=r[0], y=r[1]); b.esperar(1.2)
+    enc = b.js("document.body.classList.contains('sobre-edificio')"); ex1 = b.js("window.__visor.exposicion()"); az1 = b.js("window.__visor.ctrl.getAzimuthalAngle()")
+    pista = b.js("getComputedStyle(document.getElementById('v-pista')).opacity"); cursor = b.js("getComputedStyle(document.getElementById('v-lienzo')).cursor")
+    ok('survol: cursor «mano», el edificio se ilumina un poco y aparece la pista', enc and ex1 > ex0 + 0.05 and float(pista) > 0.5 and cursor == 'grab', f'exposición {ex0:.2f} → {ex1:.2f}, pista {pista}, cursor {cursor}')
+    ok('survol: el edificio NO gira solo', abs(az1 - az0) < 1e-6, f'azimut {az0:.4f} → {az1:.4f}')
+    b.cmd('Input.dispatchMouseEvent', type='mouseMoved', x=r[2], y=r[3]); b.esperar(1.0)
+    ok('fuera del edificio: vuelve la luz normal', not b.js("document.body.classList.contains('sobre-edificio')"))
     cab = []
     for vista in ['frente', 'lado', 'detras', 'arriba', 'inicio']:
         b.js(f"document.querySelector('[data-vista={vista}]').click()"); b.esperar(1.3)

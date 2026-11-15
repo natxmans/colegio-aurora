@@ -14,7 +14,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MODELOS, modelo } from './datos/modelos3d.js';
 
-const VERSION = 2; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
+const VERSION = 3; // cambiarlo cuando se vuelvan a exportar los modelos (evita la caché)
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 const embebido = q.get('embed') === '1';
@@ -249,6 +249,8 @@ function pintarInfo(m) {
   $('v-ant').disabled = actual === 0;
   $('v-sig').disabled = actual === MODELOS.length - 1;
   $('v-abrir').href = 'visor3d.html?m=' + m.id;
+  const enCampus = './' + (m.campus || '') + '#campus';   // mismo edificio en el campus 3D vivo (index.html)
+  $('v-campus').href = enCampus; $('v-campus-mini').href = enCampus;
   for (const b of $('v-lista').children) b.setAttribute('aria-current', String(b.dataset.id === m.id));
 }
 for (const m of MODELOS) {
@@ -292,6 +294,35 @@ function sinWebGL() {
   mostrarImagen(m);
 }
 
+// ---------- Al pasar el ratón por encima del edificio ----------
+// el cursor cambia (mano), el edificio se ilumina un poco y aparece una pista «haz clic y arrastra».
+// El edificio NO gira solo: solo gira cuando se arrastra.
+const pista = $('v-pista');
+let encima = false, girado = false;
+function sobreEdificio(cx, cy) {
+  if (!estado.listo) return false;
+  const r = lienzo.getBoundingClientRect();
+  const nx = ((cx - r.left) / r.width) * 2 - 1, ny = -((cy - r.top) / r.height) * 2 + 1;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const p of esquinas()) { const v = p.project(camara); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+  return nx >= x0 && nx <= x1 && ny >= y0 && ny <= y1;
+}
+function ponerEncima(v) { if (v !== encima) { encima = v; document.body.classList.toggle('sobre-edificio', v); sucio = true; } }
+lienzo.addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'mouse' || e.buttons) return;
+  ponerEncima(sobreEdificio(e.clientX, e.clientY));
+  if (encima && !girado) {
+    const r = escenaEl.getBoundingClientRect();
+    pista.style.left = Math.min(e.clientX - r.left + 18, r.width - 230) + 'px'; pista.style.top = Math.min(e.clientY - r.top + 20, r.height - 70) + 'px';
+  }
+});
+lienzo.addEventListener('pointerleave', () => ponerEncima(false));
+ctrl.addEventListener('start', () => { girado = true; document.body.classList.add('girado'); });
+function brillo() { // transición suave de la luz al entrar y salir
+  const objetivo = encima ? 1.17 : 1.05, e = renderer.toneMappingExposure;
+  if (Math.abs(e - objetivo) > 0.003) { renderer.toneMappingExposure = e + (objetivo - e) * 0.18; sucio = true; }
+}
+
 // ---------- Tamaño y dibujo ----------
 let sucio = true;
 function redimensionar() {
@@ -308,13 +339,14 @@ function bucle(t) {
   requestAnimationFrame(bucle);
   if (document.hidden) return;
   animar(t);
+  brillo();
   if (ctrl.update()) sucio = true;
   if (sucio) { renderer.render(escena, camara); sucio = false; }
 }
 requestAnimationFrame(bucle);
 
 // para las pruebas automáticas
-Object.assign(estado, { THREE, camara, ctrl, caja, renderer, escena, esferaR: () => esfera.radius, irA, cargar, distanciaQueCabe, dir,
+Object.assign(estado, { encima: () => encima, sobreEdificio, exposicion: () => renderer.toneMappingExposure, THREE, camara, ctrl, caja, renderer, escena, esferaR: () => esfera.radius, irA, cargar, distanciaQueCabe, dir,
   dentroDelEncuadre: () => esquinas().every(p => { const v = p.clone().project(camara); return v.z < 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 1; }),
   ocupacion: () => { const v = esquinas().map(p => p.clone().project(camara)); const xs = v.map(p => p.x), ys = v.map(p => p.y);
     return [(Math.max(...xs) - Math.min(...xs)) / 2, (Math.max(...ys) - Math.min(...ys)) / 2]; } });

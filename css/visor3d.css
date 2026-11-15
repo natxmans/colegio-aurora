@@ -14,7 +14,8 @@ body.visor { margin: 0; min-height: 100vh; background: var(--crema); color: var(
 .v-escena { position: relative; border-radius: 22px; overflow: hidden; min-height: 320px;
   background: radial-gradient(120% 90% at 50% 38%, #ffffff 0%, #f6f1e7 55%, #e9dfcb 100%);
   border: 1px solid var(--borde); box-shadow: var(--sombra-suave); }
-.v-escena canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; outline: none; }
+.v-escena canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: default; outline: none; }
+body.sobre-edificio .v-escena canvas { cursor: grab; }
 .v-escena canvas:active { cursor: grabbing; }
 .v-escena canvas:focus-visible { box-shadow: inset 0 0 0 3px var(--arena); }
 .v-escena.pseudo-completa { position: fixed; inset: 0; z-index: 50; border-radius: 0; }
@@ -74,13 +75,30 @@ body.embebido .v-escena { background: transparent; }
 body.embebido.cargado .v-escena { background: linear-gradient(180deg, #ffffff 0%, #ece2cf 100%); }
 body.embebido .v-carga p { background: rgba(255,255,255,.92); padding: 6px 12px; border-radius: 999px; font-size: 13px; }
 .v-abrir { display: none; }
-body.embebido .v-abrir { display: block; position: absolute; top: 8px; right: 8px; z-index: 4; padding: 5px 10px; border-radius: 999px;
-  background: var(--marino); color: #fff; font: 600 12px var(--texto-f); text-decoration: none; box-shadow: var(--sombra-suave); }
+
 body.embebido .v-abrir:hover { background: var(--azul); }
 body.embebido .v-ayuda { left: 10px; transform: none; max-width: calc(100% - 150px); }
 @media (max-width: 460px) {
   body.embebido .v-ayuda { display: none; }
   body.embebido .v-vistas { bottom: 4px; padding: 2px; }
   body.embebido .v-vistas button { padding: 4px 7px; font-size: 10.5px; }
-  body.embebido .v-abrir { top: 4px; right: 4px; padding: 3px 8px; font-size: 10.5px; }
 }
+
+/* vistas: discretas, con nombres cortos cuando falta sitio */
+.v-vistas { opacity: .86; transition: opacity .2s; }
+.v-vistas:hover, .v-vistas:focus-within { opacity: 1; }
+.v-vistas .corto { display: none; }
+@media (max-width: 720px) { .v-vistas .largo { display: none; } .v-vistas .corto { display: inline; } }
+/* pista al pasar el ratón por encima del edificio (desaparece después del primer giro) */
+.v-pista { position: absolute; z-index: 3; margin: 0; padding: 6px 11px; border-radius: 999px; background: var(--marino); color: #fff;
+  font: 600 12.5px var(--texto-f); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; white-space: nowrap; }
+body.es-raton.sobre-edificio:not(.girado) .v-pista { opacity: .95; transform: none; }
+/* enlaces: «Ver en el campus 3D» y «Abrir en grande» solo dentro de una diapositiva */
+.v-enlaces { display: none; }
+body.embebido .v-enlaces { display: flex; gap: 6px; position: absolute; top: 8px; right: 8px; z-index: 4; }
+body.embebido .v-enlaces a { position: static; display: block; padding: 5px 10px; border-radius: 999px; font: 600 12px var(--texto-f); text-decoration: none; box-shadow: var(--sombra-suave); }
+body.embebido .v-abrir { background: var(--marino); color: #fff; }
+body.embebido .v-campus { background: #fff; color: var(--marino); border: 1px solid var(--borde-fuerte); }
+.v-campus-btn { align-self: flex-start; }
+body.embebido .v-ayuda { max-width: calc(100% - 330px); }
+@media (max-width: 460px) { body.embebido .v-enlaces { top: 4px; right: 4px; gap: 4px; } body.embebido .v-enlaces a { padding: 3px 7px; font-size: 10.5px; } }

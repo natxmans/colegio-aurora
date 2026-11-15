@@ -1,60 +1,41 @@
 {
- "url": "https://natxmans.github.io/colegio-aurora/visor3d.html?m=",
- "diapositivas": [
-  {
-   "base": 2,
-   "modelo": "campus"
-  },
-  {
-   "base": 4,
-   "modelo": "principal"
-  },
-  {
-   "base": 5,
-   "modelo": "aula"
-  },
-  {
-   "tras": 5,
-   "modelo": "laboratorios",
-   "titulo": "4. Los laboratorios"
-  },
-  {
-   "base": 7,
-   "modelo": "residencia"
-  },
-  {
-   "tras": 7,
-   "modelo": "habitacion",
-   "titulo": "6. Una habitación doble"
-  },
-  {
-   "base": 8,
-   "modelo": "gimnasio"
-  },
-  {
-   "tras": 8,
-   "modelo": "piscina",
-   "titulo": "7. La piscina olímpica"
-  },
-  {
-   "tras": 8,
-   "modelo": "pistas",
-   "titulo": "7. El fútbol y el baloncesto"
-  },
-  {
-   "base": 9,
-   "modelo": "comedor"
-  },
-  {
-   "tras": 9,
-   "modelo": "biblioteca",
-   "titulo": "8. La biblioteca"
-  }
- ],
+ "url": "https://natxmans.github.io/colegio-aurora/",
  "textos": {
   "leyenda": "Modelo 3D · selecciónalo y gira el círculo del centro",
-  "boton": "Girar en 3D  ↗",
-  "pista": "Abrir el edificio en el visor 3D (ratón o dedos para girar y acercar)",
-  "consejo": "En PowerPoint: selecciona el modelo y gira el círculo del centro. Durante la presentación: botón «Girar en 3D»."
- }
+  "leyendaPortada": "Campus en 3D · selecciónalo y gíralo",
+  "botonGirar": "Girar en 3D  ↗",
+  "botonCampus": "Ver en el campus 3D  ↗",
+  "pistaGirar": "Abrir este edificio en el visor 3D del sitio (girar 360°, acercar, ratón o dedos)",
+  "pistaCampus": "Ver este edificio en el campus 3D vivo del sitio"
+ },
+ "diapositivas": [
+  {"tipo": "portada", "base": 1, "modelo": "campus"},
+  {"tipo": "imagen", "base": 2, "titulo": "1. Presentación del colegio", "imagen": "presentacion.jpg"},
+  {"tipo": "igual", "base": 3, "titulo": "2. El uniforme y la ropa de diario"},
+  {"tipo": "3d", "modelo": "principal", "titulo": "3. El edificio principal",
+   "tarjeta": ["Un edificio moderno de dos plantas", "Es práctico y seguro.", "Planta baja: aulas, laboratorios, biblioteca y comedor.", "Primer piso: vida escolar, permanencia y salones.", "Grandes ventanas y mucha luz natural."]},
+  {"tipo": "3d", "modelo": "aula", "titulo": "4. Las aulas",
+   "tarjeta": ["Aulas grandes", "Son grandes, limpias y cómodas.", "Hay ordenadores modernos para trabajar.", "Clases divertidas: trabajamos mucho en equipo."]},
+  {"tipo": "3d", "modelo": "laboratorios", "titulo": "5. Los laboratorios",
+   "tarjeta": ["Ciencias y experimentos", "Un laboratorio de Ciencias de la Vida y de la Tierra.", "Un laboratorio de Física y Química.", "Microscopios y mesas de trabajo."]},
+  {"tipo": "igual", "base": 6, "titulo": "6. Nuestras nueve asignaturas"},
+  {"tipo": "3d", "modelo": "biblioteca", "titulo": "7. La biblioteca digital",
+   "tarjeta": ["Un lugar tranquilo", "Libros en papel y libros digitales.", "Mesas para leer y estudiar."]},
+  {"tipo": "3d", "modelo": "comedor", "titulo": "8. El comedor",
+   "tarjeta": ["Comemos juntos", "El comedor es grande.", "La comida es sana y equilibrada.", "Comemos a las 12:20."]},
+  {"tipo": "3d", "modelo": "residencia", "titulo": "9. La residencia",
+   "tarjeta": ["Un edificio para dormir", "Todos los dormitorios están en la residencia, un edificio al lado del colegio.", "Dos plantas de habitaciones y salones para descansar."]},
+  {"tipo": "3d", "modelo": "habitacion", "titulo": "10. Las habitaciones",
+   "tarjeta": ["Habitaciones para dos alumnos", "Cada habitación es para dos compañeros.", "Hay dos camas individuales, dos escritorios y dos armarios."]},
+  {"tipo": "3d", "modelo": "gimnasio", "titulo": "11. El gimnasio",
+   "tarjeta": ["Un gran gimnasio", "Es cubierto y moderno.", "Para hacer deporte y gimnasia."]},
+  {"tipo": "3d", "modelo": "piscina", "titulo": "12. La piscina",
+   "tarjeta": ["Piscina olímpica", "Es cubierta y climatizada.", "Podemos nadar todo el año."]},
+  {"tipo": "3d", "modelo": "pistas", "titulo": "13. Las instalaciones deportivas",
+   "tarjeta": ["Deportes de equipo", "Hay un campo de fútbol con gradas.", "Hay una cancha de baloncesto."]},
+  {"tipo": "imagen", "base": 10, "titulo": "14. La vida en el internado", "imagen": "internado.jpg",
+   "tarjetaExtra": ["Los jardines y los salones", "Hay jardines y salones con sofás para descansar con los amigos."]},
+  {"tipo": "imagen", "base": 11, "titulo": "15. El horario", "imagen": "horario.jpg"},
+  {"tipo": "imagen", "base": 12, "titulo": "16. ¿Por qué nos gusta nuestro colegio?", "imagen": "noche.jpg"}
+ ]
 }

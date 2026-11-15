@@ -3,6 +3,7 @@
   "id": "campus",
   "nombre": "El campus entero",
   "corto": "El campus",
+  "campus": "?vista=completa",
   "desc": "Todo el colegio: el edificio principal, la residencia, el gimnasio, la piscina, los campos de deporte, el patio y los jardines.",
   "zona": {
    "x0": -66,
@@ -30,6 +31,7 @@
   "id": "principal",
   "nombre": "El edificio principal",
   "corto": "Edificio principal",
+  "campus": "?sala=edificio",
   "desc": "Un edificio moderno de dos plantas. Abajo: las aulas, los laboratorios, la biblioteca y el comedor. Arriba: la vida escolar, la permanencia y los salones.",
   "zona": {
    "x0": -33.6,
@@ -56,6 +58,7 @@
   "id": "aula",
   "nombre": "Un aula con ordenadores",
   "corto": "Un aula",
+  "campus": "?sala=tecno&dentro=1",
   "desc": "El aula de Tecnología, sin el techo: mesas, ordenadores, una gran pantalla y mucha luz natural.",
   "zona": {
    "x0": 15.85,
@@ -82,6 +85,7 @@
   "id": "laboratorios",
   "nombre": "Los laboratorios",
   "corto": "Laboratorios",
+  "campus": "?sala=svt&dentro=1",
   "desc": "Los laboratorios de Ciencias y de Física y Química, sin el techo: microscopios, mesas de trabajo y material de experimentos.",
   "zona": {
    "x0": -0.15,
@@ -108,6 +112,7 @@
   "id": "residencia",
   "nombre": "La residencia",
   "corto": "Residencia",
+  "campus": "?vista=residencia",
   "desc": "El edificio de los dormitorios, al lado del colegio: habitaciones dobles en dos plantas y salones para descansar.",
   "zona": {
    "x0": -61.4,
@@ -134,6 +139,7 @@
   "id": "habitacion",
   "nombre": "Una habitación doble",
   "corto": "Habitación doble",
+  "campus": "?sala=hab101&dentro=1",
   "desc": "Una habitación de la residencia, sin el techo: dos camas, dos escritorios, dos armarios y un espacio para cada alumno.",
   "zona": {
    "x0": -60.4,
@@ -161,6 +167,7 @@
   "id": "gimnasio",
   "nombre": "El gimnasio",
   "corto": "Gimnasio",
+  "campus": "?sala=gimnasio",
   "desc": "Un gimnasio cubierto y moderno para hacer deporte y gimnasia todo el año.",
   "zona": {
    "x0": 34,
@@ -186,6 +193,7 @@
   "id": "piscina",
   "nombre": "La piscina olímpica",
   "corto": "Piscina",
+  "campus": "?sala=piscina",
   "desc": "Una piscina olímpica cubierta y climatizada: podemos nadar todo el año.",
   "zona": {
    "x0": 9,
@@ -211,6 +219,7 @@
   "id": "pistas",
   "nombre": "Los campos de fútbol y de baloncesto",
   "corto": "Fútbol y baloncesto",
+  "campus": "?sala=futbol",
   "desc": "Un campo de fútbol con gradas y una cancha de baloncesto al aire libre.",
   "zona": {
    "x0": -36.5,
@@ -236,6 +245,7 @@
   "id": "comedor",
   "nombre": "El comedor",
   "corto": "Comedor",
+  "campus": "?sala=comedor&dentro=1",
   "desc": "El comedor, sin el techo: es grande y la comida es sana y equilibrada.",
   "zona": {
    "x0": 3.85,
@@ -262,6 +272,7 @@
   "id": "biblioteca",
   "nombre": "La biblioteca",
   "corto": "Biblioteca",
+  "campus": "?sala=biblioteca&dentro=1",
   "desc": "La biblioteca digital, sin el techo: un lugar tranquilo con libros en papel y libros digitales.",
   "zona": {
    "x0": -32.4,

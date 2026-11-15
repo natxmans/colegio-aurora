@@ -204,3 +204,8 @@ html.explorando .campus3d { position: fixed; inset: 0; z-index: 80; height: auto
 .diapo-marco { container-type: inline-size; }
 .diapo-3d { position: absolute; z-index: 1; border: 0; border-radius: 1.8cqw; background: transparent; }
 .diapo-flecha { z-index: 2; }
+.diapo-3d-boton { position: absolute; z-index: 1; border: 0; border-radius: 1.8cqw; background: transparent; cursor: pointer; display: grid; place-items: end center; padding-bottom: 2.4cqw; }
+.diapo-3d-boton span { background: var(--marino); color: #fff; font: 600 clamp(11px, 1.35cqw, 15px) var(--texto-f); padding: .7em 1.2em; border-radius: 999px; box-shadow: var(--sombra); }
+.diapo-3d-boton:hover span, .diapo-3d-boton:focus-visible span { background: var(--azul); }
+.diapo-enlace { position: absolute; z-index: 1; border-radius: 999px; color: transparent; font-size: 1px; overflow: hidden; }
+.diapo-enlace:hover, .diapo-enlace:focus-visible { box-shadow: 0 0 0 2px var(--arena); }

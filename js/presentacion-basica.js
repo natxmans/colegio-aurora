@@ -12,11 +12,11 @@
   var caja = $('ppt'), marco = $('ppt-marco');
   if (!caja || !marco) return;
   var src = function (k) { return 'img/diapositivas/diapositiva-' + (k < 9 ? '0' : '') + (k + 1) + '.jpg'; };
-  var ALT = ['Portada: Colegio Pablo Picasso, nuestro colegio ideal', 'Presentación del colegio (modelo 3D del campus)', 'El uniforme escolar y la ropa de diario',
-    'El edificio (modelo 3D)', 'Las aulas y los ordenadores (modelo 3D de un aula)', 'Los laboratorios (modelo 3D)', 'Las nueve asignaturas',
-    'Los dormitorios: la residencia (modelo 3D)', 'Una habitación doble (modelo 3D)', 'El complejo deportivo: el gimnasio (modelo 3D)',
-    'La piscina olímpica (modelo 3D)', 'El fútbol y el baloncesto (modelo 3D)', 'Los espacios comunes: el comedor (modelo 3D)',
-    'La biblioteca (modelo 3D)', 'La vida en el internado', 'El horario', '¿Por qué nos gusta nuestro colegio?'];
+  var ALT = ['Portada: Colegio Pablo Picasso, nuestro colegio ideal (campus en 3D)', 'Presentación del colegio', 'El uniforme y la ropa de diario',
+    'El edificio principal (modelo 3D)', 'Las aulas (modelo 3D)', 'Los laboratorios (modelo 3D)', 'Nuestras nueve asignaturas',
+    'La biblioteca digital (modelo 3D)', 'El comedor (modelo 3D)', 'La residencia (modelo 3D)', 'Las habitaciones (modelo 3D)',
+    'El gimnasio (modelo 3D)', 'La piscina (modelo 3D)', 'Las instalaciones deportivas (modelo 3D)', 'La vida en el internado',
+    'El horario', '¿Por qué nos gusta nuestro colegio?'];
   var N = ALT.length;
 
   // Imágenes: la primera ya está en la página; las demás se crean cuando hacen falta
@@ -63,14 +63,40 @@
   // ---------- Edificios en 3D dentro de las diapositivas ----------
   // js/datos/diapositivas3d.json (generado desde el PowerPoint): diapositiva, edificio y zona en %.
   // Solo hay un visor a la vez (la diapositiva activa) y solo si la presentación está a la vista.
-  var ZONAS = {}, visor = null, espera3d = 0, aLaVista3d = true;
+  var ZONAS = {}, visor = null, espera3d = 0, aLaVista3d = true, campusPedido = false;
   var hay3d = !(window.__diag && window.__diag.webgl === false) && !!window.fetch;
   function quitar3d() { clearTimeout(espera3d); if (visor) { visor.remove(); visor = null; } }
+  // los botones dibujados en la diapositiva («Girar en 3D», «Ver en el campus 3D») también se pueden pulsar aquí
+  var enlaces = [];
+  function ponerEnlaces() {
+    enlaces.forEach(function (a) { a.remove(); }); enlaces = [];
+    var z = ZONAS[i + 1]; if (!z || !z.botones) return;
+    z.botones.forEach(function (bt) {
+      var a = document.createElement('a');
+      a.className = 'diapo-enlace'; a.textContent = bt.t;
+      var base = 'https://natxmans.github.io/colegio-aurora/';
+      a.href = bt.href.indexOf(base) === 0 ? './' + bt.href.slice(base.length) : bt.href;
+      if (/visor3d\.html/.test(a.href)) { a.target = '_blank'; a.rel = 'noopener'; }
+      a.style.left = bt.x + '%'; a.style.top = bt.y + '%'; a.style.width = bt.w + '%'; a.style.height = bt.h + '%';
+      marco.insertBefore(a, $('ppt-ant')); enlaces.push(a);
+    });
+  }
   function poner3d() {
     var z = ZONAS[i + 1];
+    ponerEnlaces();
     if (!z || !aLaVista3d) { quitar3d(); return; }
-    if (visor && visor.getAttribute('data-m') === z.m) return;
+    if (visor && visor.getAttribute('data-m') === z.m && (visor.tagName === 'IFRAME' || !campusPedido)) return;
     quitar3d();
+    if (z.m === 'campus' && !campusPedido) { // el campus entero es pesado: solo si se pide
+      var bt = document.createElement('button');
+      bt.type = 'button'; bt.className = 'diapo-3d-boton'; bt.setAttribute('data-m', z.m);
+      bt.innerHTML = '<span>Girar el campus en 3D</span>';
+      bt.style.left = z.x + '%'; bt.style.top = z.y + '%'; bt.style.width = z.w + '%'; bt.style.height = z.h + '%';
+      bt.onclick = function () { campusPedido = true; quitar3d(); poner3d(); };
+      marco.insertBefore(bt, $('ppt-ant'));
+      visor = bt;
+      return;
+    }
     espera3d = setTimeout(function () { // si se pasa rápido de diapositiva, no se carga nada
       var f = document.createElement('iframe');
       f.className = 'diapo-3d'; f.setAttribute('data-m', z.m);

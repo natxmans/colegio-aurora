@@ -10,36 +10,47 @@ Devise officielle : **Estudiar · Convivir · Crecer**. Logo officiel : l'emblè
 centré sans déformation dans un carré transparent. Ne jamais le redessiner ni l'étirer.
 
 - **En ligne :** https://natxmans.github.io/colegio-aurora/
-- **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (17 diapositives, dont 11 avec un vrai bâtiment 3D)
+- **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (17 diapositives, dont 11 avec un vrai bâtiment 3D).
+  Ancienne version (v1) gardée dans `Sauvegardes/colegio-avant-perfection-…/nuestro_colegio_ideal_3D_v1.pptx`.
 - **Visionneuse 3D :** https://natxmans.github.io/colegio-aurora/visor3d.html (les 11 bâtiments, souris et doigts)
 
 ## Les bâtiments en 3D (PowerPoint + visionneuse)
 
-Les 11 modèles (`modelos/*.glb`) sont **exportés de la maquette du site** : mêmes pièces, mêmes corrections,
-toits fermés. Campus entier, bâtiment principal, une salle avec ordinateurs, laboratoires, résidence,
-chambre double, gymnase, piscine, foot et basket, cantine (comedor), bibliothèque.
-Les salles « en coupe » (salle, labos, chambre, cantine, bibliothèque) sont montrées sans le toit.
+Les 11 modèles (`modelos/*.glb`) sont **exportés de la maquette du site** : mêmes pièces, mêmes corrections.
+Couverture = campus entier ; puis bâtiment principal, salle de classe, laboratoires, bibliothèque, cantine,
+résidence, chambre double, gymnase, piscine, terrains de sport (un bâtiment par diapositive).
+Les salles « en coupe » (salle, labos, bibliothèque, cantine, chambre) sont montrées sans le toit, exprès,
+pour voir l'intérieur ; les bâtiments vus de l'extérieur ont un toit complet (vérifié vue de dessus).
+**Toit corrigé (v2)** : la voûte de la piscine avait une bande sur deux en verre presque invisible (on voyait
+l'intérieur : toit « à moitié ouvert »). Elle est maintenant pleine avec une seule bande vitrée au sommet ;
+idem pour le gymnase ; façades vitrées en verre teinté (`js/3d/Deportes.js`, `js/3d/kit.js`).
 
 **Dans PowerPoint (testé dans PowerPoint Microsoft 365)** : les modèles sont de vrais objets 3D.
 - En **mode édition** : clic sur le bâtiment → tirer le **rond du milieu** pour le tourner dans tous les sens
   (façade, côtés, arrière, toit). Onglet **Modèle 3D → Panoramique et zoom** : la loupe à droite zoome,
   glisser déplace le bâtiment. Le bâtiment ne sort jamais de sa zone (testé sur 440 positions).
 - En **mode diaporama** (F5), PowerPoint ne permet pas de tourner un modèle 3D (un clic passe à la diapositive
-  suivante) : c'est une limite de PowerPoint. Pour le faire tourner pendant l'exposé, cliquer sur le bouton
-  **« Girar en 3D ↗ »** de la diapositive : il ouvre la visionneuse 3D du site sur ce bâtiment (Internet nécessaire).
+  suivante) : c'est une limite de PowerPoint. Pendant l'exposé : bouton **« Girar en 3D ↗ »** (visionneuse du
+  site sur ce bâtiment) ou **« Ver en el campus 3D ↗ »** (le même bâtiment dans le campus vivant). Internet nécessaire.
 - La molette de la souris, dans PowerPoint, change de diapositive (elle ne zoome pas le modèle).
+- PowerPoint n'a pas d'effet « au survol » pour les modèles 3D : l'indication est écrite sous le texte.
+- Logiciels sans 3D (LibreOffice, anciennes versions) : une image du bâtiment s'affiche à la place (testé dans LibreOffice).
 
 **Sur le site** : dans la présentation en haut de la page, sur les diapositives 3D, la visionneuse est placée
 dans la diapositive : glisser = tourner à 360°, molette = zoom, clic droit = déplacer ; au doigt : un doigt pour
-tourner, deux doigts pour zoomer et déplacer. Boutons Frente / Lado / Detrás / Arriba / Centrar.
+tourner, deux doigts pour zoomer et déplacer. Boutons Vista frontal / lateral / trasera / superior / Restablecer vista.
+Au survol : curseur « main », le bâtiment s'éclaire un peu et une indication apparaît (il ne tourne jamais tout seul).
 Le zoom est limité et le centre de la vue reste sur le bâtiment : il ne peut pas sortir du cadre.
+Sur la couverture, le campus entier (13 Mo) ne se charge qu'en cliquant sur « Girar el campus en 3D ».
 
 **Refaire les modèles et le PowerPoint** (si la maquette change), avec `LANCER-LE-SITE.bat` ouvert :
 1. `python herramientas/exportar_modelos.py` → `modelos/*.glb` (zones dans `js/datos/modelos3d.js`)
 2. `powershell -File herramientas/ppt/anadir_3d.ps1` → PowerPoint (part de `herramientas/ppt/base-12-diapositivas.pptx`,
    plan dans `herramientas/ppt/plan-3d.json`), images des diapositives et `js/datos/diapositivas3d.json`
 3. `python herramientas/ppt/textos_web.py` → texte des diapositives pour « Ver el texto »
-4. Tests : `python herramientas/prueba_ppt3d.py` (29 tests), `python herramientas/vistas_modelos.py` (photos de chaque modèle)
+   (images du campus pour les diapositives sans 3D : `python herramientas/ppt/renders_ppt.py`)
+4. Tests : `python herramientas/prueba_ppt3d.py` (37 tests), `python herramientas/prueba_enlaces.py` (les 22 liens),
+   `python herramientas/revisar_tejados.py` (toits vus de dessus), `python herramientas/vistas_modelos.py` (photos des modèles)
 
 ## Lancer le site sur ton PC
 

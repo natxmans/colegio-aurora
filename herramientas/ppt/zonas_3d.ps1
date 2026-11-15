@@ -15,18 +15,24 @@ try {
   $W = $pres.PageSetup.SlideWidth; $H = $pres.PageSetup.SlideHeight
   $lista = @()
   foreach ($sl in $pres.Slides) {
-    $z = $null; $id = $null
+    $z = $null; $id = $null; $botones = @()
     foreach ($s in $sl.Shapes) {
       if ($s.Name -eq 'Zona 3D') { $z = $s }
       if ($s.Type -eq 30 -and $s.Name -like 'Modelo 3D - *') { $id = $s.Name.Substring(12) }
+      if ($s.Name -like 'Boton *') {
+        $hl = $s.ActionSettings.Item(1).Hyperlink
+        $dir = $hl.Address; if ($hl.SubAddress) { $dir = $dir + '#' + $hl.SubAddress }   # PowerPoint guarda «#campus» aparte
+        $botones += [ordered]@{ t = $s.TextFrame.TextRange.Text; href = $dir;
+          x = [math]::Round(100 * $s.Left / $W, 3); y = [math]::Round(100 * $s.Top / $H, 3); w = [math]::Round(100 * $s.Width / $W, 3); h = [math]::Round(100 * $s.Height / $H, 3) }
+      }
     }
     if ($z -and $id) {
       $lista += [ordered]@{ n = $sl.SlideIndex; m = $id;
         x = [math]::Round(100 * $z.Left / $W, 3); y = [math]::Round(100 * $z.Top / $H, 3);
-        w = [math]::Round(100 * $z.Width / $W, 3); h = [math]::Round(100 * $z.Height / $H, 3) }
+        w = [math]::Round(100 * $z.Width / $W, 3); h = [math]::Round(100 * $z.Height / $H, 3); botones = @($botones) }
     }
   }
-  $json = ConvertTo-Json @($lista) -Compress
+  $json = ConvertTo-Json @($lista) -Compress -Depth 5
   [System.IO.File]::WriteAllText($salida, $json, (New-Object System.Text.UTF8Encoding($false)))
   Write-Output ("{0} diapositivas con 3D -> {1}" -f $lista.Count, $salida)
 } finally { $pres.Close(); $app.Quit() }

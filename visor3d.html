@@ -40,19 +40,23 @@
         <p id="v-carga-txt">Cargando el modelo 3D…</p>
       </div>
       <img class="v-imagen" id="v-imagen" alt="" hidden />
-      <a class="v-abrir" id="v-abrir" href="visor3d.html" target="_blank" rel="noopener" aria-label="Abrir el visor 3D en grande (nueva pestaña)">Abrir en grande ↗</a>
+      <div class="v-enlaces">
+        <a class="v-campus" id="v-campus-mini" href="./#campus" target="_top">Ver en el campus 3D ↗</a>
+        <a class="v-abrir" id="v-abrir" href="visor3d.html" target="_blank" rel="noopener" aria-label="Abrir el visor 3D en grande (nueva pestaña)">Abrir en grande ↗</a>
+      </div>
       <div class="v-vistas" role="group" aria-label="Vistas del edificio">
-        <button type="button" data-vista="frente">Frente</button>
-        <button type="button" data-vista="lado">Lado</button>
-        <button type="button" data-vista="detras">Detrás</button>
-        <button type="button" data-vista="arriba">Arriba</button>
-        <button type="button" data-vista="inicio" aria-label="Volver a la vista de inicio">Centrar</button>
+        <button type="button" data-vista="frente"><span class="largo">Vista frontal</span><span class="corto">Frente</span></button>
+        <button type="button" data-vista="lado"><span class="largo">Vista lateral</span><span class="corto">Lado</span></button>
+        <button type="button" data-vista="detras"><span class="largo">Vista trasera</span><span class="corto">Detrás</span></button>
+        <button type="button" data-vista="arriba"><span class="largo">Vista superior</span><span class="corto">Arriba</span></button>
+        <button type="button" data-vista="inicio" aria-label="Restablecer la vista de inicio"><span class="largo">Restablecer vista</span><span class="corto">Inicio</span></button>
         <button type="button" id="v-completa" aria-label="Pantalla completa">⛶</button>
       </div>
       <p class="v-ayuda" id="v-ayuda">
-        <span class="v-raton">Arrastra para girar · rueda para acercar · clic derecho para mover</span>
+        <span class="v-raton">Haz clic y arrastra para girar · rueda para acercar · clic derecho para mover</span>
         <span class="v-tactil">Un dedo para girar · dos dedos para acercar y mover</span>
       </p>
+      <p class="v-pista" id="v-pista" aria-hidden="true">Haz clic y arrastra para girar el edificio</p>
     </section>
 
     <aside class="v-info">
@@ -63,6 +67,7 @@
         <button type="button" class="btn btn-secundario btn-peq" id="v-ant">← Anterior</button>
         <button type="button" class="btn btn-primario btn-peq" id="v-sig">Siguiente →</button>
       </div>
+      <a class="btn btn-secundario btn-peq v-campus-btn" id="v-campus" href="./#campus">Ver el edificio en el campus 3D ↗</a>
       <nav class="v-lista" id="v-lista" aria-label="Todos los edificios"></nav>
       <p class="v-nota">Son los mismos modelos que la maqueta 3D del sitio.</p>
     </aside>

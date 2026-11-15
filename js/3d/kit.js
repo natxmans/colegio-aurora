@@ -33,7 +33,7 @@ export const MAT = {
   luz: new THREE.MeshBasicMaterial({ toneMapped: false }),
   vidrio: new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.2, roughness: 0.04, metalness: 0.6, depthWrite: false, envMapIntensity: 1.6 }),
   // cristal de cubierta: más opaco y tintado (el techo se ve cerrado)
-  vidrioT: new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.66, roughness: 0.12, metalness: 0.35, depthWrite: false, envMapIntensity: 1.4 }),
+  vidrioT: new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.8, roughness: 0.12, metalness: 0.35, depthWrite: false, envMapIntensity: 1.4 }),
   plano: new THREE.MeshStandardMaterial({ roughness: 0.85, flatShading: true }),
 };
 

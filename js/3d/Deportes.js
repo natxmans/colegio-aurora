@@ -113,7 +113,7 @@ function Timpano({ p, ry = 0, luz, flecha, color = COL.piedra, cristal = false }
   }, [luz, flecha]);
   return html`<mesh geometry=${geo} position=${p} rotation=${[0, ry, 0]} castShadow=${!cristal} receiveShadow renderOrder=${cristal ? 4 : 0}>
     ${cristal
-      ? html`<meshStandardMaterial color="#a9cbe0" transparent opacity=${0.62} roughness=${0.12} metalness=${0.35} depthWrite=${false} side=${THREE.DoubleSide} />`
+      ? html`<meshStandardMaterial color="#a9cbe0" transparent opacity=${0.8} roughness=${0.12} metalness=${0.35} depthWrite=${false} side=${THREE.DoubleSide} />`
       : html`<meshStandardMaterial color=${color} roughness=${0.75} side=${THREE.DoubleSide} />`}
   </mesh>`;
 }
@@ -141,13 +141,13 @@ function Gimnasio() {
   return html`<${G}>
     <${B} p=${[cx, 0.05, cz]} s=${[w, 0.1, d]} c="#c99a62" />
     <${Suelo} p=${[cx, cz + 1.5]} w=${25} d=${15.6} tex=${texPistaGym()} y=${0.11} />
-    <${V} p=${[cx, 1.9, cz - d / 2]} s=${[w, 3.8, 0.08]} /><${V} p=${[cx, 1.9, cz + d / 2]} s=${[w, 3.8, 0.08]} />
-    <${V} p=${[cx - w / 2, 1.9, cz - (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} /><${V} p=${[cx - w / 2, 1.9, cz + (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} />
-    <${V} p=${[cx - w / 2, 3.2, cz]} s=${[0.08, 1.2, 3]} />
+    <${VT} p=${[cx, 1.9, cz - d / 2]} s=${[w, 3.8, 0.08]} /><${VT} p=${[cx, 1.9, cz + d / 2]} s=${[w, 3.8, 0.08]} />
+    <${VT} p=${[cx - w / 2, 1.9, cz - (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} /><${VT} p=${[cx - w / 2, 1.9, cz + (d / 2 + 1.5) / 2]} s=${[0.08, 3.8, d / 2 - 1.5]} />
+    <${VT} p=${[cx - w / 2, 3.2, cz]} s=${[0.08, 1.2, 3]} />
     <${B} m="M" p=${[cx - w / 2 - 0.05, 1.3, cz - 1.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
     <${B} m="M" p=${[cx - w / 2 - 0.05, 1.3, cz + 1.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
     <${B} m="M" p=${[cx - w / 2 - 0.05, 2.6, cz]} s=${[0.12, 0.1, 3.2]} c=${COL.noche} />
-    <${V} p=${[cx + w / 2, 1.9, cz]} s=${[0.08, 3.8, d]} />
+    <${VT} p=${[cx + w / 2, 1.9, cz]} s=${[0.08, 3.8, d]} />
     <${B} m="B" p=${[cx, 6.7, cz - d / 2]} s=${[w, 5.8, 0.3]} c=${COL.piedra} />
     <${B} m="B" p=${[cx, 6.7, cz + d / 2]} s=${[w, 5.8, 0.3]} c=${COL.piedra} />
     <${B} m="B" p=${[cx - w / 2, 6.7, cz]} s=${[0.3, 5.8, d]} c=${COL.piedra} />
@@ -167,7 +167,7 @@ function Gimnasio() {
     <${Punto} t="colchoneta" sala="gimnasio" i=${1} p=${[cx + 9, 0.16, cz - 4.0]} ry=${-PI / 2} accion="estirar" />
     <${TechoMovil} y=${0} ids=${['gimnasio']}>
       <${Boveda} cx=${cx} cz=${cz} largo=${w + 1.2} luz=${d + 0.6} flecha=${3.1} alto=${9.6} eje="x" color="#e9e6df"
-        vidrio=${(i, n) => i >= n / 2 - 2 && i < n / 2 + 2} />
+        vidrio=${(i, n) => i === n / 2 - 1 || i === n / 2} />
       <${Timpano} p=${[cx - w / 2, 9.6, cz]} ry=${PI / 2} luz=${d} flecha=${3} />
       <${Timpano} p=${[cx + w / 2, 9.6, cz]} ry=${PI / 2} luz=${d} flecha=${3} />
       <${B} m="M" p=${[cx, 9.65, cz - d / 2]} s=${[w + 1.2, 0.16, 0.36]} c=${COL.noche} />
@@ -217,18 +217,18 @@ function Piscina() {
       <${B} m="B" p=${[0, 1.8, 0]} s=${[0.8, 0.08, 0.8]} c=${COL.blanco} />
     <//>
     <${Punto} t="trabajo" sala="piscina" rol="socorrista" p=${[x1 + 1.3, 0.2, cz + 1.4]} ry=${-PI / 2} accion="vigilar" />
-    <${V} p=${[cx - W / 2, 3.5, (cz - D / 2 + 13.5) / 2]} s=${[0.08, 7, 13.5 + D / 2]} c="#d6e8f2" />
-    <${V} p=${[cx - W / 2, 3.5, (16.5 + D / 2) / 2]} s=${[0.08, 7, D / 2 - 16.5]} c="#d6e8f2" />
-    <${V} p=${[cx - W / 2, 4.8, 15]} s=${[0.08, 4.4, 3]} c="#d6e8f2" />
+    <${VT} p=${[cx - W / 2, 3.5, (cz - D / 2 + 13.5) / 2]} s=${[0.08, 7, 13.5 + D / 2]} c="#b9d3e2" />
+    <${VT} p=${[cx - W / 2, 3.5, (16.5 + D / 2) / 2]} s=${[0.08, 7, D / 2 - 16.5]} c="#b9d3e2" />
+    <${VT} p=${[cx - W / 2, 4.8, 15]} s=${[0.08, 4.4, 3]} c="#b9d3e2" />
     <${B} m="M" p=${[cx - W / 2 - 0.05, 1.3, 13.45]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
     <${B} m="M" p=${[cx - W / 2 - 0.05, 1.3, 16.55]} s=${[0.12, 2.6, 0.1]} c=${COL.noche} />
     <${B} m="M" p=${[cx - W / 2 - 0.05, 2.6, 15]} s=${[0.12, 0.1, 3.2]} c=${COL.noche} />
     <${B} p=${[cx - W / 2 - 0.6, 0.1, 15]} s=${[1.2, 0.2, 3]} c="#ece6da" />
-    <${V} p=${[cx + W / 2, 3.5, cz]} s=${[0.08, 7, D]} c="#d6e8f2" />
+    <${VT} p=${[cx + W / 2, 3.5, cz]} s=${[0.08, 7, D]} c="#b9d3e2" />
     <${B} m="B" p=${[cx, 3.5, cz - D / 2]} s=${[W, 7, 0.4]} c=${COL.piedra} />
-    <${V} p=${[(cx - W / 2 - 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#d6e8f2" />
-    <${V} p=${[(cx + W / 2 + 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#d6e8f2" />
-    <${V} p=${[cx, 4.8, cz + D / 2]} s=${[3, 4.4, 0.08]} c="#d6e8f2" />
+    <${VT} p=${[(cx - W / 2 - 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#b9d3e2" />
+    <${VT} p=${[(cx + W / 2 + 1.5) / 2, 3.5, cz + D / 2]} s=${[W / 2 - 1.5, 7, 0.08]} c="#b9d3e2" />
+    <${VT} p=${[cx, 4.8, cz + D / 2]} s=${[3, 4.4, 0.08]} c="#b9d3e2" />
     <${B} m="B" p=${[(cx - W / 2 - 1.5) / 2, 0.45, cz + D / 2]} s=${[W / 2 - 1.5, 0.9, 0.3]} c=${COL.piedra} />
     <${B} m="B" p=${[(cx + W / 2 + 1.5) / 2, 0.45, cz + D / 2]} s=${[W / 2 - 1.5, 0.9, 0.3]} c=${COL.piedra} />
     <${B} m="M" p=${[cx - 1.55, 1.3, cz + D / 2 + 0.05]} s=${[0.1, 2.6, 0.12]} c=${COL.noche} />
@@ -244,7 +244,7 @@ function Piscina() {
     <${Panel} p=${[cx + W / 2 + 0.3, 5.6, cz + 0.6]} r=${[0, PI / 2, 0]} w=${16} h=${1.9} transp tex=${texRotuloTexto('PISCINA OLÍMPICA CLIMATIZADA', '#ffffff')} />
     <${TechoMovil} y=${0} ids=${['piscina', 'gimnasio']}>
       <${Boveda} cx=${cx} cz=${cz} largo=${D + 0.8} luz=${W + 0.6} flecha=${4.6} alto=${7} eje="z" color=${COL.blanco}
-        vidrio=${(i, n) => i % 4 === 1 || i % 4 === 2} />
+        vidrio=${(i, n) => i === n / 2 - 1 || i === n / 2} />
       <${Timpano} p=${[cx, 7, cz + D / 2]} luz=${W} flecha=${4.5} cristal />
       <${Timpano} p=${[cx, 7, cz - D / 2]} luz=${W} flecha=${4.5} color=${COL.piedra} />
       <${B} m="M" p=${[cx - W / 2, 7.05, cz]} s=${[0.3, 0.14, D + 0.6]} c=${COL.noche} />
