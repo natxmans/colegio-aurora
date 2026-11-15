@@ -64,7 +64,7 @@ Si une tâche dépasse son heure limite, on décale d'abord les P2, puis les P1 
 | T08 | Vérification du site publié (pages, menus, boutons, liens) | P2 | dim. 18:00 | P0 | À faire | grille de la section 7 |
 | T09 | Vérification du PowerPoint (17 diapos, boutons, ouverture) | P2 | dim. 19:00 | P0 | À faire | grille de la section 7 |
 | T10 | Textes oraux v1 (espagnol + français, 2 personnes) | Claude → P2 relit | dim. 19:00 | P0 | En cours | v1 écrite (379 / 382 mots, ~7 min 40) + PDF à imprimer ; **relecture de P2 à faire** |
-| T11 | Publication de la population sur le site | Claude + P1 | dim. 20:30 | P0 | À faire | après T07 ; vérifier la version en ligne |
+| T11 | Publication de la population sur le site | Claude + P1 | dim. 20:30 | P0 | **Fait** | publié (commit 72d38ad) ; **en ligne** : `prueba_total` 51/51, `poblacion.py saltos` 64 élèves aux 9 heures, 64/64 au lit, 0 erreur |
 | T12 | Première lecture à voix haute des textes (chacun sa partie) | Les deux | dim. 21:30 | P1 | À faire | noter les mots difficiles |
 | T13 | Bilan du dimanche | Les deux | dim. 22:00 | P0 | À faire | section 9 |
 | T14 | Finaliser les corrections de la maquette (bugs de dimanche) | Claude + P1 | lun. 10:00 | P0 | À faire | |
@@ -236,6 +236,18 @@ Site en ligne ouvert · PowerPoint ouvert depuis la clé USB · PDF de secours p
 - **Temps restant** : environ 40 h avant mardi 7 h.
 
 ---
+
+### Bilan 2 — dimanche 15 novembre, 17 h 19
+
+- **Travail terminé** : T01, T02, T04, T05, T06, T06b, T07, T11 (population publiée et vérifiée en ligne) ;
+  bugs B01 à B04 corrigés ; copie de secours .pptx + PDF dans `Sauvegardes/presentation-secours-2026-11-15`.
+- **Travail en cours** : T10 (textes de l'oral écrits + PDF à imprimer : **relecture de Personne 2**),
+  T23 (copie sur clé USB à faire).
+- **Travail restant** : T03 (valider ce planning à deux), T08 et T09 (Personne 2 : grilles de la section 7),
+  T12 (première lecture à voix haute), T13 (bilan de 22 h), puis lundi T14 à T31.
+- **Problèmes** : aucun bloquant. B05 (frôlements de coins pendant la marche, 0,04 %) accepté.
+- **Prochaine action** : Personne 2 → T08 (site) puis T09 (PowerPoint) ; Personne 1 → T03 puis T12 (lire son texte).
+- **Temps restant** : environ 37 h avant mardi 7 h.
 
 ## 10. Rappels automatiques
 
