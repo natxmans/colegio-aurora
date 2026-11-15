@@ -3,7 +3,7 @@
 // vistas, techo, visita guiada, lugares, ficha de cada sala,
 // el panel del tiempo y la ayuda.
 // =========================================================
-import { html, useEffect, useState } from '../lib.js';
+import { html, useEffect, useState, useRef } from '../lib.js';
 import { useEstado, poner, leer, volverInicio, abrirExplorador, cambiarVista, seleccionar, cerrarSala, alternarInterior, alternarTecho, alternarLugares, verResidencia } from '../estado.js';
 import { SALAS, ZONAS, AULAS, ESPACIOS_PB, HABITACIONES, POR_PLANTA, RECORRIDO } from '../datos/salas.js';
 import { Icono, Logo } from './Iconos.js';
@@ -121,6 +121,16 @@ function Aviso() {
 }
 
 export function Explorador({ embebido = false }) {
+  // la altura real de la barra de arriba (1, 2 o 3 líneas según la pantalla) se guarda en --barra:
+  // la insignia de la planta y la lista de lugares se colocan justo debajo, sin taparla
+  const raiz = useRef();
+  useEffect(() => {
+    const el = raiz.current, sup = el && el.querySelector('.exp-sup');
+    if (!sup || !window.ResizeObserver) return;
+    const ro = new ResizeObserver(() => el.style.setProperty('--barra', Math.ceil(sup.getBoundingClientRect().bottom - el.getBoundingClientRect().top) + 'px'));
+    ro.observe(sup);
+    return () => ro.disconnect();
+  }, [embebido]);
   const vista = useEstado(s => s.vista);
   const resVista = useEstado(s => s.resVista);
   const techo = useEstado(s => s.techo);
@@ -145,13 +155,13 @@ export function Explorador({ embebido = false }) {
   const ins = INSIGNIA[resVista || vista];
   const empezarGuia = () => { seleccionar(RECORRIDO[0]); poner({ guiada: true }); };
   const activa = (id) => !sel && (id === 'residencia' ? !!resVista : !resVista && vista === id);
-  return html`<div className=${'exp' + (embebido ? ' embebido' : '')}>
+  return html`<div ref=${raiz} className=${'exp' + (embebido ? ' embebido' : '')}>
     <${CapaEtiquetas} />
     <div className="exp-sup">
       ${embebido ? html`<button className="btn btn-primario btn-peq exp-abrir" onClick=${() => abrirExplorador(vista === 'completa' ? 'completa' : vista)}><${Icono} n="pantalla" />Explorar a pantalla completa</button>` : html`
         <div className="exp-inicio panel">
           <button className="volver" onClick=${volverInicio}><${Icono} n="izq" />Salir</button>
-          <div className="marca"><${Logo} size=${36} /><div><b>PABLO PICASSO</b><small>Campus en 3D</small></div></div>
+          <div className="marca"><${Logo} size=${30} /><div><b>PABLO PICASSO</b><small>Campus en 3D</small></div></div>
         </div>`}
       ${embebido ? null : html`<div className="vistas panel" role="toolbar" aria-label="Vistas">
         ${VISTAS_BTN.map(v => html`<button key=${v.id} className=${activa(v.id) ? 'activo' : ''} onClick=${() => v.id === 'residencia' ? verResidencia('res1') : cambiarVista(v.id)} title=${v.t}><${Icono} n=${v.i} /><span>${v.t}</span></button>`)}

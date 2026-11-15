@@ -215,3 +215,47 @@ html.explorando .campus3d { position: fixed; inset: 0; z-index: 80; height: auto
 .reloj-elegir input { font: inherit; padding: 4px 6px; border: 1px solid var(--borde-fuerte); border-radius: 8px; background: #fff; color: var(--marino); }
 .reloj-elegir button { padding: 5px 9px; border-radius: 8px; background: var(--beige); font-weight: 700; }
 .reloj-elegir .sig-dia { background: var(--marino); color: #fff; }
+
+/* =========================================================
+   Barra de la maqueta 3D: unos 20 % más pequeña y SIEMPRE dentro de la pantalla
+   (antes, en un portátil, «Ocultar personas», «Visita guiada» y «Lugares» quedaban fuera).
+   Solo cambia la interfaz: la cámara y los edificios no se tocan.
+   ========================================================= */
+.exp-sup { top: 10px; left: 10px; right: 10px; gap: 8px; flex-wrap: wrap; align-items: center; }
+.exp-inicio { gap: 8px; padding: 5px 11px 5px 6px; border-radius: 13px; }
+.exp-inicio .volver { gap: 5px; padding: 6px 10px; border-radius: 8px; font-size: 12.5px; }
+.exp-inicio .volver svg { width: 15px; height: 15px; }
+.exp-inicio .marca { gap: 8px; }
+.exp-inicio .marca b { font-size: 12.5px; }
+.exp-inicio .marca small { font-size: 10.5px; }
+.vistas, .toggles { gap: 3px; padding: 4px; border-radius: 13px; }
+.vistas button, .toggles button { gap: 6px; padding: 7px 11px; border-radius: 10px; font-size: 12.5px; }
+.vistas button svg, .toggles button svg { width: 15px; height: 15px; }
+.insignia-planta { top: calc(var(--barra, 56px) + 8px); }
+.lugares { top: calc(var(--barra, 56px) + 8px); }
+/* portátil: los interruptores (techos, personas, visita, lugares) solo con su icono; el nombre sigue en la burbuja */
+@media (max-width: 1480px) {
+  .toggles button span { display: none; }
+  .toggles button { padding: 7px 9px; }
+}
+/* tableta horizontal: las vistas conservan su nombre, más compactas */
+@media (max-width: 1180px) {
+  .vistas button span { display: inline; }
+  .vistas button { padding: 7px 8px; gap: 5px; font-size: 12px; }
+  .exp-inicio .marca div { display: none; }
+}
+/* pantalla más estrecha: las vistas solo con icono (el nombre sigue en la burbuja) */
+@media (max-width: 1000px) {
+  .vistas button span { display: none; }
+  .vistas button { padding: 7px 10px; }
+}
+@media (max-width: 860px) {
+  .insignia-planta, .lugares { top: calc(var(--barra, 110px) + 8px); }
+}
+/* teléfono: las 6 vistas en UNA sola fila (antes 2 filas) */
+@media (max-width: 560px) {
+  .vistas { grid-template-columns: repeat(6, 1fr); }
+  .vistas button { padding: 7px 2px; }
+  .toggles button { padding: 7px 8px; }
+  .exp-inicio { padding: 4px 9px 4px 5px; }
+}

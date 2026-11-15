@@ -13,6 +13,8 @@ centré sans déformation dans un carré transparent. Ne jamais le redessiner ni
 - **PowerPoint final :** `presentacion/nuestro_colegio_ideal.pptx` (17 diapositives, dont 11 avec un vrai bâtiment 3D).
   Ancienne version (v1) gardée dans `Sauvegardes/colegio-avant-perfection-…/nuestro_colegio_ideal_3D_v1.pptx`.
 - **Visionneuse 3D :** https://natxmans.github.io/colegio-aurora/visor3d.html (les 11 bâtiments, souris et doigts)
+- **État des lieux testé** (ce qui marche, ce qui reste, erreurs corrigées) : [AUDIT.md](AUDIT.md)
+- **Visite guidée directe :** bouton « Visita guiada en 3D » sous la présentation, ou https://natxmans.github.io/colegio-aurora/?visita=guiada#campus
 
 ## Les bâtiments en 3D (PowerPoint + visionneuse)
 
