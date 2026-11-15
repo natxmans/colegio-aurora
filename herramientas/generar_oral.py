@@ -128,7 +128,7 @@ L += ['', f"**Durée estimée : environ {total_s // 60} min {total_s % 60:02d} s
       f"| Diapositives | 2, 4, 6, 8, 10, 12, 14, 16 (+ début de la 1) | 3, 5, 7, 9, 11, 13, 15, 17 (+ début de la 1) | intro (1) et fin (17) |",
       f"| Mots en espagnol | {cuenta['P1']} | {cuenta['P2']} | {cuenta['JUNTOS']} |",
       f"| Temps de parole seul | ~{seg['P1']} s | ~{seg['P2']} s | ~{seg['JUNTOS']} s |", '',
-      'Personne 1 présente surtout **les bâtiments** (elle connaît la maquette 3D) ; Personne 2 présente surtout **la vie des élèves**.', '',
+      'Les deux alternent à chaque diapositive : Personne 1 a plutôt **les bâtiments**, Personne 2 plutôt **la vie des élèves**. Les deux textes ont la même longueur : vous choisissez librement qui est Personne 1 et qui est Personne 2. Cette répartition ne sert **que pour l’oral** : tout le reste du projet se fait à deux.', '',
       '## Diapositive par diapositive\n']
 for n, t, v, partes, tr, s in D:
     L.append(f'### Diapo {n} — {t}  ·  {orador(partes)}  ·  ~{s} s')

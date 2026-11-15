@@ -40,7 +40,7 @@
 | Mots en espagnol | 379 | 382 | 13 |
 | Temps de parole seul | ~205 s | ~190 s | ~65 s |
 
-Personne 1 présente surtout **les bâtiments** (elle connaît la maquette 3D) ; Personne 2 présente surtout **la vie des élèves**.
+Les deux alternent à chaque diapositive : Personne 1 a plutôt **les bâtiments**, Personne 2 plutôt **la vie des élèves**. Les deux textes ont la même longueur : vous choisissez librement qui est Personne 1 et qui est Personne 2. Cette répartition ne sert **que pour l’oral** : tout le reste du projet se fait à deux.
 
 ## Diapositive par diapositive
 
