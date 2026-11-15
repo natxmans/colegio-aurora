@@ -13,12 +13,12 @@ correspond à un test réellement lancé, pas à une description de page.
 | Présentation (17 diapositives) | flèches, clavier, miniatures, « Ver el texto », plein écran (avec plan B sur téléphone), téléchargement du .pptx ; 11 diapositives avec le vrai modèle 3D manipulable dans la diapositive |
 | Liens | 32 liens et ancres de l'accueil : 0 cassé ; 22 liens des boutons du PowerPoint : tous ouvrent le bon bâtiment |
 | Visionneuse 3D | 15 modèles (11 bâtiments + 4 vues intérieures) chargés sans erreur, bâtiment entier dans le cadre ; souris, molette, clic droit, doigts, vues frontal/latéral/arrière/dessus |
-| Campus 3D | 44 élèves + 17 adultes (9 professeurs, personnel) ; rotation, zoom, clic sur un bâtiment, entrer/sortir, étages, toits, visite guidée (18 étapes), lieux |
+| Campus 3D | **64 élèves** (depuis le 15/11, voir section 8) + 21 adultes (9 professeurs, 12 personnels) ; rotation, zoom, clic sur un bâtiment, entrer/sortir, étages, toits, visite guidée (18 étapes), lieux |
 | Internat (résidence) | bâtiment séparé, toit fermé, 32 chambres doubles : **chacune exactement 2 lits, 2 bureaux, 2 armoires** (compté dans la maquette) ; salon, hall, coin détente ; vue extérieure + vue intérieure |
 | Journée complète (vitesse « muy rápido », sans saut) | 07:51 les 44 élèves se lèvent en uniforme · 08:15 40 en classe · 10:08 34 dans la cour · 10:31 11 en permanence (professeur absent) · 12:40 37 à la cantine · 14:14 reprise · 17:45 8 nagent, 9 jouent · 21:37 44/44 dans leur propre lit en pyjama · lendemain : réveil normal ; 0 trajet impossible, 0 téléportation |
 | Jour / nuit | lumière liée à l'heure (lever 7:30, coucher 20:00), fenêtres et lampadaires allumés la nuit ; pause, 4 vitesses, heure réelle, « Ir a… », heure au choix, jour suivant |
 | Assistant IA | une conversation par élève ; **mode démonstration clairement affiché** (pas d'IA connectée) ; serveur prêt (`servidor-ia/`) : clé dans une variable d'environnement, limite par adresse IP, taille maximale, erreurs gérées |
-| Compatibilité | diagnostic au démarrage ; 3 qualités (Alta 44 élèves + ombres, Normal 32, Ligera 16 sans ombres) ; baisse automatique si la 3D est lente ; sans WebGL : image du campus + message, le reste du site marche ; téléphone et tablette testés |
+| Compatibilité | diagnostic au démarrage ; 3 qualités (Alta, Normal, Ligera sans ombres : les 64 élèves sont simulés dans les trois) ; baisse automatique si la 3D est lente ; sans WebGL : image du campus + message, le reste du site marche ; téléphone et tablette testés |
 | Console | 0 erreur et 0 avertissement (accueil, campus, visionneuse) |
 
 ## 2. Présent mais incomplet
@@ -63,3 +63,43 @@ pas « un ordinateur par élève »).
 ## 7. Liens
 
 0 lien cassé (32 sur l'accueil, 22 dans le PowerPoint, liens vers les 15 modèles 3D).
+
+## 8. Population (mission du 15 novembre, après-midi)
+
+**Pourquoi les salles paraissaient vides** : 4 classes de 11 élèves au maximum dans des salles de 12 pupitres,
+et le nombre d'élèves simulés dépendait de la qualité graphique (Alta 44, Normal 32, **Ligera 16** : 4 élèves
+par classe). La capacité de l'internat (32 chambres doubles) est **64 lits** : 100 à 120 élèves auraient demandé
+18 à 28 chambres de plus. Solution choisie, sans toucher aux bâtiments : **64 élèves = 64 lits**.
+
+| Élément | Avant | Après (testé) |
+|---|---|---|
+| Élèves | 44 (Alta) / 32 / 16 | **64 dans les 3 qualités** |
+| Classes | 4 × 11, non mixtes | **6 classes mixtes** de 10–11 (4ºA–4ºF), salles de 12 pupitres (83–92 %) |
+| Salles de cours occupées à la fois | 4 | 6 (3 restent vides, normal) |
+| Chambres | 22 occupées | **32 / 32**, 2 élèves du même sexe, jamais plus |
+| Cantine | 48 places (deux élèves sur la même chaise possibles au-delà) | **64 places** (8 tables de 8), chaque classe mange ensemble |
+| Sports du soir | sans limite (la 9e nageuse restait sur place) | piscine 8, foot 14, basket 10, gymnase 20 ; si plein : autre sport ou gradins |
+| Adultes | 9 professeurs + 8 | 9 professeurs + **12** (monitrice de cantine, entraîneur de basket, surveillante de l'étude, 2e éducatrice de nuit) |
+
+Test `herramientas/poblacion.py saltos` (saut à chaque heure), **identique en Alta, Normal et Ligera** :
+
+| Heure | Où sont les 64 élèves |
+|---|---|
+| 07:45 | dans les chambres (réveil, uniforme) |
+| 08:15 | 6 classes : SVT 11, Physique 11, Musique 11, Gymnase 11, Français 10, Techno 10 — tous assis, professeur présent |
+| 10:05 | cour de récréation : 62 + 2 qui arrivent ; éducatrice de vie scolaire dans la cour |
+| 10:30 | Musique 11, Gymnase 11, Anglais 11, SVT 11, Histoire 10, **Permanence 10** (professeur de maths absent ce jour-là) |
+| 12:40 | **64 à la cantine**, 5 professeurs à leur table, 2 cuisiniers, la monitrice |
+| 14:15 | 6 classes complètes |
+| 17:30 | foot 14, piscine 11 (8 nagent, 3 attendent), basket 10, salle de jeux 5, bibliothèque 5, lecture 5, salon 4, étude 4, jardin 3, gymnase 3 |
+| 20:00 | salon de la résidence 13, coin détente 5, chambres 46 |
+| 21:30 | **64/64 dans leur propre lit**, 32 chambres occupées, 2 par chambre au maximum |
+
+À chaque heure : **0 chevauchement** (deux personnes au même endroit), **0 place occupée deux fois**, 0 erreur de console.
+789 places de la maquette, toutes accessibles à pied depuis la cour (testé).
+
+**Performances mesurées** (Chrome de test, qualité Alta) : simulation des 85 personnes ≈ 0,4 à 1 ms par image,
+dessin des personnages ≈ 1,1 ms par image, 233 appels de dessin et 612 000 triangles (inchangé grâce au dessin
+« instancié »). Images par seconde mesurées à 21:30 dans le Chrome de test sans écran : Alta 60, Normal 34,
+Ligera 58 — ces chiffres varient d'une mesure à l'autre et ne sont **pas** ceux d'un vrai ordinateur : à vérifier sur le PC de la présentation. Les élèves cachés (hors de l'écran,
+étage masqué, « Ocultar personas ») continuent d'exister dans la simulation.

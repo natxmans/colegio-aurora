@@ -150,6 +150,7 @@ function EstarRes({ s }) {
     <${MesaRedonda} p=${[1.6, 0, -1.4]} d=${0.8} alto=${0.42} />
     <${Estanteria} p=${[-2.2, 0, -2.95]} w=${1.8} h=${1.6} niveles=${4} tex=${texLomos(111, 4)} c=${COL.maderaC} led=${COL.maderaC} />
     <${Planta} p=${[-4.3, 0, -2.6]} s=${1.1} tipo=${0} />
+    <${Punto} t="trabajo" sala=${s.id} rol="educador" i=${1} p=${[-1.5, 0, -1.0]} ry=${PI / 2} accion="vigilar" />
   <//>`;
 }
 

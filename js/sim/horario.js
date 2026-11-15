@@ -1,7 +1,9 @@
 // =========================================================
 // LAS PERSONAS DEL COLEGIO Y SU HORARIO (datos puros, sin 3D)
-// · 4 grupos de 4º (A, B, C, D) · 9 profesores (uno por asignatura)
-// · personal: recepción, biblioteca, cocina, vida escolar, permanencia, socorrista
+// · 64 alumnos internos (la capacidad de la residencia) en 6 grupos de 4º (A-F) de 10-11 alumnos
+// · 9 profesores (uno por asignatura)
+// · personal: recepción, biblioteca, cocina, monitora del comedor, vida escolar, permanencia,
+//   educadora del estudio, socorrista, entrenador de baloncesto, 2 educadores de noche
 // Horario oficial: 07:45 despertar · 08:00 clases · 10:00 recreo (20 min) ·
 // 12:20 comida · 14:00 clases · 17:00 fin de las clases · 21:00 a dormir.
 // Estas funciones sirven para la simulación 3D y también para el asistente
@@ -9,7 +11,7 @@
 // =========================================================
 import { aMin } from './reloj.js';
 
-export const GRUPOS = ['4ºA', '4ºB', '4ºC', '4ºD'];
+export const GRUPOS = ['4ºA', '4ºB', '4ºC', '4ºD', '4ºE', '4ºF'];  // 6 clases de 10-11 alumnos (aulas de 12 pupitres)
 export const MATERIAS = [
   { id: 'svt', nombre: 'Ciencias de la Vida y de la Tierra', corto: 'Ciencias', sala: 'svt' },
   { id: 'edfisica', nombre: 'Educación Física', corto: 'Ed. Física', sala: 'gimnasio' },
@@ -45,16 +47,20 @@ const NOMBRES = ['Lucía', 'Hugo', 'Martina', 'Pablo', 'Sofía', 'Daniel', 'Paul
   'Julia', 'Adrián', 'Carla', 'Diego', 'Elena', 'Marcos', 'Noa', 'Javier', 'Alba', 'Leo',
   'Irene', 'Sergio', 'Claudia', 'Iker', 'Lola', 'Bruno', 'Vega', 'Gonzalo', 'Ainhoa', 'Rubén',
   'Nerea', 'Óscar', 'Carmen', 'Iván', 'Inés', 'Marco', 'Olivia', 'Raúl', 'Aitana', 'Unai',
-  'Emma', 'Samuel', 'Lara', 'Nicolás'];
+  'Emma', 'Samuel', 'Lara', 'Nicolás', 'Valentina', 'Mateo', 'Zoe', 'Alejandro', 'Abril', 'Manuel',
+  'Candela', 'Rodrigo', 'Jimena', 'Gabriel', 'Triana', 'Héctor', 'Mía', 'Izan', 'Ariadna', 'Thiago',
+  'Carlota', 'Eric', 'Laia', 'Pol'];
+// 64 alumnos = la capacidad de la residencia (32 habitaciones dobles x 2): todos son internos.
 const PIEL = ['#f5d3b8', '#ebbd98', '#d39b72', '#a8714b', '#6f4a2f'];
 const PELO = ['#2b1d14', '#4a2f1d', '#7a4a26', '#c08a45', '#e3c27c', '#151515', '#6b2f1a'];
 const DEPORTES = ['futbol', 'baloncesto', 'natacion', 'gimnasio'];
 const LUGARES = ['biblioteca', 'jardin', 'juegos', 'lectura', 'estudio', 'salon2'];
-export const POR_GRUPO_MAX = 11;
+export const POR_GRUPO_MAX = 11;  // 64 alumnos en 6 grupos: 4 grupos de 11 y 2 de 10
 
 export const ALUMNOS = NOMBRES.map((nombre, i) => {
   const r = azar(1000 + i * 37);
-  const g = i % 4, num = Math.floor(i / 4);
+  // grupos MIXTOS: en cada «fila» de 6 alumnos, cada grupo recibe uno (y las chicas/chicos se alternan)
+  const num = Math.floor(i / 6), g = (i + num) % 6;
   const chica = i % 2 === 0;
   return {
     id: 'al' + i, i, nombre, grupo: g, num, chica,
@@ -68,25 +74,28 @@ export const ALUMNOS = NOMBRES.map((nombre, i) => {
   };
 });
 
-// Habitaciones: dos compañeros del mismo grupo por habitación (primero el primer piso de la residencia)
-const ORDEN_HAB = [...Array(18)].map((_, k) => 'hab' + (101 + k)).concat([...Array(14)].map((_, k) => 'hab' + (k + 1)));
-export function repartir(n) {
-  // n alumnos activos (calidad): los mismos en todos los grupos
-  const porGrupo = Math.max(1, Math.round(n / 4));
-  const activos = ALUMNOS.filter(a => a.num < porGrupo);
-  // habitaciones: por grupo, de dos en dos
-  let h = 0;
-  for (let g = 0; g < 4; g++) {
-    const del = activos.filter(a => a.grupo === g).sort((a, b) => a.num - b.num);
-    for (let k = 0; k < del.length; k += 2) {
-      const hab = ORDEN_HAB[h++];
-      del[k].hab = hab; del[k].cama = 0;
-      if (del[k + 1]) { del[k + 1].hab = hab; del[k + 1].cama = 1; }
+// Habitaciones: dos compañeros del MISMO SEXO por habitación (si es posible del mismo grupo), nunca más de dos.
+// 32 chicas → 16 habitaciones, 32 chicos → 16 habitaciones = las 32 habitaciones dobles de la residencia.
+// Chicas: habitaciones 101-116 (primer piso) · chicos: 1-14 (planta baja) y 117-118 (ala este del primer piso).
+const HAB_CHICAS = [...Array(16)].map((_, k) => 'hab' + (101 + k));
+const HAB_CHICOS = [...Array(14)].map((_, k) => 'hab' + (k + 1)).concat(['hab117', 'hab118']);
+export const CAPACIDAD_RESIDENCIA = (HAB_CHICAS.length + HAB_CHICOS.length) * 2;
+export function repartir() {
+  // comedor: los compañeros de una misma clase se sientan juntos (8 mesas de 8)
+  [...ALUMNOS].sort((a, b) => a.grupo - b.grupo || a.num - b.num).forEach((a, k) => { a.mesa = k; });
+  for (const chicas of [true, false]) {
+    const lista = ALUMNOS.filter(a => a.chica === chicas).sort((a, b) => a.grupo - b.grupo || a.num - b.num);
+    const habs = chicas ? HAB_CHICAS : HAB_CHICOS;
+    for (let k = 0; k < lista.length; k += 2) {
+      const hab = habs[k / 2];
+      if (!hab) throw new Error('No hay habitación para todos: la residencia tiene ' + CAPACIDAD_RESIDENCIA + ' plazas');
+      lista[k].hab = hab; lista[k].cama = 0;
+      if (lista[k + 1]) { lista[k + 1].hab = hab; lista[k + 1].cama = 1; }
     }
   }
-  return activos;
+  return ALUMNOS;   // la simulación tiene SIEMPRE a todos los alumnos (la calidad solo cambia el dibujo)
 }
-repartir(44);
+repartir();
 
 // ---------------- PROFESORES Y PERSONAL ----------------
 const NOMBRES_PROF = { svt: 'Marta', edfisica: 'Jorge', fisica: 'Ana', historia: 'Luis', frances: 'Claire', mates: 'Carmen', tecno: 'Andrés', ingles: 'Laura', musica: 'Pedro' };
@@ -110,7 +119,12 @@ export const PERSONAL = [
   { id: 'pe5', rol: 'educador', nombre: 'Educador de noche', sala: 'hallres', desde: '17:30', hasta: '08:30', camisa: '#a0673f' },
   { id: 'pe6', rol: 'permanencia', nombre: 'Vigilante de la permanencia', sala: 'permanencia', desde: '07:50', hasta: '17:10', camisa: '#5a6b8e' },
   { id: 'pe7', rol: 'socorrista', nombre: 'Socorrista', sala: 'piscina', desde: '16:50', hasta: '19:45', camisa: '#c0392b' },
-].map((p, k) => ({ ...p, k, desdeM: aMin(p.desde), hastaM: aMin(p.hasta), piel: PIEL[(k * 2 + 1) % 5], pelo: PELO[(k * 3) % 7], peinado: k % 2 ? 'moño' : 'corto', alto: 0.98 }));
+  // más adultos para 64 alumnos
+  { id: 'pe8', rol: 'monitor', nombre: 'Monitora del comedor', texto: 'Vigila el comedor y ayuda a los alumnos', sala: 'comedor', ronda: 4, desde: '12:10', hasta: '13:50', camisa: '#2f6b5a', peinado: 'largo' },
+  { id: 'pe9', rol: 'entrenador', nombre: 'Entrenador de baloncesto', texto: 'Entrena a los jugadores de baloncesto', sala: 'baloncesto', desde: '16:55', hasta: '18:35', camisa: '#c46a2e', peinado: 'corto' },
+  { id: 'pe10', rol: 'estudio', nombre: 'Educadora del estudio', texto: 'Vigila la sala de estudio y ayuda con el trabajo', sala: 'estudio', ronda: 6, desde: '16:58', hasta: '19:55', camisa: '#3f6f8a', peinado: 'largo' },
+  { id: 'pe11', rol: 'educador', nombre: 'Educadora de noche (primer piso)', sala: 'estarres', i: 1, desde: '17:30', hasta: '08:30', camisa: '#8a5a3a', peinado: 'moño' },
+].map((p, k) => ({ ...p, k, desdeM: aMin(p.desde), hastaM: aMin(p.hasta), piel: PIEL[(k * 2 + 1) % 5], pelo: PELO[(k * 3) % 7], peinado: p.peinado || (k % 2 ? 'moño' : 'corto'), alto: 0.98 }));
 
 // ---------------- EL HORARIO DE CLASES ----------------
 // materia del grupo g en el periodo p del día d (4 materias distintas a la vez → nunca dos grupos con el mismo profesor)

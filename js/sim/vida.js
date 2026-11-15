@@ -8,7 +8,7 @@
 // =========================================================
 import { reloj, avanzar, pasoVisual, aMin } from './reloj.js';
 import { NAV, buscar, cercaLibre, libre, altura } from './navegacion.js';
-import { ALUMNOS, PROFES, PERSONAL, repartir, claseDeGrupo, HORAS, azar, PERIODOS, ausenteDe, materiaDe } from './horario.js';
+import { ALUMNOS, PROFES, PERSONAL, GRUPOS, repartir, claseDeGrupo, HORAS, azar, PERIODOS, ausenteDe, materiaDe } from './horario.js';
 import { ANIM, nuevaPose, mezclar, P } from './cuerpo.js';
 import { SALAS, aMundo } from '../datos/salas.js';
 
@@ -95,8 +95,11 @@ function planAlumno(per, dia, m) {
   if (m < HORAS.despertar + 6 + j * 0.2)
     return { id: 'vestirse', dest: punto(hab, 'armario', a.cama), accion: 'armario', ropa: 'pijama', ropaFin: 'uniforme', sala: hab, texto: 'Se levanta y se pone el uniforme' };
   if (m < HORAS.clases - 6 + j * 0.3) {
-    const sala = a.i % 3 === 0 ? 'hallres' : 'estarres';
-    return { id: 'manana', dest: puntoLibre(sala, ['sofa'], per, a.i) || { libre: 'res' }, accion: 'charlar_sentado', ropa: 'uniforme', sala, texto: 'Se reúne con los amigos en la residencia' };
+    // un sofá libre en la planta de su habitación; si no queda ninguno, prepara la mochila en su habitación
+    const sala = hab.length > 5 ? 'estarres' : (a.i % 2 ? 'hallres' : 'salonres');
+    const s = puntoLibre(sala, ['sofa'], per, a.i);
+    if (s) return { id: 'manana', dest: s, accion: 'charlar_sentado', ropa: 'uniforme', sala, texto: 'Se reúne con los amigos en la residencia' };
+    return { id: 'manana', dest: punto(hab, 'escritorio', a.cama), accion: 'escribir', ropa: 'uniforme', sala: hab, texto: 'Prepara la mochila en su habitación' };
   }
   // clases
   for (let p = 0; p < PERIODOS.length; p++) {
@@ -110,16 +113,23 @@ function planAlumno(per, dia, m) {
   }
   if (m >= HORAS.recreo && m < HORAS.finRecreo - 3) return { id: 'recreo', recreo: true, ropa: 'uniforme', sala: 'patio', texto: 'Recreo en el patio' };
   if (m >= HORAS.comida && m < HORAS.comida + 34 + j * 2)
-    return { id: 'comida', dest: punto('comedor', 'comedor', a.i), accion: 'comer', ropa: 'uniforme', sala: 'comedor', texto: 'Come en el comedor' };
+    return { id: 'comida', dest: punto('comedor', 'comedor', a.mesa), accion: 'comer', ropa: 'uniforme', sala: 'comedor', texto: 'Come en el comedor' };
   if (m >= HORAS.comida && m < HORAS.tarde - 5) return libreDe(per, dia, 'mediodia', a.i % 3 === 0 ? 'patio' : a.lugar, 'uniforme');
   // tarde libre
   const t1 = aMin('18:30') + j, t2 = aMin('19:50') + j;
-  if (m >= HORAS.finClases && m < t1) return a.deportista > 0.42 ? deporteDe(per, a.deporte) : libreDe(per, dia, 'tarde1', a.lugar, 'uniforme');
-  if (m >= HORAS.finClases && m < t2) return a.deportista > 0.42 ? libreDe(per, dia, 'tarde2', a.estudioso > 0.5 ? 'estudio' : a.lugar, 'uniforme') : (a.deportista > 0.2 ? deporteDe(per, a.deporte === 'futbol' ? 'gimnasio' : a.deporte) : libreDe(per, dia, 'tarde2', 'estudio', 'uniforme'));
+  if (m >= HORAS.finClases && m < t2) {
+    prepararTarde(dia);
+    const f = m < t1 ? 1 : 2, dep = tarde.get(a.id + ':' + f);
+    if (dep) return deporteDe(per, dep);
+    if (f === 1) return libreDe(per, dia, 'tarde1', a.lugar, 'uniforme');
+    return libreDe(per, dia, 'tarde2', a.deportista > 0.42 && a.estudioso <= 0.5 ? a.lugar : 'estudio', 'uniforme');
+  }
   if (m < HORAS.dormir - 22 + j) {
     const r = azar(a.i * 5 + dia)();
-    if (r < 0.45) return { id: 'residencia', dest: puntoLibre('salonres', ['sofa', 'juego_mesa'], per, a.i) || punto(hab, 'escritorio', a.cama), accion: null, ropa: 'uniforme', sala: 'salonres', texto: 'En el salón de la residencia' };
-    if (r < 0.65) return { id: 'residencia', dest: puntoLibre('estarres', ['sofa'], per, a.i) || punto(hab, 'escritorio', a.cama), accion: 'charlar_sentado', ropa: 'uniforme', sala: 'estarres', texto: 'Habla con los amigos en el rincón de estar' };
+    // en el salón o en el rincón de estar si queda un sitio; si no, en su habitación
+    const s = r < 0.45 ? puntoLibre('salonres', ['sofa', 'juego_mesa'], per, a.i) : r < 0.65 ? puntoLibre('estarres', ['sofa'], per, a.i) : null;
+    if (s && s.sala === 'salonres') return { id: 'residencia', dest: s, accion: null, ropa: 'uniforme', sala: 'salonres', texto: 'En el salón de la residencia' };
+    if (s) return { id: 'residencia', dest: s, accion: 'charlar_sentado', ropa: 'uniforme', sala: 'estarres', texto: 'Habla con los amigos en el rincón de estar' };
     return { id: 'residencia', dest: punto(hab, 'escritorio', a.cama), accion: a.estudioso > 0.5 ? 'escribir' : 'ordenador', ropa: 'uniforme', sala: hab, texto: 'En su habitación' };
   }
   if (m < HORAS.dormir - 12 + j) return { id: 'pijama', dest: punto(hab, 'armario', a.cama), accion: 'armario', ropa: 'uniforme', ropaFin: 'pijama', sala: hab, texto: 'Se prepara para dormir' };
@@ -129,16 +139,54 @@ function planAlumno(per, dia, m) {
 const SALA_LUGAR = { biblioteca: ['biblio', 'sillon', 'estante'], jardin: ['banco', 'paseo'], juegos: ['ping', 'futbolin', 'sofa'], lectura: ['sillon'], estudio: ['estudio'], salon2: ['sofa', 'sillon', 'mesa'], patio: ['banco', 'patio', 'ping', 'rayuela'] };
 function libreDe(per, dia, id, lugar, ropa) {
   const tipos = SALA_LUGAR[lugar] || ['sofa'];
-  const p = puntoLibre(lugar, tipos, per, (per.d.i * 3 + dia) % 7);
+  let p = puntoLibre(lugar, tipos, per, (per.d.i * 3 + dia) % 7);
+  if (!p && lugar !== 'patio') { p = puntoLibre('patio', ['banco', 'patio'], per, per.d.i * 5); if (p) lugar = 'patio'; }
   const textos = { biblioteca: 'Lee y trabaja en la biblioteca digital', jardin: 'Pasea por los jardines', juegos: 'Juega en la sala de juegos', lectura: 'Lee en el salón de lectura', estudio: 'Hace su trabajo en la sala de estudio', salon2: 'Descansa en el salón común', patio: 'Está en el patio con los amigos' };
   return { id: id + lugar, dest: p || { libre: 'patio' }, accion: null, ropa, sala: lugar, texto: textos[lugar] || 'Tiempo libre' };
 }
-function deporteDe(per, dep) {
-  if (dep === 'natacion') return { id: 'natacion', dest: puntoLibre('piscina', ['carril'], per, per.d.i % 8), nadar: true, ropa: 'banador', sala: 'piscina', texto: 'Nada en la piscina olímpica' };
+// Deportes de la tarde con PLAZAS LIMITADAS: 8 calles en la piscina, 7 contra 7 en el fútbol,
+// 5 contra 5 en el baloncesto, 20 puestos en el gimnasio. Si un deporte está lleno, el alumno
+// elige otro con sitio o espera su turno mirando desde la grada.
+const CUPO = { futbol: 14, baloncesto: 10, natacion: 8, gimnasio: 20 };
+const DEPS = ['futbol', 'baloncesto', 'gimnasio', 'natacion'];
+let tardeDia = -1;
+const tarde = new Map();   // 'al12:1' → { dep, mira } (franja 1: 17:00-18:30, franja 2: 18:30-19:50)
+function prepararTarde(dia) {
+  if (tardeDia === dia) return;
+  tardeDia = dia; tarde.clear();
+  const r = azar(900 + dia * 17);
+  const orden = [...SIM.alumnos];
+  for (let k = orden.length - 1; k > 0; k--) { const q = Math.floor(r() * (k + 1)); [orden[k], orden[q]] = [orden[q], orden[k]]; }
+  for (const f of [1, 2]) {
+    const n = { futbol: 0, baloncesto: 0, natacion: 0, gimnasio: 0 };
+    for (const per of orden) {
+      const a = per.d;
+      const quiere = f === 1 ? (a.deportista > 0.42 ? a.deporte : null)
+        : (a.deportista <= 0.42 && a.deportista > 0.2 ? (a.deporte === 'futbol' ? 'gimnasio' : a.deporte) : null);
+      if (!quiere) continue;
+      let dep = quiere, mira = false;
+      if (n[dep] >= CUPO[dep]) { const otro = r() < 0.5 ? DEPS.find(d => n[d] < CUPO[d]) : null; if (otro) dep = otro; else mira = true; }
+      if (!mira) n[dep]++;
+      tarde.set(a.id + ':' + f, { dep, mira });
+    }
+  }
+}
+function espectador(per, dep) {
+  const sala = dep === 'natacion' ? 'piscina' : dep;
+  const p = puntoLibre(sala, dep === 'baloncesto' ? ['banco'] : ['grada'], per, per.d.i * 3);
+  const textos = { futbol: 'Mira el partido de fútbol desde la grada', baloncesto: 'Espera su turno para jugar al baloncesto', natacion: 'Espera su turno para nadar: todas las calles están ocupadas', gimnasio: 'Espera su turno en la grada del gimnasio' };
+  if (p) return { id: 'mira' + dep, dest: p, accion: 'mirar', ropa: dep === 'natacion' ? 'uniforme' : 'deporte', sala, texto: textos[dep] };
+  return libreDe(per, reloj.dia, 'tarde', per.d.lugar, 'uniforme');
+}
+function deporteDe(per, t) {
+  const dep = t.dep;
+  if (t.mira) return espectador(per, dep);
+  if (dep === 'natacion') { const p = puntoLibre('piscina', ['carril'], per, per.d.i % 8); return p ? { id: 'natacion', dest: p, nadar: true, ropa: 'banador', sala: 'piscina', texto: 'Nada en la piscina olímpica' } : espectador(per, dep); }
   if (dep === 'futbol') return { id: 'futbol', juego: 'futbol', ropa: 'deporte', sala: 'futbol', texto: 'Juega al fútbol' };
   if (dep === 'baloncesto') return { id: 'baloncesto', juego: 'baloncesto', ropa: 'deporte', sala: 'baloncesto', texto: 'Juega al baloncesto' };
   const p = puntoLibre('gimnasio', ['ejercicio', 'colchoneta'], per, per.d.i % 15);
-  return { id: 'gimnasio', dest: p, accion: p && p.t === 'colchoneta' ? 'estirar' : 'ejercicio', ropa: 'deporte', sala: 'gimnasio', texto: 'Hace ejercicio en el gimnasio' };
+  if (!p) return espectador(per, 'gimnasio');
+  return { id: 'gimnasio', dest: p, accion: p.t === 'colchoneta' ? 'estirar' : 'ejercicio', ropa: 'deporte', sala: 'gimnasio', texto: 'Hace ejercicio en el gimnasio' };
 }
 
 function planProfe(per, dia, m) {
@@ -150,10 +198,10 @@ function planProfe(per, dia, m) {
   for (let p = 0; p < PERIODOS.length; p++) {
     const ini = PERIODOS[p][0] - 4, fin = PERIODOS[p][1];
     if (m >= ini && m < fin) {
-      for (let g = 0; g < 4; g++) {
+      for (let g = 0; g < GRUPOS.length; g++) {
         if (materiaDe(dia, p, g).id === pr.materia) {
           const sala = pr.materia === 'edfisica' ? 'gimnasio' : materiaDe(dia, p, g).sala;
-          return { id: 'clase' + p, profe: true, sala, dest: punto(sala, 'profe', 0), accion: 'explicar', ropa: 'adulto', texto: `Da clase de ${materiaDe(dia, p, g).nombre} a ${['4ºA', '4ºB', '4ºC', '4ºD'][g]}` };
+          return { id: 'clase' + p, profe: true, sala, dest: punto(sala, 'profe', 0), accion: 'explicar', ropa: 'adulto', texto: `Da clase de ${materiaDe(dia, p, g).nombre} a ${GRUPOS[g]}` };
         }
       }
     }
@@ -171,9 +219,12 @@ function planPersonal(per, dia, m) {
   if (d.rol === 'vidaescolar' && ((m >= HORAS.recreo && m < HORAS.finRecreo) || (m >= aMin('13:00') && m < aMin('13:52'))))
     return { id: 'patio', dest: { x: -8, z: 30, capa: 0, yaw: -PI / 2 }, accion: 'vigilar', ropa: 'adulto', sala: 'patio', texto: 'Vigila el patio' };
   if (d.rol === 'educador' && m >= aMin('21:05') && m < aMin('21:30'))
-    return { id: 'ronda', dest: { x: -52, z: (m % 10 < 5 ? -16 : 16), capa: 2, yaw: 0 }, accion: 'vigilar', ropa: 'adulto', sala: 'residencia', texto: 'Hace una ronda: ¡a dormir!' };
-  const p = lista(d.sala, 'trabajo').find(q => q.rol === d.rol && (d.i == null || q.i === d.i)) || lista(d.sala, 'trabajo')[0];
-  return { id: 'trabajo', dest: p, accion: p && p.accion ? p.accion : 'atender', ropa: 'adulto', sala: d.sala, texto: per.d.nombre };
+    return { id: 'ronda' + (m % 10 < 5 ? 0 : 1), dest: { x: -52, z: (m % 10 < 5 ? -16 : 16), capa: d.i === 1 ? 2 : 0, yaw: 0 }, accion: 'vigilar', ropa: 'adulto', sala: 'residencia', texto: 'Hace una ronda por los pasillos: ¡a dormir!' };
+  const mios = lista(d.sala, 'trabajo').filter(q => q.rol === d.rol);
+  // los que vigilan una sala grande van de un puesto a otro (d.ronda = minutos en cada puesto)
+  const p = d.ronda && mios.length > 1 ? mios[Math.floor(m / d.ronda) % mios.length]
+    : mios.find(q => d.i == null || q.i === d.i) || mios[0] || lista(d.sala, 'trabajo')[0];
+  return { id: 'trabajo' + (d.ronda && p ? p.i : ''), dest: p, accion: p && p.accion ? p.accion : 'atender', ropa: 'adulto', sala: d.sala, texto: d.texto || d.nombre };
 }
 
 function plan(per, dia, m) {
@@ -247,6 +298,7 @@ function procesarCola() {
       if (per.fallos < 4) { per.estado = 'quieto'; per.ruta = null; per.reintento = { t: SIM.tReal + 1 + per.fallos, q }; continue; }
       // último recurso (muy raro): aparece directamente en su destino
       SIM.stats.recolocados = (SIM.stats.recolocados || 0) + 1;
+      (SIM.stats.ultimosRecolocados ||= []).push([per.id, Math.round(reloj.min), +per.x.toFixed(1), +per.z.toFixed(1), per.capa, +q.x.toFixed(1), +q.z.toFixed(1), q.capa, per.planId]);
       per.fallos = 0; per.x = q.x; per.z = q.z; per.capa = q.capa; per.y = altura(q.capa, q.x, q.z);
       per.ruta = []; per.ri = 0; per.estado = 'andando';
       continue;
@@ -263,6 +315,7 @@ function ir(per, dest, accion, extra = {}) {
   soltar(per);
   per.juego = null;
   const nadando = per.nadar && (per.estado === 'nadando' || (per.estado === 'trans' && per.trans && per.trans.tipo === 'zambullida'));
+  if (nadando && per.nadar.punto && !per.nadar.punto.ocupado) per.nadar.punto.ocupado = per;  // la calle sigue ocupada hasta que sale
   if (!nadando) per.nadar = null;
   let x, z, capa, sentarse = null, yaw = dest.yaw ?? per.yaw;
   if (dest.t) { // un punto de la maqueta
@@ -332,8 +385,7 @@ function actualizarPlan(per, dia, m) {
   if (pl.recreo) { prepararRecreo(dia); return irRecreo(per); }
   if (pl.juego) return irJuego(per, pl.juego);
   if (pl.nadar && pl.dest) return ir(per, pl.dest, 'pie', { nadar: true });
-  if (pl.dest && pl.dest.libre === 'res') { const k = per.d.i % 8; return ir(per, { x: -46.4 + (k % 2) * 0.9, z: -4 + Math.floor(k / 2) * 0.95, capa: 0, yaw: -PI / 2 + (k % 2 ? 0.6 : -0.6) }, 'charlar'); }
-  if (pl.dest && pl.dest.libre) { const s = lista('patio', 'patio'); return ir(per, s[(per.d.i * 5) % Math.max(1, s.length)] || { x: -15, z: 20, capa: 0 }, 'charlar'); }
+  if (pl.dest && pl.dest.libre) return ir(per, puntoLibre('patio', ['patio', 'banco'], per, per.d.i * 5) || { x: -15, z: 20, capa: 0 }, 'charlar');
   if (!pl.dest) return;
   ir(per, pl.dest, pl.accion);
 }
@@ -376,6 +428,14 @@ function salirAgua(per) {
 function alLlegar(per) {
   const d = per.dest;
   per.ruta = null;
+  // seguridad: si el destino está lejos (o en otra planta), se pide un camino en vez de «llegar»
+  // (así nadie se desliza ni se teletransporta hasta su silla). Tras 2 intentos se acepta.
+  if (d && !d.fuera && (Math.hypot(per.x - d.x, per.z - d.z) > 1.6 || (d.capa != null && d.capa !== per.capa)) && (per.lejos || 0) < 2) {
+    per.lejos = (per.lejos || 0) + 1; per.estado = 'quieto';
+    if (!per.pedir) pedirCamino(per, d.x, d.z, d.capa ?? per.capa);
+    return;
+  }
+  per.lejos = 0;
   if (d && d.capa != null) per.capa = d.capa;
   if (!d) { per.estado = 'quieto'; return; }
   if (d.fuera) { per.estado = 'fuera'; per.visible = false; return; }
@@ -441,7 +501,7 @@ function moverTrans(per, dt) {
     if (tr.tipo === 'sentarse') { per.estado = 'sentado'; }
     else if (tr.tipo === 'acostarse') { per.estado = 'tumbado'; }
     else if (tr.tipo === 'zambullida') { per.estado = 'nadando'; }
-    else if (tr.tipo === 'salida') { per.nadar = null; per.estado = 'quieto'; vestir(per, 'deporte'); irDespues(per); }
+    else if (tr.tipo === 'salida') { const cl = per.nadar && per.nadar.punto; if (cl && cl.ocupado === per && per.punto !== cl) cl.ocupado = null; per.nadar = null; per.estado = 'quieto'; vestir(per, 'deporte'); irDespues(per); }
     else if (tr.tipo === 'levantarse') { per.estado = 'quieto'; per.sentadoEn = null; per.pitch = 0; if (per.dest) { if (per.dest.nadar && per.dest.punto) pedirCamino(per, per.dest.x, per.dest.z, per.dest.capa); else irDespues(per); } }
   }
 }
@@ -451,7 +511,8 @@ const REJ = new Map();
 function claveRej(x, z) { return (Math.floor(x / 2) * 1000 + Math.floor(z / 2)); }
 function moverAndando(per, dt, v) {
   const r = per.ruta;
-  if (!r || per.ri >= r.length) return alLlegar(per);
+  // fin del camino antiguo, pero el nuevo todavía se está calculando: se espera (nunca se «llega» de lejos)
+  if (!r || per.ri >= r.length) { if (per.pedir) { per.ruta = null; per.estado = 'quieto'; return; } return alLlegar(per); }
   const p = r[per.ri], prev = r[per.ri - 1] || p;
   let dx = p.x - per.x, dz = p.z - per.z;
   const dist = Math.hypot(dx, dz);
@@ -644,8 +705,7 @@ export function colocarTodos() {
     let dest = pl.dest;
     if (pl.recreo) { prepararRecreo(dia); const r = recreo.get(per.id) || { tipo: 'banco' }; if (r.tipo === 'banco') dest = puntoLibre('patio', 'banco', per, per.d.i * 3); else if (r.tipo === 'paseo') dest = r.ruta[0]; else dest = { x: r.x, z: r.z, capa: 0, yaw: r.yaw }; }
     if (pl.juego) { const c = CAMPOS[pl.juego]; dest = { x: c.cx + ((per.d.i * 7) % 11 - 5) * 2.5, z: c.cz + ((per.d.i * 3) % 7 - 3) * 2, capa: 0, yaw: 0 }; }
-    if (dest && dest.libre === 'res') { const k = per.d.i % 8; dest = { x: -46.4 + (k % 2) * 0.9, z: -4 + Math.floor(k / 2) * 0.95, capa: 0, yaw: -PI / 2 }; }
-    else if (dest && dest.libre) { const s = lista('patio', 'patio'); dest = s[(per.d.i * 5) % Math.max(1, s.length)]; }
+    if (dest && dest.libre) dest = puntoLibre('patio', ['patio', 'banco'], per, per.d.i * 5);
     if (!dest) { per.x = -15; per.z = 20; per.capa = 0; per.y = 0; per.estado = 'quieto'; poner(per, 'pie', 0.01); continue; }
     if (dest.t) {
       if (dest.ocupado && dest.ocupado !== per) { const alt = puntoLibre(dest.sala, dest.t, per, dest.i); if (alt) dest = alt; }
@@ -700,10 +760,16 @@ export function paso(dtReal) {
   const dt = Math.min(dtReal, 0.1);
   SIM.tReal += dt;
   // ¿cuántos alumnos caminan? (el reloj va más despacio para que se les vea caminar)
-  let andan = 0, presentes = 0, duermen = 0;
-  for (const p of SIM.alumnos) { if (p.estado !== 'fuera') presentes++; if (p.estado === 'andando' || p.pedir) andan++; if (p.estado === 'tumbado') duermen++; }
+  // Si un alumno todavía va de camino a una clase que ya empieza, el reloj también espera (nadie llega tarde
+  // porque el tiempo corre demasiado deprisa mientras él camina).
+  let andan = 0, presentes = 0, duermen = 0, retrasados = 0;
+  for (const p of SIM.alumnos) {
+    if (p.estado !== 'fuera') presentes++;
+    if (p.estado === 'andando' || p.pedir) { andan++; if (p.plan && p.plan.clase && reloj.min >= p.plan.clase.desde - 2) retrasados++; }
+    if (p.estado === 'tumbado') duermen++;
+  }
   reloj.todosDuermen = duermen === SIM.alumnos.length && (reloj.min > aMin('21:40') || reloj.min < aMin('07:40'));
-  avanzar(dt, presentes ? andan / presentes : 0);
+  avanzar(dt, presentes ? Math.max(andan / presentes, retrasados ? 0.35 : 0) : 0);
   if (reloj.saltos !== SIM.ultimoSalto) { SIM.ultimoSalto = reloj.saltos; colocarTodos(); }
   const dia = reloj.dia, m = reloj.min;
   // rejilla de vecinos
@@ -723,7 +789,8 @@ export function paso(dtReal) {
   for (const pa of Object.values(partidos)) if (pa.balon.vis) bs.push(pa.balon);
   for (const r of recreo.values()) if (r.balon && r.yo === 0 && r.balon.vis && reloj.min >= HORAS.recreo && reloj.min < HORAS.finRecreo) bs.push(r.balon);
   SIM.balones = bs;
-  SIM.stats.ms = performance.now() - t0;
+  const ms = performance.now() - t0, st = SIM.stats;
+  st.ms = ms; st.n = (st.n || 0) + 1; st.suma = (st.suma || 0) + ms; if (ms > (st.max || 0)) st.max = ms;
 }
 
 // Postura final de cada persona (mezcla suave entre la animación anterior y la nueva)

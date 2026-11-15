@@ -135,10 +135,10 @@ export function Comedor({ s }) {
   const w = s.w, d = s.d, h = s.h;
   const mesas = [];
   let k = 0;
-  // 8 mesas largas de 6 plazas (alumnos)
+  // 8 mesas largas de 8 plazas = 64 plazas: todos los alumnos comen juntos a las 12:20
   for (const x of [-10.5, -5.5, -0.5, 4.5]) for (const z of [-2.3, 1.5]) {
-    mesas.push(html`<${Mesa} key=${'m' + x + z} p=${[x, 0, z]} w=${2.6} d=${0.9} c=${COL.maderaC} />`);
-    for (const dx of [-0.85, 0, 0.85]) for (const lado of [-1, 1]) {
+    mesas.push(html`<${Mesa} key=${'m' + x + z} p=${[x, 0, z]} w=${3.4} d=${0.9} c=${COL.maderaC} />`);
+    for (const dx of [-1.275, -0.425, 0.425, 1.275]) for (const lado of [-1, 1]) {
       const i = k++;
       mesas.push(html`<${SillaPlaza} key=${'s' + i} p=${[x + dx, 0, z + lado * 0.75]} ry=${lado < 0 ? 0 : PI} c=${i % 2 ? COL.noche : COL.elec} sala=${s.id} t="comedor" i=${i} accion="comer" />`);
     }
@@ -164,6 +164,7 @@ export function Comedor({ s }) {
       <${Pantalla} p=${[w / 2 - 0.12, 2.35, -0.8]} r=${[0, -PI / 2, 0]} w=${2.6} h=${1.46} tex=${texPantalla('menu')} />
       <${Punto} t="trabajo" sala=${s.id} rol="cocina" i=${0} p=${[xb + 0.85, 0, -2.0]} ry=${-PI / 2} accion="servir" />
       <${Punto} t="trabajo" sala=${s.id} rol="cocina" i=${1} p=${[xb + 0.85, 0, 0.4]} ry=${-PI / 2} accion="servir" />
+      ${[-8.0, -3.0, 2.0].map((x, i) => html`<${Punto} key=${'mo' + i} t="trabajo" sala=${s.id} rol="monitor" i=${i} p=${[x, 0, -0.4]} ry=${i % 2 ? PI / 2 : -PI / 2} accion="vigilar" />`)}
       ${[-3.0, -1.6, -0.2, 1.2].map((z, i) => html`<${Punto} key=${'c' + i} t="cola" sala=${s.id} i=${i} p=${[xb - 0.95, 0, z]} ry=${PI / 2} accion="servirse" />`)}
     <//>
     ${[-13.2, -8.0, -3.0, 2.0].map((x, i) => html`<${Planta} key=${'pl' + i} p=${[x, 0, -4.05]} s=${1.1} tipo=${i % 3} />`)}
@@ -327,6 +328,8 @@ export function SalaEstudio({ s }) {
     <${TirasLed} w=${w} d=${d} h=${h} c=${COL.cian} />
     <${Panel} p=${[2.8, 3.0, d / 2 - 0.06]} r=${[0, PI, 0]} w=${2.6} h=${0.8} tex=${texCartel('Sala de estudio', '#9bc4dc')} />
     ${items}
+    <${Punto} t="trabajo" sala=${s.id} rol="estudio" i=${0} p=${[6.0, 0, -0.7]} ry=${-PI / 2} accion="vigilar" />
+    <${Punto} t="trabajo" sala=${s.id} rol="estudio" i=${1} p=${[-0.75, 0, -0.7]} ry=${PI / 2} accion="vigilar" />
     ${[-2.0, 0.2].map((z, i) => html`<${Estanteria} key=${'e' + i} p=${[-w / 2 + 0.27, 0, z]} r=${[0, PI / 2, 0]} w=${2.0} h=${2.2} niveles=${5} tex=${texLomos(70 + i, 5)} c=${COL.maderaC} led=${COL.maderaC} />`)}
     <${Planta} p=${[w / 2 - 0.6, 0, -4.0]} s=${1.1} tipo=${1} /><${Planta} p=${[-0.8, 0, -4.0]} s=${1.0} tipo=${2} />
   <//>`;

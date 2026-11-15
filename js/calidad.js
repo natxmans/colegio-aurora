@@ -5,16 +5,16 @@
 // =========================================================
 export const NIVELES = {
   alta: {
-    t: 'Alta', desc: 'Modelos detallados, sombras, todas las animaciones y todos los alumnos.',
-    dpr: [1, 1.75], sombras: true, mapaSombra: 2048, alumnos: 44, reflejos: true, detalle: true, animLejos: 2,
+    t: 'Alta', desc: 'Modelos detallados, sombras y todas las animaciones. Los 64 alumnos.',
+    dpr: [1, 1.75], sombras: true, mapaSombra: 2048, alumnos: 64, reflejos: true, detalle: true, animLejos: 2, detalleLejos: 3600,
   },
   normal: {
-    t: 'Normal', desc: 'Detalles intermedios, sombras más sencillas y animaciones normales.',
-    dpr: [1, 1.25], sombras: true, mapaSombra: 1024, alumnos: 32, reflejos: true, detalle: true, animLejos: 3,
+    t: 'Normal', desc: 'Detalles intermedios, sombras más sencillas. Los 64 alumnos.',
+    dpr: [1, 1.25], sombras: true, mapaSombra: 1024, alumnos: 64, reflejos: true, detalle: true, animLejos: 3, detalleLejos: 2500,
   },
   ligera: {
-    t: 'Ligera', desc: 'Menos detalles y efectos, menos personajes y animaciones simplificadas.',
-    dpr: [1, 1], sombras: false, mapaSombra: 512, alumnos: 16, reflejos: false, detalle: false, animLejos: 5,
+    t: 'Ligera', desc: 'Menos detalles y efectos, sin sombras, animaciones simplificadas de lejos. Los 64 alumnos.',
+    dpr: [1, 1], sombras: false, mapaSombra: 512, alumnos: 64, reflejos: false, detalle: false, animLejos: 5, detalleLejos: 1600,
   },
 };
 

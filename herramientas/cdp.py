@@ -1,5 +1,5 @@
 # Pilote de Chrome sans interface (protocole DevTools) pour tester le site
-import json, os, subprocess, time, uuid, shutil, base64, urllib.request, sys
+import json, os, subprocess, time, uuid, shutil, base64, urllib.request, sys, tempfile
 import websocket
 
 CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
@@ -8,7 +8,9 @@ OUT = os.path.join(AQUI, 'capturas'); os.makedirs(OUT, exist_ok=True)
 
 class Navegador:
     def __init__(self, puerto=9333):
-        self.perfil = os.path.join(AQUI, 'chrome-pruebas', uuid.uuid4().hex[:8])
+        # Profil Chrome temporaire HORS de OneDrive : sinon OneDrive voit des centaines
+        # de fichiers supprimés à chaque test et affiche « Supprimer ces éléments ? »
+        self.perfil = os.path.join(tempfile.gettempdir(), 'colegio-chrome-pruebas', uuid.uuid4().hex[:8])
         self.p = subprocess.Popen([CHROME, '--headless=new', f'--user-data-dir={self.perfil}', '--no-first-run',
             '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--hide-scrollbars', f'--remote-debugging-port={puerto}',
             '--window-size=1440,900', 'about:blank'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

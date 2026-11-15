@@ -316,6 +316,7 @@ function Baloncesto() {
     <${Valla} x0=${cx - 15} x1=${cx + 15} z0=${cz - 9.5} z1=${cz + 9.5} h=${2.6} puerta=${[cx - 1.3, cx + 1.3]} />
     <${Banco} p=${[cx - 6, 0.06, cz + 8.4]} r=${[0, PI, 0]} w=${2.4} /><${Banco} p=${[cx + 6, 0.06, cz + 8.4]} r=${[0, PI, 0]} w=${2.4} />
     ${[[-6.5, 0], [-5.5, 1], [5.5, 2], [6.5, 3]].map(([dx, i]) => html`<${Punto} key=${'bb' + i} t="banco" sala="baloncesto" i=${i} p=${[cx + dx, 0.06, cz + 8.4]} ry=${PI} asiento=${0.45} ap=${[0, 0.75]} accion="mirar" />`)}
+    <${Punto} t="trabajo" sala="baloncesto" rol="entrenador" p=${[cx - 3, 0.06, cz + 7.7]} ry=${PI} accion="vigilar" />
   <//>`;
 }
 

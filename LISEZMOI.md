@@ -88,7 +88,7 @@ Sur les 11 diapositives avec un bâtiment, le modèle 3D se manipule directement
 | Le temps | panneau en bas à gauche : pause, Lento / Normal / Rápido / Muy rápido, Hora real |
 | Aller à une heure | « ¿Qué pasa? » → 07:45, 08:00, 10:00, 12:20, 14:00, 17:00, 21:00, Día, Noche, ou « Otra hora » (n'importe quelle heure) |
 | Jour suivant | « ¿Qué pasa? » → « Día siguiente » (07:30 du jour suivant, du lundi au vendredi) |
-| Voir ce que fait chaque classe | « ¿Qué pasa? » : les 4 classes, les absences, « Simular la ausencia de un profesor », « Seguir a un alumno » |
+| Voir ce que fait chaque classe | « ¿Qué pasa? » : les 6 classes, les absences, « Simular la ausencia de un profesor », « Seguir a un alumno » |
 
 Cliquer sur un élève ne fait rien (choix voulu : c'est une présentation). Les assistants des élèves
 sont dans la section « Asistentes IA ».
@@ -105,17 +105,27 @@ sont dans la section « Asistentes IA ».
 ## Comment marche la vie du collège
 
 - **Horaire officiel** (`js/sim/horario.js`) : 07:45 réveil, 08:00 cours, 10:00 récréation de 20 min,
-  12:20 repas, 14:00 cours, 17:00 fin des cours, 21:00 coucher. 4 classes (4ºA à 4ºD), 9 matières,
-  9 professeurs, du personnel (accueil, bibliothèque, cuisine, vie scolaire, permanence, maître-nageur, éducateur de nuit).
+  12:20 repas, 14:00 cours, 17:00 fin des cours, 21:00 coucher. 9 matières, 9 professeurs.
+- **Population** (depuis le 15/11) : **64 élèves internes = les 64 lits de la résidence** (32 chambres doubles).
+  6 classes mixtes de 10 ou 11 élèves (4ºA à 4ºF) dans des salles de 12 pupitres : à chaque heure, 6 classes
+  ont cours en même temps, 3 salles restent vides. Chambres : 2 élèves du même sexe, jamais plus
+  (filles : chambres 101 à 116 ; garçons : 1 à 14, 117 et 118). Cantine : 8 tables de 8 = 64 places, les élèves
+  d'une même classe mangent ensemble. Sports du soir avec places limitées (piscine 8 couloirs, foot 7 contre 7,
+  basket 5 contre 5, gymnase 20) : si c'est plein, l'élève choisit un autre sport ou attend dans les gradins.
+  Les 3 qualités graphiques simulent **les 64 élèves** (la qualité ne change que le dessin).
+  Adultes : 9 professeurs + 12 personnes (accueil, bibliothèque, 2 cuisiniers, monitrice de cantine,
+  vie scolaire, permanence, surveillante de l'étude du soir, maître-nageur, entraîneur de basket,
+  2 éducateurs de nuit, un par étage de la résidence).
+  Pour 100 à 120 élèves, il faudrait **18 à 28 chambres doubles de plus** : rien n'a été construit sans accord.
 - **Absences** : certains jours un professeur manque ; ses élèves vont à la **permanencia**.
 - **Déplacements** (`js/sim/navegacion.js`) : un plan de circulation est calculé à partir des vrais
   murs et meubles de la maquette. Les élèves passent par les portes, les couloirs et les escaliers :
-  ils ne traversent pas les murs. Toutes les places (766 chaises, lits, bureaux…) sont accessibles à pied.
+  ils ne traversent pas les murs. Toutes les places (789 : chaises, lits, bureaux, postes des adultes…) sont accessibles à pied (testé).
 - **Corps articulés** (`js/sim/cuerpo.js`) : bassin, colonne, cou, tête, épaules, coudes, poignets,
   hanches, genoux, chevilles. Animations : marcher, courir, s'asseoir, écrire, ordinateur, lire,
   manger, discuter, nager, se coucher, dormir, football, basket, exercices…
 - **Le temps** (`js/sim/reloj.js`) : quand beaucoup d'élèves marchent, l'horloge ralentit pour qu'on
-  les voie marcher (pas de téléportation). La nuit, quand tout le monde dort, elle accélère.
+  les voie marcher (pas de téléportation). Elle attend aussi un élève encore en chemin vers un cours qui commence. La nuit, quand tout le monde dort, elle accélère.
   Seul le bouton « Ir a… » replace directement tout le monde (c'est un saut dans le temps voulu).
 - **Jour/nuit** : soleil, ciel, lune, étoiles, fenêtres allumées quand il y a du monde,
   lumières des chambres éteintes peu à peu à partir de 21:00, lampadaires le soir.
@@ -125,7 +135,9 @@ sont dans la section « Asistentes IA ».
 `js/diagnostico.js` vérifie au chargement : navigateur, WebGL, textures, mémoire, processeur,
 connexion, écran. Résultat dans le menu : « Compatible », « Compatible con rendimiento reducido »
 ou « Algunas funciones no están disponibles ». Trois qualités (`js/calidad.js`) :
-Alta (44 élèves, ombres), Normal (32), Ligera (16, sans ombres). Si la 3D est trop lente,
+Alta (ombres fines), Normal (ombres simples), Ligera (sans ombres, animations simplifiées de loin) ;
+les 64 élèves sont simulés dans les trois. De loin, les toutes petites pièces (yeux, logo, mains) ne sont
+plus dessinées. Si la 3D est trop lente,
 la qualité baisse toute seule. Sans WebGL : image du campus + message, le reste du site marche.
 
 ## L'assistant IA de chaque élève
@@ -141,9 +153,17 @@ La clé d'API ne doit jamais être dans le site : voir `servidor-ia/LISEZMOI.md`
 - `js/main.js` : monte le campus 3D (chargé seulement quand on arrive à la section), les sections et l'assistant
 - `js/estado.js` : état de la visite ; `js/3d/camara.js` : cadrage automatique sur les bâtiments
 - `js/datos/salas.js` : tous les espaces (bâtiment principal, résidence, sport, extérieurs) et les vues
-- `js/datos/contenido.js` : textes des sections ; `js/datos/diapositivas.json` : texte des 12 diapositives
+- `js/datos/contenido.js` : textes des sections ; `js/datos/diapositivas.json` : texte des 17 diapositives
 - `js/3d/` : la maquette (`Edificio.js`, `Residencia.js`, `Salas.js`, `Aulas.js`, `Deportes.js`,
   `Exteriores.js`, `Personas.js`, `LucesNoche.js`, `Escena.js`, `puntos.js` = places utilisables)
 - `js/sim/` : la simulation (horloge, horaire, plan de circulation, corps, vie des personnages)
 - `js/ui/` : interface (campus, horloge, assistant, sections)
 - `servidor-ia/` : serveur sécurisé pour l'assistant IA (à héberger, avec la clé côté serveur)
+
+## Présentation orale et planning
+
+- `PLANNING_FINAL.md` : planning jusqu'au mardi 17/11 à 7 h, tâches, responsables, suivi, bilans.
+- `presentacion/oral/PRESENTACION_ORAL.md` : texte de l'oral diapositive par diapositive (espagnol + français),
+  répartition entre les deux personnes ; `PERSONA_1.md` et `PERSONA_2.md` : le texte de chacun.
+- Tests de la population : `herramientas/poblacion.py saltos|jornada [alta|normal|ligera]`,
+  `herramientas/fotos_poblacion.py`, `herramientas/fallos_camino.py`, `herramientas/prueba_paneles6.py`.

@@ -61,7 +61,7 @@ try:
     b.tam(1280, 800)
     b.ir(BASE + '?calidad=ligera&vista=completa', 25)
     r = json.loads(b.js("JSON.stringify({ n: window.__sim ? window.__sim.SIM.alumnos.length : -1, sombras: window.__r3f ? window.__r3f.gl.shadowMap.enabled : null })"))
-    ok('calidad ligera: 16 alumnos y sin sombras', r['n'] == 16 and r['sombras'] is False, str(r))
+    ok('calidad ligera: los 64 alumnos (simulados todos) y sin sombras', r['n'] == 64 and r['sombras'] is False, str(r))
     b.foto('p-ligera')
     ok('calidad ligera: sin errores', not b.errores, str(b.errores[:2]))
 finally:

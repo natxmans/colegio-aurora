@@ -19,7 +19,9 @@ import { NIVELES } from '../calidad.js';
 import { leer, poner, camara } from '../estado.js';
 import { texLogo } from './texturas.js';
 
-const MAXP = 72;
+const MAXP = 96;   // 64 alumnos + 9 profesores + 12 adultos del personal (con margen)
+// piezas diminutas que no se dibujan de lejos
+const PEQUENAS = PIEZAS.map((_, i) => [PZ.POLO, PZ.CUELLO, PZ.LOGO, PZ.OJO1, PZ.OJO2, 16, 17].includes(i));
 // Ropa: colores de cada parte del cuerpo
 const ROPA = {
   uniforme: { torso: '#14285a', brazo: '#14285a', antebrazo: '#14285a', polo: '#ffffff', cuello: '#1b2f66', cadera: '#1b2440', muslo: '#1b2440', espinilla: '#1b2440', pie: '#3a2418', logo: true },
@@ -125,9 +127,10 @@ export function Personas({ calidad = 'normal' }) {
       E.listo = true;
       window.__sim = { SIM, NAV, reloj, FALLOS, comprobarAccesos, dentroDeMuro };
     }
-    // 2) un paso de la simulación
+    // 2) un paso de la simulación (TODOS los alumnos, también los que no se ven)
     paso(dt);
-    // 3) dibujar
+    // 3) dibujar (solo los que están en pantalla)
+    const tD = performance.now();
     const t = SIM.tReal;
     tmp.pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     tmp.fr.setFromProjectionMatrix(tmp.pm);
@@ -147,6 +150,8 @@ export function Personas({ calidad = 'normal' }) {
       // nivel de detalle: las personas lejanas se animan menos a menudo
       const d2 = tmp.esf.center.distanceToSquared(tmp.cam);
       const cada = d2 > 9000 ? cfg.animLejos : d2 > 2500 ? 2 : 1;
+      // de lejos no se dibujan las piezas diminutas (ojos, logo, cuello del polo, manos): no se verían
+      const sinDetalle = d2 > cfg.detalleLejos;
       if ((E.cuadro + per.d.i * 7 + (per.d.k || 0)) % cada === 0 || per.k < 1) animar(per, t, dt * cada);
       if (per.colVer !== SIM.version || !per.cols) colores(per);
       const o = per.pose;
@@ -184,6 +189,7 @@ export function Personas({ calidad = 'normal' }) {
       // piezas
       for (let i = 0; i < PIEZAS.length; i++) {
         if (per.oculta[i]) continue;
+        if (sinDetalle && PEQUENAS[i]) continue;
         if (i === PZ.MANTA && !(per.estado === 'tumbado' || (per.trans && per.trans.tipo === 'acostarse' && per.trans.t > 0.7))) continue;
         const tipo = TIPO_PIEZA[i];
         let loc = LOCALES[i];
@@ -201,6 +207,10 @@ export function Personas({ calidad = 'normal' }) {
       m.count = cuentas[k];
       m.instanceMatrix.needsUpdate = true; m.instanceColor.needsUpdate = true;
     }
+    // medida del tiempo de dibujo (para las pruebas de rendimiento)
+    const st = SIM.stats, msD = performance.now() - tD;
+    st.dibujo = msD; st.sumaDibujo = (st.sumaDibujo || 0) + msD; st.piezas = 0;
+    for (const k in cuentas) st.piezas += cuentas[k];
     // anillo bajo la persona elegida
     if (anillo.current) {
       anillo.current.visible = !!selPer;
