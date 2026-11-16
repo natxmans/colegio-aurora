@@ -196,3 +196,33 @@ for P in ['P1', 'P2']:
     subprocess.run([r'C:\Program Files\Google\Chrome\Application\chrome.exe', '--headless=new', '--disable-gpu', '--no-pdf-header-footer',
                     f'--print-to-pdf={pdf}', 'file:///' + f.replace(os.sep, '/')], timeout=120, capture_output=True)
     print(pdf, os.path.exists(pdf) and os.path.getsize(pdf))
+
+# ---------- fiche d'une page : la répartition de la parole (à imprimer) ----------
+def debut(t, n=7):
+    m = t.split(); return ' '.join(m[:n]) + (' …' if len(m) > n else '')
+F = ['<!doctype html><meta charset="utf-8"><title>Répartition de la parole</title><style>',
+     '@page{size:A4 landscape;margin:9mm}body{font-family:Arial,Helvetica,sans-serif;color:#14285a;margin:0}',
+     'h1{font-size:15pt;margin:0 0 1mm}p.n{font-size:9pt;color:#555;margin:0 0 2mm}',
+     'table{border-collapse:collapse;width:100%;font-size:8.6pt}th,td{border:1px solid #c9a978;padding:1.1mm 1.6mm;vertical-align:top}',
+     'th{background:#14285a;color:#fff;text-align:left}.p1{background:#e8eef9}.p2{background:#f6efe2}.j{background:#e9f3ea}',
+     '.q{font-weight:bold;white-space:nowrap}.c{background:#14285a;color:#fff;border-radius:3px;padding:0 1.2mm;font-size:8pt;white-space:nowrap}</style>',
+     '<h1>Colegio Pablo Picasso — répartition de la parole</h1>',
+     f'<p class="n">On alterne à chaque diapositive. Personne 1 : diapos 2, 4, 6, 8, 10, 12, 14, 16 ({cuenta["P1"]} mots, ~{seg["P1"]} s seul). '
+     f'Personne 2 : diapos 3, 5, 7, 9, 11, 13, 15, 17 ({cuenta["P2"]} mots, ~{seg["P2"]} s seul). Ensemble : intro et fin. '
+     f'Durée ≈ {total_s // 60} min {total_s % 60:02d}. Personne 1 fait les <span class="c">▶ CLIC</span>. '
+     'Personne 1 = ____________________ · Personne 2 = ____________________</p>',
+     '<table><tr><th>Diapo</th><th>Titre</th><th>Qui parle</th><th>Premiers mots</th><th>Transition (fin de la diapo)</th><th>Durée</th></tr>']
+for n, t, v, partes, tr, s in D:
+    q = orador(partes); cls = 'j' if q == 'Les deux' else ('p1' if q == 'Personne 1' else 'p2')
+    if tr: fin = f'<b>{NOM[tr[0]]}</b> : « {H.escape(tr[1])} » <span class="c">▶ CLIC</span>'
+    elif n < 17: fin = '<span class="c">▶ CLIC</span> après « ' + H.escape(debut(partes[-1][1], 6)) + ' »'
+    else: fin = 'Ensemble : « ¡Bienvenidos…! » · P1 : « ¿Tenéis alguna pregunta? » · Ensemble : « ¡Muchas gracias! »'
+    seq = [NOM[p[0]].replace('Personne ', 'P').replace('Les deux ensemble', 'Ensemble') for p in partes]
+    qui = ' → '.join(x for k, x in enumerate(seq) if k == 0 or x != seq[k - 1])
+    F.append(f'<tr class="{cls}"><td class="q">{n}</td><td>{H.escape(t)}</td><td class="q">{qui}</td><td>« {H.escape(debut(partes[0][1]))} »</td><td>{fin}</td><td>~{s} s</td></tr>')
+F.append('</table>')
+f = os.path.join(OUT, 'REPARTITION_PAROLE.html'); open(f, 'w', encoding='utf-8').write('\n'.join(F))
+pdf = os.path.join(OUT, 'REPARTITION_PAROLE_imprimir.pdf')
+subprocess.run([r'C:\Program Files\Google\Chrome\Application\chrome.exe', '--headless=new', '--disable-gpu', '--no-pdf-header-footer',
+                f'--print-to-pdf={pdf}', 'file:///' + f.replace(os.sep, '/')], timeout=120, capture_output=True)
+print(pdf, os.path.exists(pdf) and os.path.getsize(pdf))
